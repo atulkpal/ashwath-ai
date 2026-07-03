@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ashwath.AI | Primary Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;450;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #131313;
+            color: #e2e2e2;
+            overflow: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c0c0c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b494b;
+        }
+        /* Pulse Animation */
+        .status-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#554500",
+                        "tertiary-fixed-dim": "#eac324",
+                        "on-secondary": "#313030",
+                        "background": "#131313",
+                        "surface-tint": "#00dbe9",
+                        "surface-bright": "#393939",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "status-success": "#10b981",
+                        "error-container": "#93000a",
+                        "on-surface": "#e2e2e2",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary": "#fff5de",
+                        "surface-dim": "#131313",
+                        "outline": "#849495",
+                        "on-surface-variant": "#b9cacb",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-container": "#006970",
+                        "surface-variant": "#353535",
+                        "primary-fixed-dim": "#00dbe9",
+                        "surface-tertiary": "#1a1a1a",
+                        "text-secondary": "#a1a1a1",
+                        "surface-container-high": "#2a2a2a",
+                        "inverse-on-surface": "#303030",
+                        "inverse-primary": "#006970",
+                        "surface-container-low": "#1b1b1b",
+                        "primary-fixed": "#7df4ff",
+                        "tertiary-container": "#fed639",
+                        "on-tertiary-container": "#715d00",
+                        "on-tertiary": "#3b2f00",
+                        "primary": "#dbfcff",
+                        "error": "#ffb4ab",
+                        "text-primary": "#ffffff",
+                        "surface-secondary": "#0c0c0c",
+                        "outline-variant": "#3b494b",
+                        "secondary-fixed": "#e5e2e1",
+                        "on-primary-fixed": "#002022",
+                        "on-tertiary-fixed": "#231b00",
+                        "accent-primary": "#00f0ff",
+                        "surface-container-highest": "#353535",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "status-error": "#ff4b4b",
+                        "primary-container": "#00f0ff",
+                        "on-primary-fixed-variant": "#004f54",
+                        "surface": "#131313",
+                        "secondary": "#c8c6c5",
+                        "on-primary": "#00363a",
+                        "on-secondary-fixed-variant": "#474746",
+                        "surface-container": "#1f1f1f",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e2e2e2",
+                        "secondary-container": "#474746",
+                        "on-background": "#e2e2e2",
+                        "surface-primary": "#000000",
+                        "tertiary-fixed": "#ffe179",
+                        "border-base": "#27272a",
+                        "on-secondary-container": "#b7b5b4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "gutter": "24px",
+                        "xl": "48px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "code-sm": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "code-md": ["JetBrains Mono"],
+                        "label-caps": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "code-sm": ["12px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "headline-lg": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-xl": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "code-md": ["14px", {"lineHeight": "1.7", "letterSpacing": "0em", "fontWeight": "450"}],
+                        "label-caps": ["11px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="h-screen flex font-body-md text-body-md overflow-hidden">
+<!-- Left SideNavBar -->
+<aside class="h-screen w-64 flex-shrink-0 bg-surface-secondary dark:bg-surface-secondary flex flex-col justify-between py-md border-r border-base">
+<div>
+<!-- Header Section -->
+<div class="px-md mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 bg-accent-primary flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-surface-primary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div>
+<h1 class="font-label-caps text-label-caps tracking-widest text-accent-primary">Ashwath.AI</h1>
+<p class="text-[10px] text-text-secondary font-code-sm">v1.0.4-stable</p>
+</div>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="space-y-base px-sm">
+<a class="flex items-center gap-md px-md py-sm text-text-primary bg-surface-tertiary border-r-2 border-accent-primary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-body-md">Chat</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-body-md">Explore</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-body-md">Library</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+<span class="font-body-md">Knowledge</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-body-md">Models</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+</nav>
+</div>
+<!-- Footer -->
+<div class="px-md">
+<div class="flex items-center gap-sm text-text-secondary font-label-caps text-[10px]">
+<span class="material-symbols-outlined text-[14px]" data-icon="memory">memory</span>
+<span>Status: Local</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas (Center Pane) -->
+<main class="flex-1 flex flex-col bg-surface-primary relative">
+<!-- TopAppBar / Telemetry -->
+<header class="w-full h-16 bg-surface-primary flex items-center justify-between px-gutter border-b border-base z-10">
+<div class="flex items-center gap-xl">
+<h2 class="font-headline-lg text-headline-lg font-bold text-text-primary">Workspace</h2>
+<!-- Telemetry Bar -->
+<div class="hidden md:flex items-center gap-lg font-code-sm text-text-secondary border-l border-base pl-lg">
+<div class="flex items-center gap-xs">
+<span class="text-accent-primary">Tokens/sec:</span>
+<span class="text-text-primary">124.5</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="text-accent-primary">Context:</span>
+<span class="text-text-primary">8k/32k</span>
+</div>
+<div class="flex items-center gap-sm">
+<div class="w-2 h-2 bg-status-success rounded-full status-pulse"></div>
+<span class="text-text-primary">Llama 3 8B</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-base text-text-secondary hover:text-accent-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+</button>
+<button class="p-base text-text-secondary hover:text-accent-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span>
+</button>
+<button class="p-base text-text-secondary hover:text-accent-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="sensors">sensors</span>
+</button>
+</div>
+</header>
+<!-- Chat Feed -->
+<section class="flex-1 overflow-y-auto px-gutter py-xl flex flex-col gap-xl">
+<!-- User Message -->
+<div class="max-w-3xl ml-auto w-full flex flex-col items-end">
+<div class="bg-surface-tertiary border border-base px-md py-sm rounded-lg text-text-primary">
+<p>Explain how the Transformer architecture handles long-range dependencies in text sequences.</p>
+</div>
+<span class="font-code-sm text-[10px] text-text-secondary mt-xs">14:02:11</span>
+</div>
+<!-- AI Response -->
+<div class="max-w-4xl w-full flex gap-md">
+<div class="w-8 h-8 rounded bg-accent-primary/10 flex items-center justify-center flex-shrink-0 border border-accent-primary/20">
+<span class="material-symbols-outlined text-accent-primary text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div class="flex-1 space-y-md">
+<div class="prose prose-invert max-w-none text-text-primary">
+<p>The Transformer architecture handles long-range dependencies primarily through its <strong>Self-Attention Mechanism</strong>. Unlike RNNs that process sequences token-by-token linearly, Transformers process all tokens simultaneously, allowing every token to "attend" to every other token regardless of distance.</p>
+</div>
+<!-- Syntax Highlighted Code Block -->
+<div class="bg-surface-secondary border border-base rounded overflow-hidden">
+<div class="flex items-center justify-between px-md py-xs bg-surface-tertiary border-b border-base">
+<span class="font-code-sm text-[10px] text-text-secondary uppercase tracking-widest">attention.py</span>
+<button class="text-text-secondary hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined text-[14px]" data-icon="content_copy">content_copy</span>
+</button>
+</div>
+<pre class="p-md font-code-md text-code-md overflow-x-auto text-accent-primary/90"><code>def scaled_dot_product_attention(Q, K, V, mask=None):
+    matmul_qk = torch.matmul(Q, K.transpose(-2, -1))
+    dk = Q.size(-1)
+    scaled_attention_logits = matmul_qk / math.sqrt(dk)
+    
+    if mask is not None:
+        scaled_attention_logits += (mask * -1e9)
+        
+    attention_weights = F.softmax(scaled_attention_logits, dim=-1)
+    output = torch.matmul(attention_weights, V)
+    return output, attention_weights</code></pre>
+</div>
+<div class="prose prose-invert max-w-none text-text-primary">
+<p>Key mechanisms include:</p>
+<ul class="list-disc pl-md space-y-xs text-text-secondary">
+<li><span class="text-text-primary">Positional Encoding:</span> Injects spatial information since attention is permutation-invariant.</li>
+<li><span class="text-text-primary">Multi-Head Attention:</span> Allows the model to jointly attend to information from different representation subspaces.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- Wide Input Area -->
+<footer class="p-gutter bg-gradient-to-t from-surface-primary via-surface-primary to-transparent">
+<div class="max-w-4xl mx-auto bg-surface-secondary border border-base rounded-xl focus-within:ring-1 focus-within:ring-accent-primary transition-all duration-200">
+<textarea class="w-full bg-transparent border-none focus:ring-0 p-md font-code-md text-text-primary resize-none placeholder:text-text-secondary" placeholder="Type your prompt here..." rows="2"></textarea>
+<div class="flex items-center justify-between px-md pb-md">
+<div class="flex items-center gap-sm">
+<button class="p-xs text-accent-primary hover:bg-accent-primary/10 rounded transition-colors" title="Tools">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+</button>
+<button class="p-xs text-text-secondary hover:text-text-primary hover:bg-surface-tertiary rounded transition-colors" title="Attach">
+<span class="material-symbols-outlined" data-icon="attach_file">attach_file</span>
+</button>
+<button class="p-xs text-text-secondary hover:text-text-primary hover:bg-surface-tertiary rounded transition-colors" title="Voice">
+<span class="material-symbols-outlined" data-icon="mic">mic</span>
+</button>
+<button class="p-xs text-text-secondary hover:text-text-primary hover:bg-surface-tertiary rounded transition-colors" title="Vision">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+<button class="bg-accent-primary text-surface-primary font-label-caps px-md py-sm rounded hover:bg-white transition-colors flex items-center gap-sm">
+<span>Execute</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="send">send</span>
+</button>
+</div>
+</div>
+<p class="text-center mt-sm font-code-sm text-[10px] text-text-secondary uppercase tracking-widest opacity-50">Secure Local Compute Protocol Active</p>
+</footer>
+</main>
+<!-- Right NavigationDrawer (Model Parameters) -->
+<aside class="h-screen w-80 flex-shrink-0 bg-surface-secondary dark:bg-surface-secondary flex flex-col border-l border-base">
+<!-- Drawer Header -->
+<div class="px-md py-md border-b border-base">
+<div class="flex items-center justify-between mb-base">
+<h3 class="font-label-caps text-label-caps text-text-secondary">Context</h3>
+<span class="material-symbols-outlined text-text-secondary text-sm" data-icon="tune">tune</span>
+</div>
+<p class="font-headline-lg text-headline-lg font-bold text-accent-primary">Parameters</p>
+</div>
+<div class="flex-1 overflow-y-auto p-md space-y-xl">
+<!-- Parameter: Temperature -->
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-caps text-label-caps text-text-primary">Temperature</label>
+<span class="font-code-sm text-accent-primary">0.72</span>
+</div>
+<input class="w-full h-1 bg-surface-tertiary rounded-lg appearance-none cursor-pointer accent-accent-primary" max="2" min="0" step="0.01" type="range" value="0.72"/>
+<p class="text-[10px] text-text-secondary italic">Controls randomness: Lower is more deterministic, higher is more creative.</p>
+</div>
+<!-- Parameter: Top-P -->
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-caps text-label-caps text-text-primary">Top-P</label>
+<span class="font-code-sm text-accent-primary">0.90</span>
+</div>
+<input class="w-full h-1 bg-surface-tertiary rounded-lg appearance-none cursor-pointer accent-accent-primary" max="1" min="0" step="0.05" type="range" value="0.9"/>
+<p class="text-[10px] text-text-secondary italic">Nucleus sampling: Only consider the top tokens whose sum probability is P.</p>
+</div>
+<!-- Parameter: Max Tokens -->
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-caps text-label-caps text-text-primary">Max Tokens</label>
+<span class="font-code-sm text-accent-primary">2048</span>
+</div>
+<input class="w-full h-1 bg-surface-tertiary rounded-lg appearance-none cursor-pointer accent-accent-primary" max="8192" min="256" step="128" type="range" value="2048"/>
+</div>
+<!-- System Prompt -->
+<div class="space-y-sm">
+<label class="font-label-caps text-label-caps text-text-primary flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="terminal">terminal</span>
+                    System Prompt
+                </label>
+<textarea class="w-full bg-surface-tertiary border border-base p-sm font-code-sm text-code-sm text-text-secondary rounded h-32 focus:border-accent-primary transition-colors outline-none" placeholder="Define the model's persona...">You are Ashwath.AI, a high-performance research assistant specializing in deep technical analysis. Maintain a concise, technical, and objective tone.</textarea>
+</div>
+</div>
+<!-- Telemetry & Logs Tabs -->
+<div class="border-t border-base">
+<div class="grid grid-cols-2">
+<button class="flex items-center justify-center gap-sm py-md text-accent-primary bg-surface-tertiary transition-all duration-300">
+<span class="material-symbols-outlined text-sm" data-icon="analytics">analytics</span>
+<span class="font-label-caps text-[10px]">Telemetry</span>
+</button>
+<button class="flex items-center justify-center gap-sm py-md text-text-secondary hover:bg-surface-container-high transition-all duration-300">
+<span class="material-symbols-outlined text-sm" data-icon="description">description</span>
+<span class="font-label-caps text-[10px]">Logs</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Custom Micro-interactions -->
+<script>
+        document.querySelectorAll('input[type="range"]').forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const valueSpan = e.target.parentElement.querySelector('.font-code-sm');
+                if (valueSpan) {
+                    valueSpan.textContent = e.target.value;
+                }
+            });
+        });
+
+        // Simple scroll to bottom on load
+        const chatFeed = document.querySelector('section');
+        chatFeed.scrollTop = chatFeed.scrollHeight;
+
+        // Visual feedback for interactions
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => btn.classList.add('scale-95'));
+            btn.addEventListener('mouseup', () => btn.classList.remove('scale-95'));
+            btn.addEventListener('mouseleave', () => btn.classList.remove('scale-95'));
+        });
+    </script>
+</body></html>

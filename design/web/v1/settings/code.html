@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ashwath.AI | Deep System Configuration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-glow {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c0c0c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+        @keyframes pulse-cyan {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .status-pulse {
+            animation: pulse-cyan 2s infinite ease-in-out;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#554500",
+                        "tertiary-fixed-dim": "#eac324",
+                        "on-secondary": "#313030",
+                        "background": "#131313",
+                        "surface-tint": "#00dbe9",
+                        "surface-bright": "#393939",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "status-success": "#10b981",
+                        "error-container": "#93000a",
+                        "on-surface": "#e2e2e2",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary": "#fff5de",
+                        "surface-dim": "#131313",
+                        "outline": "#849495",
+                        "on-surface-variant": "#b9cacb",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-container": "#006970",
+                        "surface-variant": "#353535",
+                        "primary-fixed-dim": "#00dbe9",
+                        "surface-tertiary": "#1a1a1a",
+                        "text-secondary": "#a1a1a1",
+                        "surface-container-high": "#2a2a2a",
+                        "inverse-on-surface": "#303030",
+                        "inverse-primary": "#006970",
+                        "surface-container-low": "#1b1b1b",
+                        "primary-fixed": "#7df4ff",
+                        "tertiary-container": "#fed639",
+                        "on-tertiary-container": "#715d00",
+                        "on-tertiary": "#3b2f00",
+                        "primary": "#dbfcff",
+                        "error": "#ffb4ab",
+                        "text-primary": "#ffffff",
+                        "surface-secondary": "#0c0c0c",
+                        "outline-variant": "#3b494b",
+                        "secondary-fixed": "#e5e2e1",
+                        "on-primary-fixed": "#002022",
+                        "on-tertiary-fixed": "#231b00",
+                        "accent-primary": "#00f0ff",
+                        "surface-container-highest": "#353535",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "status-error": "#ff4b4b",
+                        "primary-container": "#00f0ff",
+                        "on-primary-fixed-variant": "#004f54",
+                        "surface": "#131313",
+                        "secondary": "#c8c6c5",
+                        "on-primary": "#00363a",
+                        "on-secondary-fixed-variant": "#474746",
+                        "surface-container": "#1f1f1f",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e2e2e2",
+                        "secondary-container": "#474746",
+                        "on-background": "#e2e2e2",
+                        "surface-primary": "#000000",
+                        "tertiary-fixed": "#ffe179",
+                        "border-base": "#27272a",
+                        "on-secondary-container": "#b7b5b4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "gutter": "24px",
+                        "xl": "48px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "code-sm": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "code-md": ["JetBrains Mono"],
+                        "label-caps": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "code-sm": ["12px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "headline-lg": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-xl": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "code-md": ["14px", {"lineHeight": "1.7", "letterSpacing": "0em", "fontWeight": "450"}],
+                        "label-caps": ["11px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface-primary text-text-primary font-body-md selection:bg-accent-primary selection:text-surface-primary overflow-hidden h-screen flex">
+<!-- Left Side Navigation (SideNavBar) -->
+<aside class="h-screen w-64 flex-shrink-0 bg-surface-secondary border-r border-base flex flex-col justify-between py-md">
+<div>
+<!-- Brand Header -->
+<div class="px-md mb-xl flex items-center gap-sm">
+<div class="w-8 h-8 bg-accent-primary flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined text-surface-primary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps tracking-widest text-accent-primary">Ashwath.AI</span>
+<span class="font-label-caps text-[9px] text-text-secondary">v1.0.4-stable</span>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex flex-col">
+<a class="flex items-center gap-md px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-caps text-label-caps">Chat</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-caps text-label-caps">Explore</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="font-label-caps text-label-caps">Library</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-label-caps text-label-caps">Knowledge</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-label-caps text-label-caps">Models</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-text-primary bg-surface-tertiary border-r-2 border-accent-primary active-glow transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+</div>
+<!-- Footer -->
+<div class="px-md">
+<div class="flex items-center gap-sm py-sm text-text-secondary">
+<span class="material-symbols-outlined text-[14px]">memory</span>
+<span class="font-label-caps text-[10px]">Status: Local</span>
+<div class="w-1.5 h-1.5 bg-status-success rounded-full ml-auto status-pulse"></div>
+</div>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 flex flex-col min-w-0 bg-surface-primary">
+<!-- Top App Bar -->
+<header class="w-full h-16 bg-surface-primary border-b border-base flex items-center justify-between px-gutter">
+<div class="flex items-center gap-md">
+<h1 class="font-headline-lg text-headline-lg font-bold text-text-primary">System Configuration</h1>
+</div>
+<div class="flex items-center gap-lg">
+<div class="relative flex items-center h-10 w-64 bg-surface-secondary border border-base rounded-sm px-sm focus-within:border-accent-primary">
+<span class="material-symbols-outlined text-text-secondary text-[20px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-code-md font-code-md text-text-primary w-full placeholder:text-text-secondary" placeholder="Search parameters..." type="text"/>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-text-secondary hover:text-accent-primary transition-all duration-200">
+<span class="material-symbols-outlined">monitoring</span>
+</button>
+<button class="text-text-secondary hover:text-accent-primary transition-all duration-200">
+<span class="material-symbols-outlined">settings_input_component</span>
+</button>
+<button class="text-text-secondary hover:text-accent-primary transition-all duration-200">
+<span class="material-symbols-outlined">sensors</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="flex-1 overflow-hidden flex">
+<!-- Secondary Navigation (Tabs) -->
+<nav class="w-48 flex-shrink-0 border-r border-base flex flex-col py-md bg-surface-secondary/50">
+<div class="px-md mb-sm">
+<span class="font-label-caps text-label-caps text-text-secondary opacity-50">CATEGORIES</span>
+</div>
+<button class="flex items-center gap-sm px-md py-sm text-accent-primary border-r-2 border-accent-primary bg-surface-tertiary font-label-caps text-label-caps">AI Engine</button>
+<button class="flex items-center gap-sm px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors font-label-caps text-label-caps">Storage</button>
+<button class="flex items-center gap-sm px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors font-label-caps text-label-caps">Privacy</button>
+<button class="flex items-center gap-sm px-md py-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors font-label-caps text-label-caps">Developer</button>
+</nav>
+<!-- Settings Canvas -->
+<div class="flex-1 overflow-y-auto p-gutter space-y-xl">
+<!-- AI Section -->
+<section class="max-w-4xl space-y-lg" id="ai-section">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-accent-primary">neurology</span>
+<h2 class="font-headline-lg text-headline-lg text-text-primary">AI Inference</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Quantization Defaults -->
+<div class="bg-surface-secondary border border-base p-md rounded-sm space-y-md">
+<label class="font-label-caps text-label-caps text-text-secondary block">Quantization Defaults</label>
+<select class="w-full bg-surface-tertiary border border-base text-code-md font-code-md p-sm text-text-primary focus:border-accent-primary focus:ring-0 appearance-none rounded-sm">
+<option>Q4_K_M (Recommended)</option>
+<option>Q8_0 (High Precision)</option>
+<option>Q5_K_S (Balanced)</option>
+<option>FP16 (Lossless)</option>
+</select>
+<p class="text-[12px] text-text-secondary leading-tight">Lower quantization reduces RAM usage but may slightly impact reasoning accuracy.</p>
+</div>
+<!-- Thread Allocation -->
+<div class="bg-surface-secondary border border-base p-md rounded-sm space-y-md">
+<div class="flex justify-between items-center">
+<label class="font-label-caps text-label-caps text-text-secondary block">Thread Allocation</label>
+<span class="font-code-sm text-code-sm text-accent-primary">12 Cores</span>
+</div>
+<input class="w-full h-1 bg-surface-tertiary accent-accent-primary appearance-none cursor-pointer" max="16" min="1" type="range" value="12"/>
+<div class="flex justify-between text-[10px] font-code-sm text-text-secondary">
+<span>1</span>
+<span>8</span>
+<span>16</span>
+</div>
+</div>
+<!-- NPU Acceleration -->
+<div class="bg-surface-secondary border border-base p-md rounded-sm flex items-center justify-between col-span-full">
+<div class="space-y-1">
+<label class="font-label-caps text-label-caps text-text-primary block">NPU Acceleration</label>
+<p class="text-[12px] text-text-secondary">Leverage local neural processing units for 40% faster latency.</p>
+</div>
+<button class="w-12 h-6 bg-accent-primary rounded-full relative flex items-center px-1 transition-colors duration-300">
+<div class="w-4 h-4 bg-surface-primary rounded-full absolute right-1"></div>
+</button>
+</div>
+</div>
+</section>
+<!-- Privacy Section -->
+<section class="max-w-4xl space-y-lg border-t border-base pt-xl" id="privacy-section">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-accent-primary">security</span>
+<h2 class="font-headline-lg text-headline-lg text-text-primary">Privacy &amp; Security</h2>
+</div>
+<div class="space-y-md">
+<!-- Pure Offline Mode -->
+<div class="bg-surface-tertiary border border-accent-primary/30 p-md rounded-sm flex items-center justify-between active-glow">
+<div class="flex gap-md items-center">
+<div class="w-10 h-10 rounded-sm bg-accent-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-accent-primary">wifi_off</span>
+</div>
+<div>
+<h3 class="font-body-md text-body-md text-text-primary font-bold">Pure Offline Mode</h3>
+<p class="text-[12px] text-text-secondary">System is locked to local resources. No external pings allowed.</p>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-caps text-[10px] text-accent-primary">ENFORCED</span>
+<button class="w-12 h-6 bg-accent-primary rounded-full relative flex items-center px-1">
+<div class="w-4 h-4 bg-surface-primary rounded-full absolute right-1"></div>
+</button>
+</div>
+</div>
+<!-- Zero Telemetry Status -->
+<div class="grid grid-cols-3 gap-md">
+<div class="bg-surface-secondary border border-base p-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-status-success text-sm">check_circle</span>
+<span class="font-code-sm text-code-sm text-text-secondary">Zero Telemetry</span>
+</div>
+<div class="bg-surface-secondary border border-base p-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-status-success text-sm">check_circle</span>
+<span class="font-code-sm text-code-sm text-text-secondary">No Log Storage</span>
+</div>
+<div class="bg-surface-secondary border border-base p-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-status-success text-sm">check_circle</span>
+<span class="font-code-sm text-code-sm text-text-secondary">Encrypted Cache</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Developer Section -->
+<section class="max-w-4xl space-y-lg border-t border-base pt-xl pb-xl" id="developer-section">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-accent-primary">terminal</span>
+<h2 class="font-headline-lg text-headline-lg text-text-primary">Developer Console</h2>
+</div>
+<div class="flex gap-sm">
+<span class="font-code-sm text-code-sm text-text-secondary">Go-Engine: <span class="text-status-success">CONNECTED</span></span>
+</div>
+</div>
+<div class="space-y-md">
+<!-- Go Engine Settings -->
+<div class="bg-surface-secondary border border-base p-md rounded-sm grid grid-cols-2 gap-md">
+<div class="space-y-sm">
+<label class="font-label-caps text-[10px] text-text-secondary">RPC Endpoint</label>
+<input class="w-full bg-surface-tertiary border border-base text-code-sm font-code-sm p-sm text-accent-primary focus:border-accent-primary focus:ring-0 rounded-sm" type="text" value="ws://localhost:8080/engine"/>
+</div>
+<div class="space-y-sm">
+<label class="font-label-caps text-[10px] text-text-secondary">Debug Verbosity</label>
+<select class="w-full bg-surface-tertiary border border-base text-code-sm font-code-sm p-sm text-text-primary focus:border-accent-primary focus:ring-0 rounded-sm">
+<option>Level 3: Trace</option>
+<option>Level 2: Debug</option>
+<option>Level 1: Warn</option>
+</select>
+</div>
+</div>
+<!-- Real-time log stream -->
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-caps text-label-caps text-text-secondary">Live System Logs</label>
+<button class="text-text-secondary hover:text-text-primary text-[10px] font-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">delete</span> CLEAR
+                                </button>
+</div>
+<div class="h-64 bg-black border border-base rounded-sm p-md font-code-sm text-code-sm overflow-y-auto space-y-1" id="log-stream">
+<div class="text-text-secondary opacity-40">[09:24:01] <span class="text-status-success">BOOT</span> Kernel initialization sequence complete...</div>
+<div class="text-text-secondary opacity-40">[09:24:02] <span class="text-accent-primary">LOAD</span> Model 'ashwath-llama-3-70b' metadata fetched (1.2s)</div>
+<div class="text-text-secondary opacity-40">[09:24:05] <span class="text-status-success">READY</span> Inference engine heartbeat detected.</div>
+<div class="text-text-secondary opacity-80">[10:11:42] <span class="text-tertiary-fixed-dim">WARN</span> NPU thermal threshold at 65°C</div>
+<div class="text-text-secondary">[10:12:05] <span class="text-accent-primary">INFO</span> Connection establishing to local Go-Engine...</div>
+<div class="text-text-secondary">[10:12:05] <span class="text-status-success">SUCC</span> Handshake established via WS on 8080</div>
+<div class="text-text-primary border-l border-accent-primary pl-2 animate-pulse">[10:14:33] STREAM: Query incoming... token_id: 4812</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Context/Telemetry Drawer -->
+<aside class="h-screen w-80 flex-shrink-0 bg-surface-secondary border-l border-base flex flex-col">
+<div class="p-md border-b border-base">
+<h3 class="font-label-caps text-label-caps text-text-secondary">Context</h3>
+<p class="font-code-sm text-[10px] text-text-secondary opacity-60 uppercase tracking-widest mt-1">Parameters</p>
+</div>
+<div class="flex-1 overflow-y-auto">
+<!-- Tab Items -->
+<div class="flex flex-col">
+<div class="p-md border-b border-base bg-surface-tertiary flex items-center gap-md">
+<span class="material-symbols-outlined text-accent-primary">tune</span>
+<div>
+<p class="font-label-caps text-label-caps text-accent-primary">Model Parameters</p>
+<p class="font-code-sm text-[10px] text-text-secondary">Active: llama-3-70b</p>
+</div>
+</div>
+<div class="p-md border-b border-base hover:bg-surface-tertiary transition-colors cursor-pointer flex items-center gap-md">
+<span class="material-symbols-outlined text-text-secondary">description</span>
+<div>
+<p class="font-label-caps text-label-caps text-text-secondary">File Metadata</p>
+<p class="font-code-sm text-[10px] text-text-secondary">4 documents cached</p>
+</div>
+</div>
+<div class="p-md border-b border-base hover:bg-surface-tertiary transition-colors cursor-pointer flex items-center gap-md">
+<span class="material-symbols-outlined text-text-secondary">analytics</span>
+<div>
+<p class="font-label-caps text-label-caps text-text-secondary">Telemetry</p>
+<p class="font-code-sm text-[10px] text-text-secondary">1.2ms inference latency</p>
+</div>
+</div>
+<div class="p-md border-b border-base hover:bg-surface-tertiary transition-colors cursor-pointer flex items-center gap-md">
+<span class="material-symbols-outlined text-text-secondary">terminal</span>
+<div>
+<p class="font-label-caps text-label-caps text-text-secondary">Logs</p>
+<p class="font-code-sm text-[10px] text-text-secondary">System is stable</p>
+</div>
+</div>
+</div>
+<!-- Usage Stats -->
+<div class="p-md space-y-md mt-md">
+<div class="space-y-sm">
+<div class="flex justify-between font-code-sm text-[10px] text-text-secondary">
+<span>VRAM USAGE</span>
+<span class="text-text-primary">12.4 GB / 24 GB</span>
+</div>
+<div class="w-full h-1 bg-surface-tertiary rounded-full overflow-hidden">
+<div class="h-full bg-accent-primary w-[51%]"></div>
+</div>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between font-code-sm text-[10px] text-text-secondary">
+<span>CACHE SIZE</span>
+<span class="text-text-primary">2.1 GB</span>
+</div>
+<div class="w-full h-1 bg-surface-tertiary rounded-full overflow-hidden">
+<div class="h-full bg-surface-variant w-[15%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- FAB -->
+<div class="p-md">
+<button class="w-full bg-accent-primary text-surface-primary py-sm rounded-sm font-label-caps text-label-caps font-bold hover:brightness-110 transition-all flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">save</span> COMMIT CHANGES
+                    </button>
+</div>
+</aside>
+</div>
+</main>
+<script>
+        // Micro-interaction for logs
+        const logStream = document.getElementById('log-stream');
+        const logLines = [
+            "[10:14:35] PROCESSING: Semantic extraction in progress...",
+            "[10:14:38] OPTIMIZE: Memory compaction triggered.",
+            "[10:14:40] ENGINE: Connection stable, latency 0.4ms.",
+            "[10:14:45] SYNC: Knowledge graph updated."
+        ];
+        
+        let logIndex = 0;
+        setInterval(() => {
+            const line = document.createElement('div');
+            line.className = "text-text-secondary opacity-60";
+            line.innerHTML = `<span class="opacity-30">${new Date().toLocaleTimeString()}</span> <span class="text-accent-primary">INFO</span> ${logLines[logIndex % logLines.length]}`;
+            logStream.appendChild(line);
+            logStream.scrollTop = logStream.scrollHeight;
+            logIndex++;
+        }, 4000);
+
+        // Sidebar Active Toggle Logic
+        const navLinks = document.querySelectorAll('aside nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                navLinks.forEach(l => {
+                    l.classList.remove('text-text-primary', 'bg-surface-tertiary', 'border-r-2', 'border-accent-primary', 'active-glow');
+                    l.classList.add('text-text-secondary');
+                });
+                link.classList.add('text-text-primary', 'bg-surface-tertiary', 'border-r-2', 'border-accent-primary', 'active-glow');
+                link.classList.remove('text-text-secondary');
+            });
+        });
+    </script>
+</body></html>

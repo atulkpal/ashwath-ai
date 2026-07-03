@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;450;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pulse-accent {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c0c0c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+    </style>
+<title>Ashwath.AI | Model Discovery</title>
+</head>
+<body class="bg-background text-text-primary font-body-md text-body-md overflow-hidden flex h-screen">
+<!-- Tailwind Config Injection -->
+<script>
+      window.tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-tertiary-fixed-variant": "#554500",
+                "tertiary-fixed-dim": "#eac324",
+                "on-secondary": "#313030",
+                "background": "#131313",
+                "surface-tint": "#00dbe9",
+                "surface-bright": "#393939",
+                "on-secondary-fixed": "#1c1b1b",
+                "status-success": "#10b981",
+                "error-container": "#93000a",
+                "on-surface": "#e2e2e2",
+                "surface-container-lowest": "#0e0e0e",
+                "tertiary": "#fff5de",
+                "surface-dim": "#131313",
+                "outline": "#849495",
+                "on-surface-variant": "#b9cacb",
+                "on-error-container": "#ffdad6",
+                "on-primary-container": "#006970",
+                "surface-variant": "#353535",
+                "primary-fixed-dim": "#00dbe9",
+                "surface-tertiary": "#1a1a1a",
+                "text-secondary": "#a1a1a1",
+                "surface-container-high": "#2a2a2a",
+                "inverse-on-surface": "#303030",
+                "inverse-primary": "#006970",
+                "surface-container-low": "#1b1b1b",
+                "primary-fixed": "#7df4ff",
+                "tertiary-container": "#fed639",
+                "on-tertiary-container": "#715d00",
+                "on-tertiary": "#3b2f00",
+                "primary": "#dbfcff",
+                "error": "#ffb4ab",
+                "text-primary": "#ffffff",
+                "surface-secondary": "#0c0c0c",
+                "outline-variant": "#3b494b",
+                "secondary-fixed": "#e5e2e1",
+                "on-primary-fixed": "#002022",
+                "on-tertiary-fixed": "#231b00",
+                "accent-primary": "#00f0ff",
+                "surface-container-highest": "#353535",
+                "secondary-fixed-dim": "#c8c6c5",
+                "status-error": "#ff4b4b",
+                "primary-container": "#00f0ff",
+                "on-primary-fixed-variant": "#004f54",
+                "surface": "#131313",
+                "secondary": "#c8c6c5",
+                "on-primary": "#00363a",
+                "on-secondary-fixed-variant": "#474746",
+                "surface-container": "#1f1f1f",
+                "on-error": "#690005",
+                "inverse-surface": "#e2e2e2",
+                "secondary-container": "#474746",
+                "on-background": "#e2e2e2",
+                "surface-primary": "#000000",
+                "tertiary-fixed": "#ffe179",
+                "border-base": "#27272a",
+                "on-secondary-container": "#b7b5b4"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "base": "4px",
+                "lg": "24px",
+                "sm": "8px",
+                "md": "16px",
+                "xs": "4px",
+                "gutter": "24px",
+                "xl": "48px",
+                "container-max": "1440px"
+            },
+            "fontFamily": {
+                "body-md": ["Inter"],
+                "code-sm": ["JetBrains Mono"],
+                "body-sm": ["Inter"],
+                "headline-lg": ["Inter"],
+                "headline-xl": ["Inter"],
+                "code-md": ["JetBrains Mono"],
+                "label-caps": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                "code-sm": ["12px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                "body-sm": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                "headline-lg": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "headline-xl": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "code-md": ["14px", {"lineHeight": "1.7", "letterSpacing": "0em", "fontWeight": "450"}],
+                "label-caps": ["11px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<!-- SideNavBar (JSON Component) -->
+<aside class="h-screen w-64 flex-shrink-0 bg-surface-secondary dark:bg-surface-secondary border-r border-base flex flex-col justify-between py-md">
+<div class="space-y-sm">
+<div class="px-md mb-xl flex items-center space-x-sm">
+<div class="w-8 h-8 bg-accent-primary flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined text-black font-bold">memory</span>
+</div>
+<div>
+<h1 class="font-label-caps text-label-caps tracking-widest text-accent-primary">Ashwath.AI</h1>
+<p class="font-code-sm text-code-sm text-text-secondary">v1.0.4-stable</p>
+</div>
+</div>
+<nav class="space-y-base">
+<a class="flex items-center px-md py-sm space-x-md text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-caps text-label-caps">Chat</span>
+</a>
+<!-- Active Item: Models matches "Model discovery" intent -->
+<a class="flex items-center px-md py-sm space-x-md text-text-primary bg-surface-tertiary border-r-2 border-accent-primary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-label-caps text-label-caps">Models</span>
+</a>
+<a class="flex items-center px-md py-sm space-x-md text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-caps text-label-caps">Explore</span>
+</a>
+<a class="flex items-center px-md py-sm space-x-md text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="font-label-caps text-label-caps">Library</span>
+</a>
+<a class="flex items-center px-md py-sm space-x-md text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-label-caps text-label-caps">Knowledge</span>
+</a>
+<a class="flex items-center px-md py-sm space-x-md text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+</div>
+<div class="px-md py-sm border-t border-base">
+<div class="flex items-center space-x-md text-text-secondary">
+<span class="material-symbols-outlined text-status-success pulse-accent">memory</span>
+<span class="font-label-caps text-label-caps">Status: Local</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-surface-primary relative">
+<!-- TopAppBar (JSON Component) -->
+<header class="w-full h-16 bg-surface-primary dark:bg-surface-primary border-b border-base flex items-center justify-between px-gutter w-full">
+<div class="flex items-center">
+<h2 class="font-headline-lg text-headline-lg font-bold text-text-primary">Discovery</h2>
+</div>
+<div class="flex items-center space-x-lg">
+<div class="flex items-center bg-surface-secondary border border-base rounded-sm px-sm h-10 w-64">
+<span class="material-symbols-outlined text-text-secondary mr-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-code-md font-code-md text-text-primary placeholder-text-secondary w-full" placeholder="Search parameters..." type="text"/>
+</div>
+<div class="flex items-center space-x-md">
+<button class="text-text-secondary hover:text-text-primary transition-all duration-200">
+<span class="material-symbols-outlined">monitoring</span>
+</button>
+<button class="text-text-secondary hover:text-text-primary transition-all duration-200">
+<span class="material-symbols-outlined">settings_input_component</span>
+</button>
+<button class="text-text-secondary hover:text-text-primary transition-all duration-200">
+<span class="material-symbols-outlined">sensors</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-gutter space-y-xl">
+<!-- Hero Section: Recommended for Your Device -->
+<section>
+<div class="flex justify-between items-end mb-lg">
+<div>
+<span class="font-label-caps text-label-caps text-accent-primary mb-xs block">Hardware Match</span>
+<h3 class="font-headline-xl text-headline-xl">Recommended for Your Device</h3>
+</div>
+<div class="text-right">
+<p class="font-code-sm text-code-sm text-text-secondary">System Profile: RTX 4090 / 24GB VRAM</p>
+<div class="w-48 h-1 bg-surface-tertiary mt-sm relative overflow-hidden">
+<div class="absolute inset-0 bg-accent-primary w-3/4"></div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Recommended Card 1 -->
+<div class="group relative bg-surface-secondary border border-base p-lg hover:border-accent-primary transition-all">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h4 class="font-headline-lg text-headline-lg mb-xs">Llama-3-8B-Q8</h4>
+<span class="bg-surface-tertiary text-accent-primary px-sm py-1 font-code-sm text-code-sm rounded-sm">Native Perf</span>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-label-caps text-status-success">98% Compatibility</span>
+</div>
+</div>
+<div class="space-y-md">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-text-secondary">Est. Speed</span>
+<div class="flex items-end space-x-base">
+<span class="font-code-md text-code-md text-text-primary">112 tok/s</span>
+<div class="flex space-x-0.5 pb-1">
+<div class="w-1 h-3 bg-accent-primary"></div>
+<div class="w-1 h-4 bg-accent-primary"></div>
+<div class="w-1 h-5 bg-accent-primary"></div>
+<div class="w-1 h-4 bg-accent-primary"></div>
+<div class="w-1 h-3 bg-accent-primary"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-text-secondary">RAM required</span>
+<span class="font-code-md text-code-md text-text-primary">8.5 GB</span>
+</div>
+</div>
+<button class="w-full mt-lg py-sm border border-base group-hover:bg-accent-primary group-hover:text-black font-label-caps text-label-caps transition-colors">Download Architecture</button>
+</div>
+<!-- Recommended Card 2 (Bento Focus) -->
+<div class="md:col-span-2 group bg-surface-secondary border border-accent-primary p-lg relative overflow-hidden flex flex-col md:flex-row gap-lg">
+<div class="absolute top-0 right-0 p-lg opacity-10 pointer-events-none">
+<span class="material-symbols-outlined scale-[5]" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div class="flex-1 z-10">
+<div class="flex items-center space-x-md mb-md">
+<span class="font-label-caps text-label-caps bg-accent-primary text-black px-sm py-1">Optimized Hero</span>
+<span class="font-code-sm text-code-sm text-status-success">Perfect Fit</span>
+</div>
+<h4 class="font-headline-xl text-headline-xl mb-sm">Mistral-Nemo-12B</h4>
+<p class="font-body-md text-body-md text-text-secondary mb-lg max-w-md">The best balance of reasoning and speed for your current local hardware setup. Fully fits into VRAM with KV cache headroom.</p>
+<div class="grid grid-cols-2 gap-md">
+<div class="bg-surface-tertiary p-md border border-base">
+<p class="font-label-caps text-label-caps text-text-secondary mb-xs">Throughput</p>
+<p class="font-headline-lg text-headline-lg text-accent-primary">84.2 <span class="text-sm font-normal">t/s</span></p>
+</div>
+<div class="bg-surface-tertiary p-md border border-base">
+<p class="font-label-caps text-label-caps text-text-secondary mb-xs">Precision</p>
+<p class="font-headline-lg text-headline-lg text-text-primary">BF16</p>
+</div>
+</div>
+</div>
+<div class="md:w-1/3 flex flex-col justify-between z-10">
+<div class="space-y-sm">
+<div class="flex justify-between items-end">
+<span class="font-code-sm text-code-sm text-text-secondary">Efficiency</span>
+<span class="font-code-sm text-code-sm text-accent-primary">Superior</span>
+</div>
+<div class="h-24 flex items-end justify-between space-x-1">
+<div class="bg-accent-primary w-full" style="height: 40%"></div>
+<div class="bg-accent-primary w-full" style="height: 60%"></div>
+<div class="bg-accent-primary w-full" style="height: 55%"></div>
+<div class="bg-accent-primary w-full" style="height: 85%"></div>
+<div class="bg-accent-primary w-full" style="height: 100%"></div>
+<div class="bg-accent-primary w-full" style="height: 90%"></div>
+<div class="bg-accent-primary w-full" style="height: 95%"></div>
+</div>
+</div>
+<button class="w-full bg-accent-primary text-black py-md font-label-caps text-label-caps font-bold">Initialize Model</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Category Sections -->
+<section class="space-y-xl">
+<!-- Category Headers -->
+<div class="flex items-center space-x-xl border-b border-base overflow-x-auto whitespace-nowrap scrollbar-hide pb-sm">
+<button class="font-label-caps text-label-caps text-accent-primary border-b-2 border-accent-primary pb-sm transition-all">Coding</button>
+<button class="font-label-caps text-label-caps text-text-secondary hover:text-text-primary pb-sm transition-all">Reasoning</button>
+<button class="font-label-caps text-label-caps text-text-secondary hover:text-text-primary pb-sm transition-all">Vision</button>
+<button class="font-label-caps text-label-caps text-text-secondary hover:text-text-primary pb-sm transition-all">Experimental</button>
+<button class="font-label-caps text-label-caps text-text-secondary hover:text-text-primary pb-sm transition-all">Fast</button>
+</div>
+<!-- Grid for Category Content -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-md">
+<!-- Model Item 1 -->
+<div class="bg-surface-secondary border border-base p-md hover:bg-surface-tertiary transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-label-caps text-label-caps text-text-secondary">DeepSeek-Coder</span>
+<span class="material-symbols-outlined text-text-secondary text-sm">terminal</span>
+</div>
+<h5 class="font-body-md text-body-md font-bold text-text-primary mb-md">V2-Lite-Base</h5>
+<div class="space-y-sm mb-lg">
+<div class="flex justify-between">
+<span class="font-code-sm text-code-sm text-text-secondary">Speed</span>
+<span class="font-code-sm text-code-sm text-accent-primary">45 t/s</span>
+</div>
+<div class="w-full h-1 bg-surface-primary overflow-hidden">
+<div class="bg-accent-primary h-full w-2/3"></div>
+</div>
+</div>
+<div class="flex justify-between items-center text-code-sm">
+<span class="text-text-secondary">RAM: 14.2GB</span>
+<span class="text-status-success">Score: 84</span>
+</div>
+</div>
+<!-- Model Item 2 -->
+<div class="bg-surface-secondary border border-base p-md hover:bg-surface-tertiary transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-label-caps text-label-caps text-text-secondary">CodeQwen</span>
+<span class="material-symbols-outlined text-text-secondary text-sm">code</span>
+</div>
+<h5 class="font-body-md text-body-md font-bold text-text-primary mb-md">1.5-Chat-1.8B</h5>
+<div class="space-y-sm mb-lg">
+<div class="flex justify-between">
+<span class="font-code-sm text-code-sm text-text-secondary">Speed</span>
+<span class="font-code-sm text-code-sm text-accent-primary">158 t/s</span>
+</div>
+<div class="w-full h-1 bg-surface-primary overflow-hidden">
+<div class="bg-accent-primary h-full w-full"></div>
+</div>
+</div>
+<div class="flex justify-between items-center text-code-sm">
+<span class="text-text-secondary">RAM: 2.1GB</span>
+<span class="text-status-success">Score: 99</span>
+</div>
+</div>
+<!-- Model Item 3 -->
+<div class="bg-surface-secondary border border-base p-md hover:bg-surface-tertiary transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-label-caps text-label-caps text-text-secondary">Phind</span>
+<span class="material-symbols-outlined text-text-secondary text-sm">precision_manufacturing</span>
+</div>
+<h5 class="font-body-md text-body-md font-bold text-text-primary mb-md">CodeLlama-34B-V2</h5>
+<div class="space-y-sm mb-lg">
+<div class="flex justify-between">
+<span class="font-code-sm text-code-sm text-text-secondary">Speed</span>
+<span class="font-code-sm text-code-sm text-accent-primary">12 t/s</span>
+</div>
+<div class="w-full h-1 bg-surface-primary overflow-hidden">
+<div class="bg-accent-primary h-full w-1/5"></div>
+</div>
+</div>
+<div class="flex justify-between items-center text-code-sm">
+<span class="text-text-secondary">RAM: 22.8GB</span>
+<span class="text-error">Score: 42</span>
+</div>
+</div>
+<!-- Model Item 4 -->
+<div class="bg-surface-secondary border border-base p-md hover:bg-surface-tertiary transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-label-caps text-label-caps text-text-secondary">StableCode</span>
+<span class="material-symbols-outlined text-text-secondary text-sm">integration_instructions</span>
+</div>
+<h5 class="font-body-md text-body-md font-bold text-text-primary mb-md">Instruct-3B</h5>
+<div class="space-y-sm mb-lg">
+<div class="flex justify-between">
+<span class="font-code-sm text-code-sm text-text-secondary">Speed</span>
+<span class="font-code-sm text-code-sm text-accent-primary">92 t/s</span>
+</div>
+<div class="w-full h-1 bg-surface-primary overflow-hidden">
+<div class="bg-accent-primary h-full w-4/5"></div>
+</div>
+</div>
+<div class="flex justify-between items-center text-code-sm">
+<span class="text-text-secondary">RAM: 4.5GB</span>
+<span class="text-status-success">Score: 92</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Metrics Comparison Table -->
+<section class="mt-xl">
+<div class="bg-surface-secondary border border-base">
+<div class="px-md py-sm bg-surface-tertiary border-b border-base flex justify-between items-center">
+<h4 class="font-label-caps text-label-caps text-text-primary">Global Efficiency Benchmarks</h4>
+<div class="flex space-x-md">
+<span class="flex items-center space-x-xs font-code-sm text-code-sm text-text-secondary">
+<div class="w-2 h-2 bg-accent-primary"></div>
+<span>Optimization Range</span>
+</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-code-sm text-code-sm">
+<thead>
+<tr class="text-text-secondary border-b border-base">
+<th class="px-md py-sm font-normal">Model Architecture</th>
+<th class="px-md py-sm font-normal">Tokens/Sec</th>
+<th class="px-md py-sm font-normal">VRAM Usage</th>
+<th class="px-md py-sm font-normal">Compatibility Score</th>
+<th class="px-md py-sm font-normal">Benchmarks</th>
+</tr>
+</thead>
+<tbody class="text-text-primary divide-y divide-base">
+<tr class="hover:bg-surface-tertiary">
+<td class="px-md py-md">Command R+ (Q4_K_M)</td>
+<td class="px-md py-md">5.2</td>
+<td class="px-md py-md text-error">64.5 GB</td>
+<td class="px-md py-md text-error">12/100</td>
+<td class="px-md py-md">
+<div class="flex space-x-0.5 items-end h-4">
+<div class="w-2 bg-accent-primary h-1"></div>
+<div class="w-2 bg-accent-primary h-1.5"></div>
+<div class="w-2 bg-accent-primary h-1"></div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-tertiary">
+<td class="px-md py-md">Mistral-7B-v0.3</td>
+<td class="px-md py-md">78.4</td>
+<td class="px-md py-md text-status-success">6.8 GB</td>
+<td class="px-md py-md text-status-success">100/100</td>
+<td class="px-md py-md">
+<div class="flex space-x-0.5 items-end h-4">
+<div class="w-2 bg-accent-primary h-3"></div>
+<div class="w-2 bg-accent-primary h-4"></div>
+<div class="w-2 bg-accent-primary h-3.5"></div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-tertiary">
+<td class="px-md py-md">Gemma-2-9B</td>
+<td class="px-md py-md">42.1</td>
+<td class="px-md py-md text-status-success">9.4 GB</td>
+<td class="px-md py-md text-status-success">88/100</td>
+<td class="px-md py-md">
+<div class="flex space-x-0.5 items-end h-4">
+<div class="w-2 bg-accent-primary h-2"></div>
+<div class="w-2 bg-accent-primary h-3"></div>
+<div class="w-2 bg-accent-primary h-2.5"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- NavigationDrawer (JSON Component) - Right Side -->
+<aside class="h-screen w-80 flex-shrink-0 bg-surface-secondary border-l border-base flex flex-col">
+<div class="p-gutter border-b border-base">
+<h3 class="font-label-caps text-label-caps text-text-secondary">Context</h3>
+<p class="font-code-sm text-code-sm text-accent-primary mt-xs">Parameters</p>
+</div>
+<div class="flex-1 overflow-y-auto p-md space-y-md">
+<div class="bg-surface-tertiary border border-base p-md">
+<div class="flex items-center space-x-sm mb-sm text-accent-primary">
+<span class="material-symbols-outlined text-sm">tune</span>
+<span class="font-label-caps text-label-caps">Model Parameters</span>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between font-code-sm text-code-sm">
+<span class="text-text-secondary">Temperature</span>
+<span class="text-text-primary">0.7</span>
+</div>
+<div class="w-full h-1 bg-surface-primary">
+<div class="bg-accent-primary h-full w-3/4"></div>
+</div>
+<div class="flex justify-between font-code-sm text-code-sm">
+<span class="text-text-secondary">Top P</span>
+<span class="text-text-primary">0.9</span>
+</div>
+<div class="w-full h-1 bg-surface-primary">
+<div class="bg-accent-primary h-full w-11/12"></div>
+</div>
+</div>
+</div>
+<div class="bg-surface-tertiary border border-base p-md">
+<div class="flex items-center space-x-sm mb-sm text-text-secondary">
+<span class="material-symbols-outlined text-sm">description</span>
+<span class="font-label-caps text-label-caps">File Metadata</span>
+</div>
+<div class="space-y-xs font-code-sm text-code-sm text-text-secondary">
+<p>Format: GGUF</p>
+<p>Quant: Q8_0</p>
+<p>Layers: 32</p>
+<p>Context: 8k</p>
+</div>
+</div>
+<div class="bg-surface-tertiary border border-base p-md">
+<div class="flex items-center justify-between mb-sm">
+<div class="flex items-center space-x-sm text-text-secondary">
+<span class="material-symbols-outlined text-sm">analytics</span>
+<span class="font-label-caps text-label-caps">Telemetry</span>
+</div>
+<span class="bg-status-success w-2 h-2 rounded-full pulse-accent"></span>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between font-code-sm text-code-sm">
+<span class="text-text-secondary">GPU Temp</span>
+<span class="text-text-primary">54°C</span>
+</div>
+<div class="flex justify-between font-code-sm text-code-sm">
+<span class="text-text-secondary">Power Draw</span>
+<span class="text-text-primary">145W</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-tertiary border border-base p-md">
+<div class="flex items-center space-x-sm mb-sm text-text-secondary">
+<span class="material-symbols-outlined text-sm">terminal</span>
+<span class="font-label-caps text-label-caps">Logs</span>
+</div>
+<div class="font-code-sm text-code-sm text-text-secondary space-y-1 h-32 overflow-hidden overflow-y-auto">
+<p class="text-status-success">[INFO] Driver version 550.67</p>
+<p>[CORE] Local server active on :8080</p>
+<p>[MEM] Scanning VRAM allocations...</p>
+<p>[MEM] Found 24576MB total</p>
+<p class="text-accent-primary">[SCAN] Model match found: Llama-3</p>
+<p>[CORE] Ready for inference.</p>
+</div>
+</div>
+</div>
+<div class="p-gutter border-t border-base bg-surface-primary">
+<button class="w-full bg-accent-primary text-black py-sm font-label-caps text-label-caps font-bold">Deploy to Local</button>
+</div>
+</aside>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Tab switching logic (aesthetic only)
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoryBtns.forEach(b => {
+                    b.classList.remove('text-accent-primary', 'border-accent-primary', 'border-b-2');
+                    b.classList.add('text-text-secondary');
+                });
+                btn.classList.add('text-accent-primary', 'border-accent-primary', 'border-b-2');
+                btn.classList.remove('text-text-secondary');
+            });
+        });
+
+        // Hover animation on cards
+        const cards = document.querySelectorAll('.bg-surface-secondary');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('scale-[1.01]');
+            });
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('scale-[1.01]');
+            });
+        });
+    </script>
+</body></html>
