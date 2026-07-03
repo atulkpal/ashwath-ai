@@ -73,14 +73,13 @@ class ChatViewModel(
 
     fun downloadEngine() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                installer.install().onSuccess {
-                    withContext(Dispatchers.Main) {
-                        startEngine()
-                    }
-                }.onFailure { e ->
-                    _state.update { it.copy(engineStatus = EngineStatus.Error(e.message ?: "Installation failed")) }
-                }
+            val result = withContext(Dispatchers.IO) {
+                installer.install()
+            }
+            result.onSuccess {
+                startEngine()
+            }.onFailure { e ->
+                _state.update { it.copy(engineStatus = EngineStatus.Error(e.message ?: "Installation failed")) }
             }
         }
     }
