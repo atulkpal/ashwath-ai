@@ -40,3 +40,6 @@ tmp/
 
 # SDK build outputs
 sdk/kotlin/build/
+
+# Git worktrees (root checkouts outside repo)
+worktrees/
