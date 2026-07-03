@@ -42,9 +42,7 @@ fun ChatScreen(
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 val application = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]!!
                 return ChatViewModel(
-                    ServiceLocator.provideInferenceEngine(),
-                    ServiceLocator.provideEngineInstaller(application),
-                    ServiceLocator.provideEngineProcessManager(application)
+                    ServiceLocator.provideInferenceEngine()
                 ) as T
             }
         }
@@ -107,14 +105,14 @@ fun ChatScreen(
             }
 
             if (state.engineStatus !is EngineStatus.Connected) {
-                EngineStatusOverlay(state.engineStatus, onAction = { viewModel.downloadEngine() })
+                EngineStatusOverlay(state.engineStatus, onRetry = { viewModel.onEvent(ChatEvent.RetryEngine) })
             }
         }
     }
 }
 
 @Composable
-fun EngineStatusOverlay(status: EngineStatus, onAction: () -> Unit) {
+fun EngineStatusOverlay(status: EngineStatus, onRetry: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -126,22 +124,7 @@ fun EngineStatusOverlay(status: EngineStatus, onAction: () -> Unit) {
             modifier = Modifier.padding(24.dp)
         ) {
             when (status) {
-                is EngineStatus.NotInstalled -> {
-                    Text("Ashwath Engine Required", color = Color.White, style = MaterialTheme.typography.headlineSmall)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Download the local AI engine to start chatting privately.", color = Color.Gray, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Button(onClick = onAction, colors = ButtonDefaults.buttonColors(containerColor = CyanPrimary)) {
-                        Text("Download Engine (arm64)", color = Color.Black)
-                    }
-                }
-                is EngineStatus.Installing -> {
-                    CircularProgressIndicator(progress = { status.progress }, color = CyanPrimary)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Installing Ashwath Engine...", color = Color.White)
-                    Text("${(status.progress * 100).toInt()}%", color = CyanPrimary, style = MaterialTheme.typography.labelLarge)
-                }
-                is EngineStatus.Starting -> {
+                is EngineStatus.Initializing -> {
                     CircularProgressIndicator(color = CyanPrimary)
                     Spacer(modifier = Modifier.height(16.dp))
                     Text("Starting engine...", color = Color.White)
@@ -152,11 +135,11 @@ fun EngineStatusOverlay(status: EngineStatus, onAction: () -> Unit) {
                     Text("Engine Error", color = Color.Red, style = MaterialTheme.typography.titleLarge)
                     Text(status.message, color = Color.Gray, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                     Spacer(modifier = Modifier.height(24.dp))
-                    Button(onClick = onAction, colors = ButtonDefaults.buttonColors(containerColor = CyanPrimary)) {
+                    Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = CyanPrimary)) {
                         Text("Retry", color = Color.Black)
                     }
                 }
-                else -> {}
+                is EngineStatus.Connected -> {}
             }
         }
     }

@@ -44,6 +44,31 @@ test-android:
 lint-android:
 	cd android && ./gradlew lint
 
+# ─── Android .so (JNI) ──────────────────────────────────────────
+# Requires ANDROID_NDK_HOME pointing to the NDK installation.
+# Example:
+#   export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358
+build-android-so:
+	$(eval HOST_TAG := $(shell uname -s | tr A-Z a-z)-x86_64)
+	$(eval CC := $(ANDROID_NDK_HOME)/toolchains/llvm/prebuilt/$(HOST_TAG)/bin/aarch64-linux-android21-clang)
+	cd engine && \
+	CGO_ENABLED=1 GOOS=android GOARCH=arm64 CC=$(CC) \
+	  go build -buildmode=c-shared \
+	  -o ../android/app/src/main/jniLibs/arm64-v8a/libashwath_engine.so \
+	  ./cmd/libashwath/
+
+# ─── Release targets ────────────────────────────────────────────
+release-all: release-engine release-android-so
+
+release-android-so:
+	$(eval HOST_TAG := $(shell uname -s | tr A-Z a-z)-x86_64)
+	$(eval CC := $(ANDROID_NDK_HOME)/toolchains/llvm/prebuilt/$(HOST_TAG)/bin/aarch64-linux-android21-clang)
+	cd engine && mkdir -p releases && \
+	CGO_ENABLED=1 GOOS=android GOARCH=arm64 CC=$(CC) \
+	  go build -buildmode=c-shared \
+	  -o releases/libashwath_engine-arm64-v8a.so \
+	  ./cmd/libashwath/
+
 # ─── Cross-platform ─────────────────────────────────────────────
 test-all: test-engine test-android
 

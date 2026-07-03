@@ -21,4 +21,6 @@ jobs:
           go-version: '1.22'
       - run: go mod tidy
       - run: go build ./cmd/ashwathd
+      - run: go build ./mobile/
+      - run: go vet ./mobile/
       - run: go test ./...

@@ -46,18 +46,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    // gRPC & Ktor
-    implementation(libs.grpc.okhttp)
-    implementation(libs.grpc.stub)
-    implementation(libs.grpc.protobuf.lite)
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.okhttp)
-    compileOnly(libs.javax.annotation.api)
-
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.ktor.client.mock)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
