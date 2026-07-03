@@ -3,6 +3,7 @@ package com.ashwathai.ashwathai.core.downloads
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,7 @@ class EngineDownloader(private val httpClient: HttpClient) {
             if (response.status.value in 200..299) {
                 destFile.parentFile?.mkdirs()
                 val channel: ByteReadChannel = response.bodyAsChannel()
-                val totalBytes = response.contentLength() ?: -1L
+                val totalBytes = response.headers[HttpHeaders.ContentLength]?.toLongOrNull() ?: -1L
                 var bytesRead = 0L
 
                 FileOutputStream(destFile).use { output ->
