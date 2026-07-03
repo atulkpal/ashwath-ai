@@ -16,6 +16,9 @@ class EngineJniAdapter(
     override val version: String = "0.1.0"
 
     override suspend fun initialize(): Result<Unit> {
+        if (!AshwathBridge.isLoaded) {
+            return Result.success(Unit)
+        }
         val result = bridge.nativeInit(null, null)
         return if (result == 1) Result.success(Unit)
         else Result.failure(Exception("Engine initialization failed (code=$result)"))
@@ -25,6 +28,13 @@ class EngineJniAdapter(
         prompt: String,
         options: GenerationOptions,
     ): Flow<InferenceResult> = callbackFlow {
+        if (!AshwathBridge.isLoaded) {
+            trySend(InferenceResult.Partial("Native engine library is not available. "))
+            trySend(InferenceResult.Success("Native engine library is not available. Falling back to stub mode."))
+            close()
+            return@callbackFlow
+        }
+
         val callback = object : TokenCallback {
             override fun onToken(text: String?, done: Boolean) {
                 if (done) {
@@ -54,10 +64,16 @@ class EngineJniAdapter(
             close()
         }
 
-        awaitClose { bridge.nativeCancel() }
+        awaitClose {
+            if (AshwathBridge.isLoaded) {
+                bridge.nativeCancel()
+            }
+        }
     }
 
     override suspend fun stop() {
-        bridge.nativeShutdown()
+        if (AshwathBridge.isLoaded) {
+            bridge.nativeShutdown()
+        }
     }
 }

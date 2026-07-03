@@ -2,8 +2,16 @@ package com.ashwathai.sdk.jni
 
 class AshwathBridge {
     companion object {
+        var isLoaded = false
+            private set
+
         init {
-            System.loadLibrary("ashwath_engine")
+            try {
+                System.loadLibrary("ashwath_engine")
+                isLoaded = true
+            } catch (e: UnsatisfiedLinkError) {
+                // Library not found, will handle gracefully in adapter
+            }
         }
     }
 
