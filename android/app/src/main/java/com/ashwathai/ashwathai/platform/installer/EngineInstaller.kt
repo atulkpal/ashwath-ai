@@ -19,7 +19,7 @@ class EngineInstaller(
     val downloadState: StateFlow<DownloadState> = downloader.downloadState
 
     suspend fun install(abiOverride: String? = null): Result<Unit> {
-        val abi = abiOverride ?: android.os.Build.SUPPORTED_ABIS?.firstOrNull() ?: "arm64-v8a"
+        val abi = sanitizeAbi(abiOverride ?: android.os.Build.SUPPORTED_ABIS?.firstOrNull() ?: "arm64-v8a")
         val engineFile = File(context.filesDir, "bin/ashwathd")
         val checksumsFile = File(context.cacheDir, "checksums.txt")
 
@@ -32,7 +32,7 @@ class EngineInstaller(
             val response = httpClient.get(checksumsUrl)
             val checksumsContent = response.bodyAsText()
 
-            // 2. Download engine binary
+            // 2. Download engine binary (arm64-v8a is the only supported ABI)
             val binaryName = "ashwathd-$abi"
             val downloadUrl = "https://github.com/atulkpal/ashwath-ai/releases/latest/download/$binaryName"
             downloader.downloadFile(downloadUrl, engineFile)
@@ -53,6 +53,13 @@ class EngineInstaller(
             }
         } catch (e: Exception) {
             return Result.failure(e)
+        }
+    }
+
+    private fun sanitizeAbi(abi: String): String {
+        return when {
+            abi.startsWith("arm64") || abi == "arm64-v8a" -> "arm64-v8a"
+            else -> "arm64-v8a"   // only arm64-v8a binaries are published
         }
     }
 
