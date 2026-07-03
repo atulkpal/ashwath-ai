@@ -13,10 +13,12 @@ import com.ashwathai.ashwathai.platform.installer.EngineProcessManager
 import com.ashwathai.ashwathai.runtime.api.GenerationOptions
 import com.ashwathai.ashwathai.runtime.api.InferenceEngine
 import com.ashwathai.ashwathai.runtime.api.InferenceResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ChatViewModel(
     private val engine: InferenceEngine,
@@ -71,10 +73,14 @@ class ChatViewModel(
 
     fun downloadEngine() {
         viewModelScope.launch {
-            installer.install().onSuccess {
-                startEngine()
-            }.onFailure { e ->
-                _state.update { it.copy(engineStatus = EngineStatus.Error(e.message ?: "Installation failed")) }
+            withContext(Dispatchers.IO) {
+                installer.install().onSuccess {
+                    withContext(Dispatchers.Main) {
+                        startEngine()
+                    }
+                }.onFailure { e ->
+                    _state.update { it.copy(engineStatus = EngineStatus.Error(e.message ?: "Installation failed")) }
+                }
             }
         }
     }

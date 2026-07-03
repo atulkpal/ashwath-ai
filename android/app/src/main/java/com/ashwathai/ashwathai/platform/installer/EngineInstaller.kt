@@ -23,19 +23,23 @@ class EngineInstaller(
         val engineFile = File(context.filesDir, "bin/ashwathd")
         val checksumsFile = File(context.cacheDir, "checksums.txt")
 
+        // 0. Start progress
+        downloader.updateState(DownloadState.Downloading(0f))
+
         // 1. Download checksums
-        val checksumsUrl = "https://github.com/ashwathai/ashwath-engine/releases/latest/download/checksums.txt"
+        val checksumsUrl = "https://github.com/atulkpal/ashwath-ai/releases/latest/download/checksums.txt"
         try {
             val response = httpClient.get(checksumsUrl)
             val checksumsContent = response.bodyAsText()
 
             // 2. Download engine binary
             val binaryName = "ashwathd-$abi"
-            val downloadUrl = "https://github.com/ashwathai/ashwath-engine/releases/latest/download/$binaryName"
+            val downloadUrl = "https://github.com/atulkpal/ashwath-ai/releases/latest/download/$binaryName"
             downloader.downloadFile(downloadUrl, engineFile)
 
             if (downloader.downloadState.value is DownloadState.Complete) {
                 // 3. Verify checksum
+                downloader.updateState(DownloadState.Verifying)
                 val expectedChecksum = checksumVerifier.parseChecksums(checksumsContent, binaryName)
                 if (expectedChecksum != null && checksumVerifier.verifyChecksum(engineFile, expectedChecksum)) {
                     // 4. Mark as executable

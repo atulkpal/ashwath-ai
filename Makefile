@@ -23,9 +23,7 @@ proto-gen:
 
 release-engine: proto-gen
 	cd engine && mkdir -p releases && \
-	GOOS=android GOARCH=arm64 go build -o releases/ashwathd-arm64-v8a ./cmd/ashwathd && \
-	GOOS=android GOARCH=amd64 go build -o releases/ashwathd-x86_64 ./cmd/ashwathd && \
-	GOOS=android GOARCH=arm GOARM=7 go build -o releases/ashwathd-armeabi-v7a ./cmd/ashwathd && \
+	CGO_ENABLED=0 GOOS=android GOARCH=arm64 go build -o releases/ashwathd-arm64-v8a ./cmd/ashwathd && \
 	GOOS=linux GOARCH=arm64 go build -o releases/ashwathd-linux-arm64 ./cmd/ashwathd && \
 	GOOS=linux GOARCH=amd64 go build -o releases/ashwathd-linux-x64 ./cmd/ashwathd && \
 	GOOS=darwin GOARCH=arm64 go build -o releases/ashwathd-macos-arm64 ./cmd/ashwathd && \

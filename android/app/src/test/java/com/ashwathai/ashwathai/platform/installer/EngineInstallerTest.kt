@@ -7,8 +7,10 @@ import com.ashwathai.ashwathai.core.downloads.EngineDownloader
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
 import io.ktor.http.*
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -25,6 +27,7 @@ class EngineInstallerTest {
     fun `install fails if downloader fails`() = runTest {
         val downloadState = MutableStateFlow<DownloadState>(DownloadState.Idle)
         every { downloader.downloadState } returns downloadState
+        every { downloader.updateState(any()) } just Runs
         coEvery { downloader.downloadFile(any(), any()) } coAnswers {
             downloadState.value = DownloadState.Failed("Error")
         }
