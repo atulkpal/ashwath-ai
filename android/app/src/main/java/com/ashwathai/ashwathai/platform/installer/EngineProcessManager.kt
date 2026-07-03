@@ -12,11 +12,25 @@ class EngineProcessManager(private val context: Context) {
     private var process: Process? = null
     private val TAG = "EngineProcessManager"
 
+    fun getEngineFile(): File {
+        return File(context.cacheDir, "ashwathd")
+    }
+
     suspend fun start(port: Int): Result<Unit> = withContext(Dispatchers.IO) {
-        val engineFile = File(context.filesDir, "bin/ashwathd")
+        val engineFile = getEngineFile()
         if (!engineFile.exists()) {
-            return@withContext Result.failure(Exception("Engine not installed"))
+            return@withContext Result.failure(Exception("Engine binary not found at ${engineFile.absolutePath}"))
         }
+
+        Log.i(TAG, String.format(
+            "Engine binary: path=%s exists=%b read=%b write=%b exec=%b size=%d",
+            engineFile.absolutePath,
+            engineFile.exists(),
+            engineFile.canRead(),
+            engineFile.canWrite(),
+            engineFile.canExecute(),
+            engineFile.length()
+        ))
 
         try {
             val pb = ProcessBuilder(
@@ -29,14 +43,13 @@ class EngineProcessManager(private val context: Context) {
 
             process = pb.start()
 
-            // Wait for gRPC health check or just wait a bit
-            // In a real app, we should check if the port is open
             delay(1000)
 
             if (isRunning()) {
                 Result.success(Unit)
             } else {
-                Result.failure(Exception("Process failed to start"))
+                val exitVal = process?.exitValue()
+                Result.failure(Exception("Engine exited immediately with code $exitVal"))
             }
         } catch (e: IOException) {
             Log.e(TAG, "Failed to start engine", e)
