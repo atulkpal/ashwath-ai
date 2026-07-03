@@ -1,105 +1,104 @@
-# EPIC 2: Android + SDK Integration — Task List
+# EPIC 2: Android + SDK Integration — Remaining Work
 
-## Build Fixes Already Applied (review these, don't revert)
+## ✅ Already Done (engine-side)
 
-Your SDK/app code was good. These 3 build fixes were needed:
-
-1. **`sdk/kotlin/build.gradle.kts`**: Removed `version "2.2.10"` from `kotlin("jvm")` (plugin already on classpath). Removed `repositories { mavenCentral() }` block (conflicts with `FAIL_ON_PROJECT_REPOS` in settings).
-
-2. **`android/app/build.gradle.kts`**: Replaced `sourceSets { java.srcDir("../../sdk/kotlin/src/main/kotlin") }` with `implementation(project(":sdk"))` — use proper project dependency, don't inline SDK sources into the app module.
-
-3. **`android/settings.gradle.kts`**: Added `pluginManagement.plugins` block for `org.jetbrains.kotlin.jvm` and `com.google.protobuf` so the SDK resolves its plugin correctly.
-
-DO NOT touch these files unless adding NEW dependencies.
+| What | Where |
+|------|-------|
+| Engine default port changed to **50051** | `engine/internal/config/loader.go:15` |
+| CI binary naming aligned with Android ABI | `.github/workflows/release-engine.yml` |
+| Added `armeabi-v7a` build target | CI + Makefile |
+| Go protobuf types generated from shared proto | `engine/internal/api/pb/` |
+| Engine service uses generated stubs | `engine/internal/api/service.go` |
+| JSON codec removed from service/tests | `jsoncodec.go`, `service_test.go` |
+| Smoke test uses protobuf client | `engine/tests/smoke.go` |
+| Worktree setup script | `scripts/setup-worktrees.ps1` |
+| Initial commit + `engine/v0.1.0` tag created | `git tag` |
+| Feature branches created | `feature/android-installer`, `feature/engine-llama`, `feature/web-frontend`, `feature/ios-frontend`, `feature/desktop-frontend` |
 
 ---
 
-## Remaining Work (in priority order)
+## 🔴 Critical — Fix Before First Release (Android-side)
 
-### 1. Generate gRPC Stubs from Proto
+### 1. Add `INTERNET` Permission
+**File:** `android/app/src/main/AndroidManifest.xml`
 
-The `ServiceProto.kt` file is a hand-written proto — replace it with real generated stubs.
-
-- [ ] Add protobuf plugin config to `sdk/kotlin/build.gradle.kts`:
-
-```kotlin
-plugins {
-    kotlin("jvm")
-    id("com.google.protobuf")
-}
-
-protobuf {
-    protoc { artifact = "com.google.protobuf:protoc:4.28.2" }
-    plugins {
-        create("grpc") { artifact = "io.grpc:protoc-gen-grpc-java:1.68.0" }
-        create("grpckt") { artifact = "io.grpc:protoc-gen-grpc-kotlin:1.4.1" }
-    }
-    generateProtoTasks {
-        all().forEach {
-            it.plugins { create("grpc") {}; create("grpckt") {} }
-        }
-    }
-}
+Add before `<application>`:
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
 ```
 
-- [ ] Create `sdk/kotlin/src/main/proto/ashwathai/v1/engine.proto` — copy from `engine/proto/ashwathai/v1/engine.proto`
-- [ ] Add build dependency: `implementation("io.grpc:grpc-kotlin-stub:1.4.1")`
-- [ ] Update `sdk/kotlin/build.gradle.kts` dependencies to include protobuf-java and grpc-kotlin-stub
-- [ ] Run `./gradlew :sdk:generateProto` and verify stubs are generated in `sdk/kotlin/build/generated/`
+Without this, all download and gRPC calls silently fail on API 28+.
 
-### 2. Wire Real gRPC Stubs in EngineGrpcClient
+### 2. Fix Network I/O Dispatchers
+**Files:** `ChatViewModel.kt`, `EngineDownloader.kt`
 
-`EngineGrpcClient.generate()` currently returns mock responses. Replace with real stub calls.
+Wrap network suspend calls in `withContext(Dispatchers.IO)`:
+- `ChatViewModel.downloadEngine()` body → IO dispatcher
+- `EngineDownloader.downloadFile()` body → IO dispatcher
 
-- [ ] In `EngineGrpcClient.kt`, replace mocked flow with:
-  ```kotlin
-  val stub = AshwathEngineGrpcKt.AshwathEngineCoroutineStub(channel)
-  val request = generateRequest { /* set fields from prompt + options */ }
-  stub.generate(request).collect { response ->
-      emit(GenerateResponse(response.text, response.tokenCount, response.done))
-  }
-  ```
+Currently runs on `Dispatchers.Main` → causes ANR (app minimize).
 
-### 3. Fix Deprecation Warnings
+### 3. Emit Progress Before Checksum Fetch
+**File:** `EngineInstaller.kt`
 
-Current build has 4 warnings. Fix them:
+Set `_downloadState.value = DownloadState.Downloading(0f)` before the `httpClient.get(checksumsUrl)` call. Currently no progress is emitted during the checksum fetch, so the UI stays on "idle" for several seconds.
 
-- [ ] `Screen.kt:21,27`: Replace `Icons.Filled.Chat` → `Icons.AutoMirrored.Filled.Chat`, same for `LibraryBooks`
-- [ ] `Theme.kt:40`: Remove deprecated `window.statusBarColor` usage
-- [ ] `EngineDownloader.kt:36`: Remove `import kotlin.io.use` (stdlib version auto-available)
+### 4. Fix Download Progress Reporting
+**File:** `EngineDownloader.kt`
 
-### 4. Add Tests
-
-- [ ] Unit tests for `EngineGrpcClient` (mock channel)
-- [ ] Unit tests for `EngineProcessManager` and `EngineInstaller`
-- [ ] Unit tests for `ClientInferenceEngine`
-- [ ] Instrumentation test for full download → install → connect flow
-
-### 5. Polish
-
-- [ ] Add error handling for missing engine binary
-- [ ] Add retry logic for gRPC connection
-- [ ] Add progress UI for model downloads
-- [ ] Handle app lifecycle (pause/resume engine process)
+Replace raw `bodyAsChannel()` loop with `prepareGet().execute` so `onDownload` fires progressively with OkHttp engine. Currently `onDownload` may fire only once at 100%.
 
 ---
 
-## Build Verification
+## 🟡 Medium Priority (Android-side)
 
-Always run these before committing:
+### 5. Binary Naming Alignment
+The CI now produces binaries named:
+- `ashwathd-arm64-v8a` (was `ashwathd-android-arm64`)
+- `ashwathd-x86_64` (was `ashwathd-android-x64`)
+- `ashwathd-armeabi-v7a` (new)
+
+The `EngineInstaller.kt` constructs `"ashwathd-$abi"` where `$abi` is from `Build.SUPPORTED_ABIS` — this **already matches** the new naming. Verify with a real download once a release exists.
+
+### 6. Add Tests for Download Flow
+- Success case: mock HTTP returns binary, verify `Complete` state emitted
+- Progress case: verify `Downloading` states are emitted in order
+- Checksum failure case: verify `Failed` state
+
+### 7. Handle Engine Process Failure Gracefully
+If `EngineProcessManager.start()` fails (e.g., SELinux blocks execution), show a user-friendly error overlay rather than crashing.
+
+---
+
+## 🔵 Build Verification (run before commit)
 
 ```powershell
-# Root: engine tests
+# Engine tests
 cd engine
-go test ./...
+go test -count=1 ./...
 go build ./cmd/ashwathd
 
-# Android: app + SDK
+# Android
 cd android
-./gradlew assembleDebug
-
-# SDK jar explicitly
-./gradlew :sdk:jar
+.\gradlew assembleDebug
+.\gradlew test
+.\gradlew :sdk:jar
 ```
 
-All three must pass without errors.
+---
+
+## 📦 Creating a Real Release
+
+To trigger the first binary release:
+```powershell
+git remote add origin https://github.com/ashwathai/ashwath-engine.git
+git push -u origin main
+git push origin engine/v0.1.0
+```
+
+This triggers `.github/workflows/release-engine.yml` which:
+1. Cross-compiles 8 binaries (3 Android ABIs + Linux/Mac/Windows)
+2. Generates `checksums.txt` with SHA-256 hashes
+3. Publishes a GitHub Release at `https://github.com/ashwathai/ashwath-engine/releases/tag/engine/v0.1.0`
+
+The Android app downloads from `https://github.com/ashwathai/ashwath-engine/releases/latest/download/`.
