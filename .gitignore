@@ -1,0 +1,42 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Go
+engine/vendor/
+*.exe
+*.test
+*.out
+
+# Android (android/ has its own .gitignore)
+android/.gradle/
+android/build/
+android/local.properties
+android/captures/
+android/.externalNativeBuild/
+android/.cxx/
+
+# Rust (future)
+target/
+
+# Node (web)
+node_modules/
+dist/
+
+# Environment
+.env
+.env.local
+
+# Build artifacts
+*.log
+tmp/
+
+# SDK build outputs
+sdk/kotlin/build/

@@ -1,0 +1,67 @@
+// Ashwath Engine gRPC Service Definition
+// Frontends communicate with the engine through this API.
+syntax = "proto3";
+
+package ashwath;
+
+option go_package = "github.com/ashwathai/ashwath-engine/api/proto";
+option java_multiple_files = true;
+option java_package = "com.ashwathai.sdk.generated";
+
+service AshwathEngine {
+  rpc Generate(GenerateRequest) returns (stream GenerateResponse);
+  rpc ListModels(Empty) returns (ModelList);
+  rpc InstallModel(InstallRequest) returns (InstallResponse);
+  rpc GetDeviceInfo(Empty) returns (DeviceInfo);
+  rpc Shutdown(Empty) returns (Empty);
+}
+
+message GenerateRequest {
+  string model = 1;
+  string prompt = 2;
+  int32 max_tokens = 3;
+  float temperature = 4;
+  int32 top_k = 5;
+  float top_p = 6;
+}
+
+message GenerateResponse {
+  string text = 1;
+  int32 tokens_used = 2;
+  bool done = 3;
+}
+
+message ModelList {
+  repeated ModelInfo models = 1;
+}
+
+message ModelInfo {
+  string id = 1;
+  string name = 2;
+  string provider = 3;
+  int64 size_bytes = 4;
+  string parameters = 5;
+  repeated string tags = 6;
+  bool installed = 7;
+}
+
+message InstallRequest {
+  string model_id = 1;
+}
+
+message InstallResponse {
+  bool started = 1;
+  string message = 2;
+}
+
+message DeviceInfo {
+  double ram_gb = 1;
+  int32 cpu_cores = 2;
+  bool has_npu = 3;
+  bool has_gpu = 4;
+  string gpu_vendor = 5;
+  string os = 6;
+  string arch = 7;
+}
+
+message Empty {}

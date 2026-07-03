@@ -1,0 +1,24 @@
+name: Engine CI
+
+on:
+  push:
+    paths:
+      - 'engine/**'
+  pull_request:
+    paths:
+      - 'engine/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: engine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - run: go mod tidy
+      - run: go build ./cmd/ashwathd
+      - run: go test ./...

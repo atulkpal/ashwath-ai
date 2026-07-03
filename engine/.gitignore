@@ -1,0 +1,6 @@
+vendor/
+ashwathd
+ashwathd.exe
+*.test
+*.out
+releases/
