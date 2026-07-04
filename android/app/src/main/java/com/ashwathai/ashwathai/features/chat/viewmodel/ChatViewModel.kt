@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ashwathai.ashwathai.domain.models.ChatMessage
 import com.ashwathai.ashwathai.domain.models.Sender
+import com.ashwathai.ashwathai.domain.repository.ModelRepository
 import com.ashwathai.ashwathai.features.chat.events.ChatEvent
 import com.ashwathai.ashwathai.features.chat.state.ChatState
 import com.ashwathai.ashwathai.features.chat.state.EngineStatus
@@ -13,18 +14,32 @@ import com.ashwathai.ashwathai.runtime.api.InferenceResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ChatViewModel(
     private val engine: InferenceEngine,
+    private val modelRepository: ModelRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatState())
     val state = _state.asStateFlow()
 
     init {
-        initializeEngine()
+        checkModelsAndInitialize()
+    }
+
+    private fun checkModelsAndInitialize() {
+        viewModelScope.launch {
+            _state.update { it.copy(engineStatus = EngineStatus.Initializing) }
+            val installedModels = modelRepository.getInstalledModels().first()
+            if (installedModels.isEmpty()) {
+                _state.update { it.copy(engineStatus = EngineStatus.NoModelInstalled) }
+            } else {
+                initializeEngine()
+            }
+        }
     }
 
     private fun initializeEngine() {
@@ -50,7 +65,7 @@ class ChatViewModel(
             is ChatEvent.InputChanged -> _state.update { it.copy(inputText = event.text) }
             is ChatEvent.SendMessage -> sendMessage()
             is ChatEvent.ClearChat -> _state.update { it.copy(messages = emptyList()) }
-            is ChatEvent.RetryEngine -> initializeEngine()
+            is ChatEvent.RetryEngine -> checkModelsAndInitialize()
         }
     }
 

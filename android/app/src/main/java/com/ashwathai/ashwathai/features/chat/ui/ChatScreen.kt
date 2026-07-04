@@ -1,6 +1,7 @@
 package com.ashwathai.ashwathai.features.chat.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,12 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ashwathai.ashwathai.app.components.*
 import com.ashwathai.ashwathai.app.theme.CyanPrimary
+import com.ashwathai.ashwathai.app.theme.PureBlack
 import com.ashwathai.ashwathai.app.theme.SurfaceTier1
 import com.ashwathai.ashwathai.app.theme.SurfaceTier2
 import com.ashwathai.ashwathai.di.ServiceLocator
@@ -40,9 +45,9 @@ fun ChatScreen(
         factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val application = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]!!
                 return ChatViewModel(
-                    ServiceLocator.provideInferenceEngine()
+                    ServiceLocator.provideInferenceEngine(),
+                    ServiceLocator.modelRepository
                 ) as T
             }
         }
@@ -60,40 +65,50 @@ fun ChatScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text("Ashwath AI", style = MaterialTheme.typography.titleMedium)
-                        Text(state.activeModelName, style = MaterialTheme.typography.labelSmall, color = CyanPrimary)
-                    }
-                },
+            AshwathTopBar(
+                title = "Ashwath AI",
+                subtitle = if (state.engineStatus is EngineStatus.Connected) state.activeModelName else "Engine Offline",
                 actions = {
-                    IconButton(onClick = { viewModel.onEvent(ChatEvent.ClearChat) }) {
-                        Icon(Icons.Default.DeleteSweep, contentDescription = "Clear", tint = Color.Gray)
+                    if (state.messages.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.onEvent(ChatEvent.ClearChat) }) {
+                            Icon(Icons.Default.DeleteSweep, contentDescription = "Clear")
+                        }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black, titleContentColor = Color.White)
+                }
             )
         },
         containerColor = Color.Black
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Column(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(
-                    state = scrollState,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    item { Spacer(modifier = Modifier.height(8.dp)) }
-                    items(state.messages) { message ->
-                        ChatBubble(message)
+                if (state.messages.isEmpty() && state.engineStatus is EngineStatus.Connected) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        EmptyChatContent(
+                            onSuggestionClick = { viewModel.onEvent(ChatEvent.InputChanged(it)) }
+                        )
                     }
-                    if (state.isTyping) {
-                        item { TypingIndicator() }
+                } else {
+                    LazyColumn(
+                        state = scrollState,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        item { Spacer(modifier = Modifier.height(8.dp)) }
+                        items(state.messages) { message ->
+                            if (message.text.isNotBlank() || message.sender == Sender.AI) {
+                                AshwathChatBubble(
+                                    text = message.text,
+                                    isAi = message.sender == Sender.AI
+                                )
+                            }
+                        }
+                        if (state.isTyping) {
+                            item { TypingIndicator() }
+                        }
+                        item { Spacer(modifier = Modifier.height(16.dp)) }
                     }
-                    item { Spacer(modifier = Modifier.height(16.dp)) }
                 }
 
                 ChatInputBar(
@@ -112,32 +127,144 @@ fun ChatScreen(
 }
 
 @Composable
+fun EmptyChatContent(onSuggestionClick: (String) -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            Icons.Default.AutoAwesome,
+            contentDescription = null,
+            tint = CyanPrimary.copy(alpha = 0.5f),
+            modifier = Modifier.size(64.dp)
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            "Ready to assist",
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.White
+        )
+        Text(
+            "Your conversations are local and private.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.Gray,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        Text(
+            "TRY ASKING",
+            style = MaterialTheme.typography.labelSmall,
+            color = CyanPrimary,
+            letterSpacing = 2.sp
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val suggestions = listOf(
+            "Write a Python script for data analysis",
+            "Explain quantum computing like I'm five",
+            "Help me plan a 3-day trip to Tokyo"
+        )
+
+        suggestions.forEach { suggestion ->
+            AshwathCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                onClick = { onSuggestionClick(suggestion) }
+            ) {
+                Text(
+                    text = suggestion,
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun EngineStatusOverlay(status: EngineStatus, onRetry: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.8f)),
+            .background(Color.Black.copy(alpha = 0.9f)),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier.padding(32.dp)
         ) {
             when (status) {
                 is EngineStatus.Initializing -> {
-                    CircularProgressIndicator(color = CyanPrimary)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Starting engine...", color = Color.White)
+                    CircularProgressIndicator(color = CyanPrimary, strokeWidth = 2.dp)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        "Initializing Ashwath AI",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
+                    Text(
+                        "Starting local inference engine...",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
+                is EngineStatus.NoModelInstalled -> {
+                    Icon(
+                        Icons.Default.DownloadForOffline,
+                        contentDescription = null,
+                        tint = CyanPrimary,
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        "No Models Found",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.White
+                    )
+                    Text(
+                        "Download a model to start chatting offline.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    AshwathPrimaryButton(
+                        text = "EXPLORE MODELS",
+                        onClick = { /* Navigation handled via BottomBar */ }
+                    )
                 }
                 is EngineStatus.Error -> {
-                    Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = Color.Red, modifier = Modifier.size(48.dp))
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Engine Error", color = Color.Red, style = MaterialTheme.typography.titleLarge)
-                    Text(status.message, color = Color.Gray, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                    Icon(
+                        Icons.Default.ErrorOutline,
+                        contentDescription = null,
+                        tint = Color.Red,
+                        modifier = Modifier.size(64.dp)
+                    )
                     Spacer(modifier = Modifier.height(24.dp))
-                    Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = CyanPrimary)) {
-                        Text("Retry", color = Color.Black)
-                    }
+                    Text(
+                        "Engine Failure",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.Red
+                    )
+                    Text(
+                        status.message,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    AshwathPrimaryButton(
+                        text = "RETRY INITIALIZATION",
+                        onClick = onRetry
+                    )
                 }
                 is EngineStatus.Connected -> {}
             }
@@ -146,42 +273,39 @@ fun EngineStatusOverlay(status: EngineStatus, onRetry: () -> Unit) {
 }
 
 @Composable
-fun ChatBubble(message: ChatMessage) {
-    val isAi = message.sender == Sender.AI
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = if (isAi) Alignment.Start else Alignment.End
+fun TypingIndicator() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 12.dp,
-                        topEnd = 12.dp,
-                        bottomStart = if (isAi) 0.dp else 12.dp,
-                        bottomEnd = if (isAi) 12.dp else 0.dp
-                    )
-                )
-                .background(if (isAi) SurfaceTier1 else CyanPrimary)
-                .padding(12.dp)
+                .width(48.dp)
+                .height(32.dp)
+                .background(
+                    color = SurfaceTier2,
+                    shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp, bottomEnd = 8.dp)
+                ),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = message.text,
-                color = if (isAi) Color.White else Color.Black,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                repeat(3) {
+                    Box(
+                        modifier = Modifier
+                            .size(4.dp)
+                            .background(CyanPrimary, CircleShape)
+                    )
+                }
+            }
         }
-    }
-}
-
-@Composable
-fun TypingIndicator() {
-    Box(
-        modifier = Modifier
-            .background(SurfaceTier1, RoundedCornerShape(12.dp))
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-    ) {
-        Text("Thinking...", style = MaterialTheme.typography.labelSmall, color = CyanPrimary)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            "AI is thinking...",
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.Gray
+        )
     }
 }
 
@@ -207,23 +331,12 @@ fun ChatInputBar(
                 Icon(Icons.Default.Add, contentDescription = "Attach", tint = if (enabled) Color.Gray else Color.DarkGray)
             }
 
-            TextField(
+            AshwathTextField(
                 value = text,
                 onValueChange = onTextChange,
                 modifier = Modifier.weight(1f),
                 enabled = enabled,
-                placeholder = { Text("Ask anything...", color = Color.Gray) },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = SurfaceTier2,
-                    unfocusedContainerColor = SurfaceTier2,
-                    disabledContainerColor = SurfaceTier1,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.White,
-                    disabledTextColor = Color.Gray
-                ),
-                shape = RoundedCornerShape(24.dp)
+                placeholder = "Ask anything..."
             )
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -232,13 +345,13 @@ fun ChatInputBar(
                 onClick = onSend,
                 enabled = enabled && text.isNotBlank(),
                 modifier = Modifier
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(4.dp))
                     .background(if (enabled && text.isNotBlank()) CyanPrimary else Color.DarkGray)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send",
-                    tint = if (enabled && text.isNotBlank()) Color.Black else Color.Gray
+                    tint = if (enabled && text.isNotBlank()) PureBlack else Color.Gray
                 )
             }
         }

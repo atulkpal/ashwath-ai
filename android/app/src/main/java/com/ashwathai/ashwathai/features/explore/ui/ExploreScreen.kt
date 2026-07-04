@@ -1,7 +1,6 @@
 package com.ashwathai.ashwathai.features.explore.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -10,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Memory
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -24,6 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ashwathai.ashwathai.app.components.AshwathCard
+import com.ashwathai.ashwathai.app.components.AshwathChip
+import com.ashwathai.ashwathai.app.components.AshwathTextField
+import com.ashwathai.ashwathai.app.components.AshwathTopBar
 import com.ashwathai.ashwathai.domain.models.ModelInfo
 import com.ashwathai.ashwathai.features.explore.events.ExploreEvent
 import com.ashwathai.ashwathai.features.explore.viewmodel.ExploreViewModel
@@ -39,13 +40,7 @@ fun ExploreScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Explore Models", style = MaterialTheme.typography.headlineMedium) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black,
-                    titleContentColor = Color.White
-                )
-            )
+            AshwathTopBar(title = "Explore Models")
         },
         containerColor = Color.Black
     ) { innerPadding ->
@@ -97,21 +92,11 @@ fun ExploreScreen(
 
 @Composable
 fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
-    OutlinedTextField(
+    AshwathTextField(
         value = query,
         onValueChange = onQueryChange,
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("Search models...", color = Color.Gray) },
-        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
-        shape = RoundedCornerShape(8.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = CyanPrimary,
-            unfocusedBorderColor = Color.DarkGray,
-            focusedContainerColor = SurfaceTier2,
-            unfocusedContainerColor = SurfaceTier2,
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White
-        )
+        placeholder = "Search models..."
     )
 }
 
@@ -152,21 +137,11 @@ fun CategorySection(
 ) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         items(categories) { category ->
-            val isSelected = category == selectedCategory
-            Surface(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .clickable { onCategorySelected(category) },
-                color = if (isSelected) CyanPrimary else SurfaceTier2,
-                contentColor = if (isSelected) Color.Black else Color.White
-            ) {
-                Text(
-                    text = category.uppercase(),
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            AshwathChip(
+                text = category.uppercase(),
+                selected = category == selectedCategory,
+                onClick = { onCategorySelected(category) }
+            )
         }
     }
 }
@@ -204,26 +179,11 @@ fun ModelExploreCard(model: ModelInfo, onDownloadClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ModelTag(text = model.size)
-                ModelTag(text = model.parameters)
-                model.tags.take(1).forEach { ModelTag(text = it) }
+                AshwathChip(text = model.size)
+                AshwathChip(text = model.parameters)
+                model.tags.take(1).forEach { AshwathChip(text = it) }
             }
         }
     }
 }
 
-@Composable
-fun ModelTag(text: String) {
-    Box(
-        modifier = Modifier
-            .background(Color.DarkGray, RoundedCornerShape(2.dp))
-            .padding(horizontal = 6.dp, vertical = 2.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = Color.White,
-            fontSize = 9.sp
-        )
-    }
-}

@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ashwathai.ashwathai.app.theme.BorderSubtle
 import com.ashwathai.ashwathai.app.theme.CyanPrimary
-import com.ashwathai.ashwathai.app.theme.OnCyanPrimary
 import com.ashwathai.ashwathai.app.theme.PureBlack
 
 @Composable

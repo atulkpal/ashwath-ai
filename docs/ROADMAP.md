@@ -22,24 +22,25 @@
 - [x] Unit test suite: 21 tests across 6 packages (config, logging, device, models, runtime, api)
 - [x] In-memory gRPC integration tests for all RPCs
 
-## Phase 3: Android Engine Integration (In Progress)
+## Phase 3: Android Engine Integration ✅ (Complete)
 - [x] Kotlin SDK module with gRPC client infrastructure
 - [x] Engine downloader with progress tracking and checksum verification
 - [x] Engine process lifecycle manager (start, stop, health check)
 - [x] Android ServiceLocator wiring SDK to app
 - [x] ChatViewModel connected to InferenceEngine interface
-- [ ] Generate real gRPC stubs from proto file
-- [ ] Wire `EngineGrpcClient.generate()` to real stub calls (currently mocked)
-- [ ] Handle engine not installed / offline state properly
-- [ ] Fix deprecation warnings (icons, statusBar, use import)
-- [ ] Add instrumented tests for download → install → connect flow
+- [x] Generate real gRPC stubs from proto file
+- [x] Wire `EngineGrpcClient.generate()` to real stub calls
+- [x] Handle engine not installed / offline state properly
+- [x] Add instrumented tests for download → install → connect flow
 
-## Phase 4: Real Inference
-- [ ] llama.cpp Go bindings
-- [ ] Model download from GitHub Releases
-- [ ] Streaming token generation with real models
+## Phase 4: Real Inference (Phase A: Foundation Stabilization ✅)
+- [x] llama.cpp Go backend wiring
+- [x] Real model installation pipeline (Downloads + Verification)
+- [x] Persistent model registry (`registry.json`)
+- [x] Performance benchmarking implementation
+- [ ] Phase B: Architecture Foundation (Next Priority)
+- [ ] Streaming token generation with real models (End-to-End)
 - [ ] Basic chat flow end-to-end (Android app ↔ Go engine)
-- [ ] Performance benchmarking
 
 ## Phase 5: Knowledge & RAG
 - [ ] SQLite-based vector store

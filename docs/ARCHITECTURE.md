@@ -37,27 +37,29 @@ The engine exposes a gRPC API on localhost (127.0.0.1) using a dynamically assig
 
 ### Engine Packages
 
-| Package | Purpose |
-|---------|---------|
-| `cmd/ashwathd` | Main entry point, wires all services |
-| `internal/api` | gRPC service definitions, JSON codec, request/response types |
-| `internal/config` | JSON file + env var config loader |
-| `internal/device` | Hardware detection (OS, arch, CPU, RAM) |
-| `internal/logging` | Structured slog-based logger |
-| `internal/models` | Model registry (installed + available) |
-| `internal/runtime` | Engine abstraction (mock, future: llama.cpp) |
-| `internal/downloads` | Model download manager |
-| `internal/rag` | Retrieval-augmented generation (planned) |
-| `internal/voice` | STT/TTS (planned) |
-| `internal/vision` | Image understanding (planned) |
-| `internal/knowledge` | Knowledge base management (planned) |
-| `internal/plugins` | Plugin system (planned) |
-| `pkg/api` | Public API types for external consumers |
+| Package | Purpose | Status |
+|---------|---------|--------|
+| `cmd/ashwathd` | Main entry point, wires all services | ✅ Implemented |
+| `internal/api` | gRPC service definitions, JSON codec, request/response types | ✅ Implemented |
+| `internal/config` | JSON file + env var config loader | ✅ Implemented |
+| `internal/device` | Hardware detection (OS, arch, CPU, RAM) | ✅ Implemented |
+| `internal/logging` | Structured slog-based logger | ✅ Implemented |
+| `internal/models` | Persistent model registry (`registry.json`) | ✅ Implemented (Phase A) |
+| `internal/runtime` | Engine abstraction (llama.cpp and mock backends) | ✅ Implemented (Phase A) |
+| `internal/downloads` | Multi-threaded download manager with verification | ✅ Implemented (Phase A) |
+| `internal/benchmark` | On-device performance evaluation (tokens/sec, memory) | ✅ Implemented (Phase A) |
+| `internal/rag` | Retrieval-augmented generation | 🗂️ Planned |
+| `internal/voice` | STT/TTS | 🗂️ Planned |
+| `internal/vision` | Image understanding | 🗂️ Planned |
+| `internal/knowledge` | Knowledge base management | 🗂️ Planned |
+| `internal/plugins` | Plugin system | 🗂️ Planned |
+| `pkg/api` | Public API types for external consumers | ✅ Implemented |
 
 ### Testing
-- Unit tests: 21 tests across 6 packages.
+- Unit tests: 45 tests across 8 packages (including downloads and runtime).
 - In-memory gRPC integration tests using `bufconn` (no external server needed).
 - Smoke test in `engine/tests/smoke.go` for manual verification.
+- `go vet` and `golangci-lint` integrated into CI.
 
 ## Android Architecture
 
@@ -91,10 +93,17 @@ The Kotlin SDK is included in the Android build as a Gradle subproject. It will 
 1. **Frontend launches**:
    - **Android (Embedded)**: The app loads `libashwath_engine.so` via JNI. `EmbeddedInferenceEngine` calls `nativeStartServer` to launch the gRPC server within the app process.
    - **Desktop/Others (Daemon)**: The app checks if the `ashwathd` binary is installed. If not, it downloads it from GitHub Releases, verifies the checksum, and launches it as a child process.
-2. **Model Loading**: Both modes check for installed models in the `data-dir`. If a model is missing, it is downloaded from GitHub Releases / HuggingFace.
-3. **Connect via gRPC**: All frontends connect to the local gRPC server (usually on `127.0.0.1:50051`).
-4. **AI Operations**: All requests (Generate, ListModels, etc.) are sent as gRPC calls.
-5. **Shutdown**: Frontend calls `Shutdown` RPC or `nativeShutdown` (JNI) to gracefully terminate the engine.
+2. **Engine Initialization**:
+   - The engine loads its configuration and initializes the **Persistent Model Registry**.
+   - If a backend (e.g., `llama.cpp`) is requested, the engine wires the specific runtime backend.
+3. **Model Management**:
+   - The engine exposes `ListModels`, `InstallModel`, and `RemoveModel` RPCs.
+   - `InstallModel` triggers the **Download Manager**, which handles multi-threaded GGUF downloads with background verification.
+   - The registry state is persisted to `registry.json` in the `data-dir`.
+4. **Connect via gRPC**: All frontends connect to the local gRPC server (usually on `127.0.0.1:50051`).
+5. **AI Operations**: All requests (Generate, ListModels, etc.) are sent as gRPC calls.
+6. **Performance Monitoring**: The engine periodically runs benchmarks (if enabled) to report hardware utilization and inference speed to the frontend via `GetDeviceInfo` or custom telemetry.
+7. **Shutdown**: Frontend calls `Shutdown` RPC or `nativeShutdown` (JNI) to gracefully terminate the engine and all child processes (like `llama-server`).
 
 ## Future Frontends
 

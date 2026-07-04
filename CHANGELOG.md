@@ -21,7 +21,7 @@
 - GitHub Actions: engine CI (lint, test, build) + release pipeline (7 cross-compile targets).
 - `go vet` clean, all tests passing.
 
-### Android (EPIC-2, WIP)
+### Android (EPIC-2)
 - Kotlin SDK module (`sdk/kotlin/`) as a Gradle subproject.
 - SDK interfaces: `InferenceEngine`, `GenerationOptions`, `InferenceResult`.
 - SDK implementations: `ClientInferenceEngine`, `EngineGrpcClient`.
@@ -31,6 +31,17 @@
 - ViewModels: `ChatViewModel` (connected to engine), `LibraryViewModel`.
 - Version catalog (`libs.versions.toml`) with gRPC, Ktor, protobuf, Compose dependencies.
 - Full app build succeeds (`./gradlew assembleDebug`).
+
+### Engine (EPIC-3, Phase A: Foundation Stabilization)
+- Real model installation pipeline with background download worker.
+- Persistent model registry (`registry.json`) with install/remove lifecycle management.
+- Integration of `llama.cpp` backend wiring with initial `llama-server` process management.
+- Download manager with multi-threaded chunked downloads and SHA-256 verification.
+- Benchmark implementation for on-device performance evaluation (tokens/sec, memory).
+- Refined engine configuration with data directory isolation.
+- Verified end-to-end integration between engine and SDK for real model metadata.
+- Unit test coverage expanded to 45 tests; `go test` and `go vet` clean.
+- Fixed various race conditions in streaming response cancellation.
 
 ### Fixed
 - gRPC `HandlerType` nil-pointer crash in service descriptor registration.

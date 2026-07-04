@@ -14,9 +14,12 @@ import com.ashwathai.ashwathai.app.theme.SurfaceTier1
 @Composable
 fun AshwathCard(
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Surface(
+        onClick = onClick ?: {},
+        enabled = onClick != null,
         modifier = modifier
             .border(
                 width = 1.dp,

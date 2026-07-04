@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,13 +28,13 @@ fun AshwathChatBubble(
     isAi: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val alignment = if (isAi) Alignment.Start else Alignment.End
+    val contentAlignment = if (isAi) Alignment.CenterStart else Alignment.CenterEnd
     val backgroundColor = if (isAi) SurfaceTier2 else CyanPrimary
     val textColor = if (isAi) Color.White else PureBlack
 
     Box(
         modifier = modifier.fillMaxWidth(),
-        contentAlignment = alignment
+        contentAlignment = contentAlignment
     ) {
         Row(
             modifier = Modifier

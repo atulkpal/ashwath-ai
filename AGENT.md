@@ -27,17 +27,15 @@ Every AI session MUST begin by reading:
 ---
 
 ## 4. Current Mission
-After reading the required documents, identify the project's current mission from `docs/PROJECT_STATE.md` before making changes. If `docs/PROJECT_STATE.md` and the implementation disagree, report the inconsistency before implementing changes. **The implementation remains the source of truth.**
+The engine foundation has been stabilized (EPIC 3 - Phase A). The current mission is **EPIC 3 – Phase B (Architecture Foundation)**. This involves standardizing gRPC contracts, refining SDK abstractions, and preparing for multi-backend support.
 
----
+Before making changes, identify the specific goals of Phase B from `docs/PROJECT_STATE.md`. If `docs/PROJECT_STATE.md` and the implementation disagree, report the inconsistency before implementing changes. **The implementation remains the source of truth.**
 
-## 5. Repository Audit
-Before making changes, every AI contributor should:
-- Understand the subsystem and its role in the platform.
-- Compare the implementation with the documentation.
-- Report any inconsistencies found.
-- Understand the existing architecture and patterns.
-- Only then begin implementation.
+## 5. Repository Audit (Engine Maturity)
+As of Phase A completion:
+- **Engine**: Supports real `llama.cpp` backend wiring, persistent model registry, and background downloads.
+- **Android**: Successfully embeds the engine and communicates via loopback gRPC.
+- **SDK**: Kotlin SDK is the reference implementation for gRPC communication.
 
 ---
 

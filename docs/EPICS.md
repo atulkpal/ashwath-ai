@@ -29,16 +29,23 @@
 - [x] E2.8: Verified end-to-stream pipeline in Android UI
 - [x] E2.9: Establish Engineering Charter (`GUILD.md`)
 
-## EPIC-3: Real Inference
+## EPIC-3: Real Inference ✅ (Phase A Complete)
 
 **Goal**: Engine runs real AI models (llama.cpp).
 
-### Stories
-- [ ] E3.1: llama.cpp Go bindings
-- [ ] E3.2: Model download from GitHub Releases/HuggingFace
-- [ ] E3.3: Streaming token generation
-- [ ] E3.4: Model management UI in Android
-- [ ] E3.5: Performance benchmarking
+### Stories (Phase A: Foundation Stabilization)
+- [x] E3.1: llama.cpp Go backend wiring
+- [x] E3.2: Persistent model registry (`registry.json`)
+- [x] E3.3: Real model installation pipeline (Downloads + Verification)
+- [x] E3.4: Performance benchmarking implementation
+- [x] E3.5: End-to-end foundation verification
+
+### Stories (Phase B: Architecture Foundation)
+- [ ] E3.6: Standardized gRPC API contracts
+- [ ] E3.7: Refined SDK abstractions
+- [ ] E3.8: Multi-backend selection logic
+- [ ] E3.9: Model download resumption
+- [ ] E3.10: Android lifecycle-aware process management
 
 ## EPIC-4: RAG & Knowledge
 

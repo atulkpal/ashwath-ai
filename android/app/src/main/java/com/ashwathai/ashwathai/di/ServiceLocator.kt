@@ -1,6 +1,8 @@
 package com.ashwathai.ashwathai.di
 
 import android.content.Context
+import com.ashwathai.ashwathai.data.repository.MockModelRepository
+import com.ashwathai.ashwathai.domain.repository.ModelRepository
 import com.ashwathai.ashwathai.runtime.api.InferenceEngine
 import com.ashwathai.sdk.ClientInferenceEngine
 import com.ashwathai.sdk.EmbeddedInferenceEngine
@@ -17,6 +19,10 @@ object ServiceLocator {
 
     private val grpcClient by lazy {
         EngineGrpcClient(engineConfig.host, engineConfig.port)
+    }
+
+    val modelRepository: ModelRepository by lazy {
+        MockModelRepository()
     }
 
     fun provideInferenceEngine(): InferenceEngine {

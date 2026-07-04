@@ -5,9 +5,9 @@ This document provides a real-time operational dashboard for the Ashwath.AI repo
 ---
 
 ### Meta Information
-- **Project Version**: 0.1.1
-- **Current Milestone**: EPIC 3: Real Inference (llama.cpp)
-- **Last Updated**: 2024-03-21
+- **Project Version**: 0.2.0
+- **Current Milestone**: EPIC 3: Phase B (Architecture Foundation)
+- **Last Updated**: 2024-03-24
 
 ---
 
@@ -38,14 +38,15 @@ This document provides a real-time operational dashboard for the Ashwath.AI repo
 
 ### Current Work
 
-- **Platform Team**: Initializing llama.cpp Go bindings (EPIC 3).
-- **Android Client Team**: Enhancing Chat UI with real model metadata.
-- **Web Client Team**: gRPC-Web exploration and WASM build path.
-- **Research Lab**: Evaluating GGUF quantization performance.
+- **Platform Team**: Transitioning to EPIC 3 Phase B (Refining gRPC contracts and SDK abstractions).
+- **Android Client Team**: Migrating to the new persistent model registry in the Library UI.
+- **Web Client Team**: Prototyping gRPC-Web bridge for browser-based engine access.
+- **Research Lab**: Benchmarking Q4_K_M vs Q5_K_M GGUF models on mobile hardware.
 
 ---
 
 ### Recently Completed
+- [x] **EPIC 3 Phase A**: Stabilized Engine Foundation (Real downloads, registry, benchmarks).
 - [x] Migrated Android to **Embedded Go Runtime** (.so) via JNI.
 - [x] Automated Go Engine build within the Gradle pipeline.
 - [x] Established shared gRPC loopback architecture for all platforms.
@@ -56,7 +57,7 @@ This document provides a real-time operational dashboard for the Ashwath.AI repo
 ---
 
 ### Next Priorities
-1. **llama.cpp bindings**: Move from mock inference to real local models.
+1. **EPIC 3 Phase B**: Architecture Foundation (Standardizing API contracts and multi-backend support).
 2. **Model Management**: UI for downloading and switching between specific models.
 3. **App Lifecycle**: Pausing/Stopping the engine process when app is backgrounded.
 
