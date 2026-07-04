@@ -89,12 +89,12 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
-extern int goInit(char* cModelPath, char* cDataDir);
+extern int goInit(char* cEngineType, char* cModelPath, char* cLlamaBin);
 extern void goShutdown(void);
 extern int goRunning(void);
 extern int goGenerate(char* cPrompt, int cMaxTokens, float cTemperature, int cTopK, float cTopP);
 extern int goCancel(void);
-extern int goStartServer(int port, char* cDataDir);
+extern int goStartServer(int port, char* cDataDir, char* cEngineType);
 
 #ifdef __cplusplus
 }
