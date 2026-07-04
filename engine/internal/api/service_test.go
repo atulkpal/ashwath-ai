@@ -63,6 +63,25 @@ func TestServiceGetDeviceInfo(t *testing.T) {
 	}
 }
 
+func TestServiceRemoveModel(t *testing.T) {
+	srv, lis := newTestServer(t)
+	defer srv.GracefulStop()
+	go srv.Serve(lis)
+	defer srv.Stop()
+
+	conn := dialTest(t, lis)
+	defer conn.Close()
+
+	client := pb.NewAshwathEngineClient(conn)
+	resp, err := client.RemoveModel(context.Background(), &pb.RemoveRequest{ModelId: "nonexistent"})
+	if err != nil {
+		t.Fatalf("RemoveModel failed: %v", err)
+	}
+	if resp.Success {
+		t.Error("RemoveModel should return success=false for nonexistent model")
+	}
+}
+
 func TestServiceInstallModelMissing(t *testing.T) {
 	srv, lis := newTestServer(t)
 	defer srv.GracefulStop()

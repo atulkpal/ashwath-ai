@@ -65,6 +65,21 @@ func (s *EngineService) InstallModel(ctx context.Context, req *pb.InstallRequest
 	}, nil
 }
 
+func (s *EngineService) RemoveModel(ctx context.Context, req *pb.RemoveRequest) (*pb.RemoveResponse, error) {
+	s.log.Info("RemoveModel", "model_id", req.ModelId)
+	if err := s.registry.Remove(req.ModelId); err != nil {
+		s.log.Error("RemoveModel failed", "model_id", req.ModelId, "error", err)
+		return &pb.RemoveResponse{
+			Success: false,
+			Message: fmt.Sprintf("Remove failed: %v", err),
+		}, nil
+	}
+	return &pb.RemoveResponse{
+		Success: true,
+		Message: fmt.Sprintf("Model %s removed", req.ModelId),
+	}, nil
+}
+
 func (s *EngineService) GetDeviceInfo(ctx context.Context, req *pb.Empty) (*pb.DeviceInfo, error) {
 	caps, err := s.detector.Detect()
 	if err != nil {
