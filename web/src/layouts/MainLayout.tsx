@@ -1,9 +1,41 @@
-export function MainLayout() {
+import { useState, type ReactNode } from "react"
+import { Sidebar } from "@/components/layout/Sidebar"
+import { TopBar } from "@/components/layout/TopBar"
+import { MainContentArea } from "@/components/layout/MainContentArea"
+import { RightPanel } from "@/components/layout/RightPanel"
+import { StatusBar } from "@/components/layout/StatusBar"
+
+type MainLayoutProps = {
+  children?: ReactNode
+}
+
+export function MainLayout({ children }: MainLayoutProps) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [rightPanelOpen, setRightPanelOpen] = useState(false)
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-black text-white">
-      <h1 className="text-5xl font-bold text-cyan-400">
-        Ashwath.AI
-      </h1>
-    </main>
-  );
+    <div className="flex h-screen flex-col bg-[var(--sn-base)] text-[var(--sn-text-primary)]">
+      {/* Top Bar */}
+      <TopBar
+        rightPanelOpen={rightPanelOpen}
+        onToggleRightPanel={() => setRightPanelOpen((prev) => !prev)}
+      />
+
+      {/* Body: Sidebar + Content + Right Panel */}
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed((prev) => !prev)}
+        />
+        <MainContentArea>{children}</MainContentArea>
+        <RightPanel
+          open={rightPanelOpen}
+          onClose={() => setRightPanelOpen(false)}
+        />
+      </div>
+
+      {/* Status Bar */}
+      <StatusBar />
+    </div>
+  )
 }
