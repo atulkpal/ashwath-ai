@@ -1,19 +1,13 @@
 # Ashwath AI Project State
 
-This document provides a real-time operational dashboard for the Ashwath AI repository.
+**Operational Dashboard** — Last Updated: 2026-07-04
 
 ---
 
 ### Meta Information
-<<<<<<< HEAD
-- **Project Version**: 0.1.1
-- **Current Milestone**: EPIC 3: Real Inference (llama.cpp)
-- **Last Updated**: 2024-03-21
-=======
-- **Project Version**: 0.1.0
-- **Current Milestone**: Sprint W3A – Engine Integration Architecture
+- **Project Version**: 0.2.0
+- **Current Milestone**: EPIC 3 Phase B — Real Inference (llama.cpp)
 - **Last Updated**: 2026-07-04
->>>>>>> feature/web-client
 
 ---
 
@@ -21,14 +15,9 @@ This document provides a real-time operational dashboard for the Ashwath AI repo
 
 | Subsystem | Status | Primary Maintainer |
 | :--- | :--- | :--- |
-| **Platform** | Stable | Platform Team |
-<<<<<<< HEAD
+| **Platform (Engine + SDK)** | Stable | Platform Team |
 | **Android Client** | Stable | Android Client Team |
-| **Web Client** | Planned | Web Client Team |
-=======
-| **Android Client** | Integration | Android Client Team |
 | **Web Client** | Active Development | Web Client Team |
->>>>>>> feature/web-client
 | **Research Lab** | Experimental | Research Lab |
 | **Documentation** | Active | Shared |
 
@@ -36,79 +25,70 @@ This document provides a real-time operational dashboard for the Ashwath AI repo
 
 ### Repository Health
 
-- **Build Status**: ✅ Passing (Android, Engine, & SDK)
-- **Test Status**: ✅ Passing (SDK & Engine integration tests)
-- **Known Issues**: 
+- **Build Status**: ✅ Passing (Android `assembleDebug`, Engine `go build`)
+- **Test Status**: ✅ Passing (Engine: 42+ tests, Android/SDK: 10+ tests)
+- **Known Issues**:
   - SELinux restrictions on physical devices bypassed via Embedded Runtime.
   - Automatic Go build requires Go SDK in system PATH.
+  - Stitch/Google Fonts theme conflict in Android Compose (separate workspace).
 - **Technical Debt**:
-  - `libashwath` JNI bridge needs more granular error codes from Go.
-  - Proto definitions should be synchronized across all future frontends.
+  - `EmbeddedInferenceEngine` JNI bridge needs granular error codes from Go.
+  - Model download progress streaming is unary (no streaming progress RPC yet).
+  - Android UI compile depends on Stitch fix for full `assembleDebug` success.
 
 ---
 
 ### Current Work
 
-<<<<<<< HEAD
-- **Platform Team**: Initializing llama.cpp Go bindings (EPIC 3).
-- **Android Client Team**: Enhancing Chat UI with real model metadata.
-- **Web Client Team**: gRPC-Web exploration and WASM build path.
-- **Research Lab**: Evaluating GGUF quantization performance.
-=======
-- **Platform Team**: Defining the web engine integration architecture and preparing the shared API surface for Sprint W3A.
-- **Android Client Team**: Continuing engine integration validation while cross-platform contracts are finalized.
-- **Web Client Team**: Advancing the web client ↔ Go engine integration architecture, focused on transport, streaming, lifecycle, and SDK boundaries.
-- **Research Lab**: Evaluating quantization techniques for mobile NPUs.
->>>>>>> feature/web-client
+- **Platform Team**: Preparing for EPIC 3 Phase B — llama.cpp Go bindings for real local inference.
+- **Android Client Team**: Awaiting UI compile fix (Stitch); model management ViewModels wired and tested.
+- **Web Client Team**: Continuing engine SDK and runtime foundation for browser-based interaction.
+- **Research Lab**: Evaluating GGUF quantization performance and mobile NPU targets.
 
 ---
 
-### Sprint Milestones
-- [x] Sprint W0 — Design System v1.0 completed.
-- [x] Sprint W1 — Web Application Shell completed.
-- [x] Sprint W2 — Chat Workspace completed.
+### Completed Milestones
 
----
-
-### Recently Completed
-- [x] Migrated Android to **Embedded Go Runtime** (.so) via JNI.
-- [x] Automated Go Engine build within the Gradle pipeline.
-- [x] Established shared gRPC loopback architecture for all platforms.
-- [x] Verified end-to-stream pipeline in the Chat UI.
-- [x] Implemented Kotlin SDK with real gRPC stubs.
-- [x] Established Engineering Charter (`GUILD.md`).
-- [x] Delivered the foundational design language and web UI primitives for Sprint W0.
-- [x] Delivered the web application shell and core navigation framework for Sprint W1.
-- [x] Delivered the chat workspace experience and conversation input flow for Sprint W2.
-
----
+- [x] **EPIC 1: Engine MVP** — gRPC server, config, device detection, mock inference, model registry, logging, CI release pipeline.
+- [x] **EPIC 2: Android Engine Integration** — JNI bridge, embedded .so, Gradle build, Kotlin SDK gRPC client, ChatViewModel wired, ServiceLocator.
+- [x] **EPIC 3 Phase A: Engine Foundation & Android Integration** — Backend selection, model download/registry persistence, RemoveModel RPC, real benchmark implementation, proto drift fix, Android build fixed, Web merged into main, all worktrees synchronized.
 
 ### Next Priorities
-1. **Web ↔ Engine Integration Architecture**: Finalize the transport layer, streaming model, engine lifecycle, SDK boundary, and migration path for Sprint W3A.
-2. **llama.cpp bindings**: Move from mock inference to real local models.
-3. **Model Management**: UI for downloading and switching between specific models.
-4. **App Lifecycle**: Pausing/Stopping the engine process when app is backgrounded.
+
+1. **EPIC 3 Phase B**: llama.cpp Go bindings, real model download from HuggingFace/GitHub Releases, streaming token generation.
+2. **Android UI Fix**: Resolve Stitch/Google Fonts conflict for full UI compile.
+3. **Model Management UI**: Connect Explore and Library screens to wired ViewModels.
+4. **App Lifecycle**: Pause/stop engine when app is backgrounded.
 
 ---
 
 ### Important Decisions
+
 - **ADR-001**: Adoption of gRPC over localhost for engine communication.
 - **ADR-002**: Multi-worktree monorepo structure for parallel development.
 - **ADR-003**: Selection of Protobuf Lite for mobile binary size optimization.
+- **ADR-004**: Worktree-based development — `main` is integration branch; all implementation in feature worktrees.
+- **ADR-005**: Web Client uses Ashwath AI Runtime + gRPC-Web architecture (not direct engine access).
 
 ---
 
 ### Repository Layout
+
 - `/android`: Flagship Android application (Compose + MVVM).
 - `/engine`: Go-based AI execution core.
 - `/sdk`: Cross-platform language bindings (Kotlin, TS, Go).
+- `/web`: Browser-based frontend (React + Vite + TypeScript).
 - `/research`: Experimental models and lab scripts.
 - `/docs`: Global platform documentation and Architecture.
 - `/scripts`: Tooling for repository setup and CI/CD.
+- `/design`: Shared design assets and Synthetic Noir design system.
 
 ---
 
 ### Notes for Contributors
-- Ensure your worktree is synchronized with `main` before starting.
-- Never commit directly to `main`; use `feature/` branches.
+
+- `main` is the integration branch — never commit directly to it.
+- All implementation belongs in feature worktrees (`feature/platform`, `feature/android-client`, `feature/web-client`).
+- Merge latest `main` into feature branches before debugging.
+- Documentation lives in `docs/`; workspace-specific progress in `docs/analysis/`.
 - Respect the **Engineering Charter** in `docs/GUILD.md`.

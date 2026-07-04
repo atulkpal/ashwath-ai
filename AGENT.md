@@ -25,7 +25,7 @@ Every AI session MUST begin by reading:
 3. `docs/PROJECT_STATE.md` (Operational Dashboard)
 4. `docs/PLATFORM_RULES.md` (Platform Constraints)
 5. `docs/ENGINE_CLIENT_CONTRACT.md` (Engine-Client Contract)
-6. The client-specific architecture document appropriate to the assigned client (e.g. `docs/WEB_ARCHITECTURE.md` for the Web Client, `docs/ANDROID_ARCHITECTURE.md` for the Android Client)
+6. The client-specific architecture document appropriate to the assigned client (e.g. `docs/WEB_ARCHITECTURE.md` for the Web Client; see `docs/ARCHITECTURE.md` and `docs/JNI_ARCHITECTURE.md` for Android)
 
 ---
 
@@ -54,7 +54,36 @@ Before making changes, every AI contributor should:
 
 ---
 
-## 7. Team Sections
+## 7. Worktree Rules
+- `main` is the **integration branch**. It must always be stable, building, and passing all tests.
+- **Never develop directly on `main`.** All implementation belongs in feature worktrees.
+- Feature worktrees: `feature/platform`, `feature/android-client`, `feature/web-client`, `research/lab`.
+- After a feature is complete and verified, merge into `main` and clean up the worktree branch.
+
+---
+
+## 8. Documentation Rules
+- `docs/PROJECT_STATE.md` is maintained **only by the Project Integrator**. Feature agents must not modify it directly.
+- Feature work should update workspace-specific progress documents under `docs/analysis/`:
+  - `docs/analysis/ENGINE_PROGRESS.md`
+  - `docs/analysis/ANDROID_PROGRESS.md`
+  - `docs/analysis/WEB_PROGRESS.md`
+- Platform-wide documentation in `docs/` is shared and should only be modified when explicitly requested or required by an approved milestone.
+
+---
+
+## 9. Merge Rules
+- Merge latest `main` into feature branches before debugging.
+- **Never debug stale branches.** Always sync with `main` first.
+- Keep documentation synchronized with implementation.
+- After merging, verify:
+  - All worktrees are synchronized with `main`.
+  - All branches are cleaned (merged branches deleted).
+  - `docs/analysis/` progress files updated if applicable.
+
+---
+
+## 10. Team Sections
 
 ### Platform Team (OpenCode Agent)
 - **Mission**: Maintain the "Heart of Ashwath."
@@ -80,14 +109,14 @@ Before making changes, every AI contributor should:
 
 ---
 
-## 8. Cross-Team Collaboration
+## 11. Cross-Team Collaboration
 - **Visibility**: All agents have unrestricted visibility. You are encouraged to understand the entire system to make better local decisions.
 - **Responsibility vs. Exclusivity**: Primary Maintainer status does not mean you cannot suggest changes elsewhere, but major cross-boundary modifications (e.g., API changes) must be discussed.
 - **Contracts**: All communication between Engine and Clients must follow the established SDK contracts and platform communication definitions.
 
 ---
 
-## 9. Session Checklist
+## 12. Session Checklist
 Before concluding a session, verify:
 - [ ] The project still builds (Android: `./gradlew assembleDebug`, Engine: `go build`).
 - [ ] Unit tests pass in the modified module.
@@ -97,7 +126,7 @@ Before concluding a session, verify:
 
 ---
 
-## 10. Maintaining AGENT.md
+## 13. Maintaining AGENT.md
 - The **Universal Engineering Rules** change rarely.
 - Team sections should be updated as new AI agents join or responsibilities shift.
 - Platform-wide status belongs in `docs/PROJECT_STATE.md`, not here.

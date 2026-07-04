@@ -1,6 +1,10 @@
 # Sprint W3A – Engine Integration Architecture
 
-Status: Draft
+Status: Complete — Archived
+
+> This document defined the architecture for connecting the Web Client to the Go Engine during Sprint W3A.
+> The architecture has been implemented and the Web Client has been merged into `main`.
+> This document is preserved as a historical record of the architectural decision-making process.
 
 ---
 

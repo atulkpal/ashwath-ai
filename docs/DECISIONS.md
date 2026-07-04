@@ -27,10 +27,10 @@
 - **Decision**: SDK uses `grpc-protobuf-lite` instead of full `grpc-protobuf`.
 - **Reasoning**: Lite variant avoids duplicate class conflicts with Android's built-in protobuf-javalite. Reduces SDK footprint.
 
-## [2026-07-03] Web Frontend Deferred
-- **Decision**: Web frontend (TypeScript/React) is deferred until EPIC-3 (real inference) stabilizes the engine API.
-- **Reasoning**: Premature web development would cause churn when the API changes. The Kotlin SDK serves as the reference gRPC client implementation.
-- **Prerequisites**: gRPC-Web support in the engine, proto-generated TypeScript stubs, stable Generate RPC contract.
+## [2026-07-04] Web Frontend Merged into Main
+- **Decision**: Web frontend (TypeScript/React) project is now merged into main and actively developed.
+- **Rationale**: The engine API is stable enough (EPIC 2 and EPIC 3 Phase A complete) for parallel web development. The Web Client follows the Ashwath AI Runtime + gRPC-Web architecture described in `docs/SPRINT_W3A_ENGINE_INTEGRATION_ARCHITECTURE.md`.
+- **Status**: Active development. Engine SDK and chat UI components established. Merged into main on 2026-07-04.
 
 ## [2026-03-07] Initial Architecture Selection
 - **Decision**: Use Package-based modularization within `:app` initially.

@@ -15,7 +15,7 @@ Future frontends will include iOS, Desktop, and Web — all powered by the same 
 ├── android/       Android frontend (standalone, Jetpack Compose)
 ├── ios/           iOS frontend (future)
 ├── desktop/       Desktop frontend (future)
-├── web/           Web frontend (future)
+├── web/           Web frontend (React + Vite + TypeScript, active)
 ├── sdk/           Client SDKs for engine API
 ├── docs/          Platform documentation
 ├── design/        Shared design assets

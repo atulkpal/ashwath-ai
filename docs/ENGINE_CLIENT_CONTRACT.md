@@ -1,6 +1,8 @@
 # Engine Client Contract
 
-Status: Draft
+Status: Active
+
+> This contract governs all existing and future clients (Android, Web, Desktop, iOS, CLI).
 
 ---
 
