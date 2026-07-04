@@ -10,6 +10,7 @@ import (
 	"github.com/ashwathai/ashwath-engine/internal/api/pb"
 	"github.com/ashwathai/ashwath-engine/internal/config"
 	"github.com/ashwathai/ashwath-engine/internal/device"
+	"github.com/ashwathai/ashwath-engine/internal/downloads"
 	"github.com/ashwathai/ashwath-engine/internal/logging"
 	"github.com/ashwathai/ashwath-engine/internal/models"
 	"github.com/ashwathai/ashwath-engine/internal/runtime"
@@ -65,7 +66,7 @@ func Run(ctx context.Context, cfg *config.Config, opts Options) error {
 	}
 	log.Info("Engine initialized", "name", eng.Name())
 
-	reg := models.NewRegistry()
+	reg := models.NewRegistry(cfg.ModelsDir, downloads.NewManager())
 
 	shutdownCh := make(chan struct{})
 	api.SetShutdownChannel(shutdownCh)
