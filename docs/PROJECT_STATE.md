@@ -1,13 +1,13 @@
-# Ashwath.AI Project State
+# Ashwath AI Project State
 
-This document provides a real-time operational dashboard for the Ashwath.AI repository.
+This document provides a real-time operational dashboard for the Ashwath AI repository.
 
 ---
 
 ### Meta Information
 - **Project Version**: 0.1.0
-- **Current Milestone**: EPIC 2: Android Engine Integration
-- **Last Updated**: 2024-03-07
+- **Current Milestone**: Sprint W3 – Web Client ↔ Go Engine Integration Planning
+- **Last Updated**: 2026-07-04
 
 ---
 
@@ -17,7 +17,7 @@ This document provides a real-time operational dashboard for the Ashwath.AI repo
 | :--- | :--- | :--- |
 | **Platform** | Stable | Platform Team |
 | **Android Client** | Integration | Android Client Team |
-| **Web Client** | Planned | Web Client Team |
+| **Web Client** | Active Development | Web Client Team |
 | **Research Lab** | Experimental | Research Lab |
 | **Documentation** | Active | Shared |
 
@@ -38,10 +38,17 @@ This document provides a real-time operational dashboard for the Ashwath.AI repo
 
 ### Current Work
 
-- **Platform Team**: Stabilizing gRPC API and preparing for llama.cpp integration (EPIC 3).
-- **Android Client Team**: Finalizing engine downloader UI and testing process lifecycle.
-- **Web Client Team**: Initial project scaffolding and gRPC-Web exploration.
+- **Platform Team**: Defining the web engine integration contract and preparing the shared API surface for Sprint W3.
+- **Android Client Team**: Continuing engine integration validation while cross-platform contracts are finalized.
+- **Web Client Team**: Advancing the web client ↔ Go engine integration path, focused on transport, state flow, and UX alignment.
 - **Research Lab**: Evaluating quantization techniques for mobile NPUs.
+
+---
+
+### Sprint Milestones
+- [x] Sprint W0 — Design System v1.0 completed.
+- [x] Sprint W1 — Web Application Shell completed.
+- [x] Sprint W2 — Chat Workspace completed.
 
 ---
 
@@ -51,13 +58,17 @@ This document provides a real-time operational dashboard for the Ashwath.AI repo
 - [x] Resolved "Permission Denied" (error 13) for engine execution on Android.
 - [x] Integrated `ChatViewModel` with streaming gRPC responses.
 - [x] Established Engineering Charter (`GUILD.md`).
+- [x] Delivered the foundational design language and web UI primitives for Sprint W0.
+- [x] Delivered the web application shell and core navigation framework for Sprint W1.
+- [x] Delivered the chat workspace experience and conversation input flow for Sprint W2.
 
 ---
 
 ### Next Priorities
-1. **llama.cpp bindings**: Move from mock inference to real local models.
-2. **Model Management**: UI for downloading and switching between specific models.
-3. **App Lifecycle**: Pausing/Stopping the engine process when app is backgrounded.
+1. **Web ↔ Engine Integration Planning**: Define the client/engine contract, transport strategy, and state synchronization approach for Sprint W3.
+2. **llama.cpp bindings**: Move from mock inference to real local models.
+3. **Model Management**: UI for downloading and switching between specific models.
+4. **App Lifecycle**: Pausing/Stopping the engine process when app is backgrounded.
 
 ---
 
