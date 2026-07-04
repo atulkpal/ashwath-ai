@@ -47,7 +47,6 @@ fun ChatScreen(
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 return ChatViewModel(
                     ServiceLocator.provideInferenceEngine(),
-                    ServiceLocator.modelRepository
                 ) as T
             }
         }
