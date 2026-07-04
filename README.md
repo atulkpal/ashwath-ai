@@ -45,11 +45,15 @@ go build ./cmd/ashwathd
 ## Architecture
 
 Ashwath.AI uses a modular, engine-client architecture:
-- **Go Engine**: The "brain" of the platform. On Android, it's embedded as a native library via JNI. On other platforms, it runs as a local daemon.
-- **gRPC API**: The engine and frontend communicate over a local loopback gRPC connection. This ensures frontend code remains lightweight and platform-agnostic.
-- **Gradle Integration**: On Android, the Go engine is automatically compiled and bundled during the Gradle build process.
+- **Unified Go Engine**: A single high-performance AI core written in Go.
+- **Platform-Specific Runtime**: 
+  - **Android**: Embedded as a native library (`.so`) via JNI for security (W^X compliance) and performance.
+  - **Desktop**: Runs as a standalone local daemon.
+- **Shared gRPC/Protobuf API**: All clients communicate with the engine over a local loopback gRPC connection, ensuring a consistent developer experience across all frontends.
+- **Automated Build**: Android builds automatically compile the Go engine from source using a custom Gradle integration.
+- **Downloadable Models**: While the engine is bundled, AI models (GGUF) are downloaded on-demand to the device's local storage.
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/engineering/gradle-go-integration.md](docs/engineering/gradle-go-integration.md) for details.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/engineering/gradle-go-integration.md](docs/engineering/gradle-go-integration.md) for detailed technical specifications.
 
 ## License
 

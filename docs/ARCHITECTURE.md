@@ -67,11 +67,11 @@ The Android app (`android/`) follows Clean Architecture with MVVM:
 - **`features/`**: Self-contained features (Chat, Library, Explore, Settings, Knowledge, Onboarding)
 - **`domain/`**: Pure Kotlin business logic and repository interfaces
 - **`data/`**: Repository implementations
-- **`core/`**: Engine download, checksum verification
-- **`platform/`**: Engine installer, process manager
-- **`sdk/`** (via Gradle subproject `:sdk`): Shared inference client (`ClientInferenceEngine`, `EngineGrpcClient`)
+- **`core/`**: Model download, checksum verification
+- **`platform/`**: Native bridge management, process control (for non-embedded modes)
+- **`sdk/`** (via Gradle subproject `:sdk`): Shared inference client (`ClientInferenceEngine`, `EngineGrpcClient`, `EmbeddedInferenceEngine`)
 
-The Android app builds independently. It contains zero AI business logic — all inference is delegated to the Go engine over gRPC.
+The Android app builds the Go engine automatically via Gradle custom tasks. It contains zero AI business logic — all inference is delegated to the Go engine over gRPC (loopback).
 
 ## SDK Layer
 
@@ -91,9 +91,10 @@ The Kotlin SDK is included in the Android build as a Gradle subproject. It will 
 1. **Frontend launches**:
    - **Android (Embedded)**: The app loads `libashwath_engine.so` via JNI. `EmbeddedInferenceEngine` calls `nativeStartServer` to launch the gRPC server within the app process.
    - **Desktop/Others (Daemon)**: The app checks if the `ashwathd` binary is installed. If not, it downloads it from GitHub Releases, verifies the checksum, and launches it as a child process.
-2. **Connect via gRPC**: All frontends connect to the local gRPC server (usually on `127.0.0.1:50051`).
-3. **AI Operations**: All requests (Generate, ListModels, etc.) are sent as gRPC calls.
-4. **Shutdown**: Frontend calls `Shutdown` RPC or `nativeShutdown` (JNI) to gracefully terminate the engine.
+2. **Model Loading**: Both modes check for installed models in the `data-dir`. If a model is missing, it is downloaded from GitHub Releases / HuggingFace.
+3. **Connect via gRPC**: All frontends connect to the local gRPC server (usually on `127.0.0.1:50051`).
+4. **AI Operations**: All requests (Generate, ListModels, etc.) are sent as gRPC calls.
+5. **Shutdown**: Frontend calls `Shutdown` RPC or `nativeShutdown` (JNI) to gracefully terminate the engine.
 
 ## Future Frontends
 
