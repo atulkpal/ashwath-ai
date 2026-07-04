@@ -16,6 +16,7 @@ import (
 
 	"github.com/ashwathai/ashwath-engine/internal/config"
 	"github.com/ashwathai/ashwath-engine/internal/runtime"
+	"github.com/ashwathai/ashwath-engine/internal/runtime/llama"
 	"github.com/ashwathai/ashwath-engine/internal/server"
 )
 
@@ -28,11 +29,26 @@ var (
 )
 
 //export goInit
-func goInit(cModelPath, cDataDir *C.char) C.int {
+func goInit(cEngineType, cModelPath, cLlamaBin *C.char) C.int {
+	engineType := C.GoString(cEngineType)
 	modelPath := C.GoString(cModelPath)
-	eng = runtime.NewMock()
-	opts := runtime.Options{ModelPath: modelPath}
+	llamaBin := C.GoString(cLlamaBin)
+
+	opts := runtime.Options{}
+
+	switch engineType {
+	case "llama":
+		if modelPath == "" {
+			return 0
+		}
+		eng = llama.New(llamaBin)
+		opts.ModelPath = modelPath
+	default:
+		eng = runtime.NewMock()
+	}
+
 	if err := eng.Initialize(context.Background(), opts); err != nil {
+		eng = nil
 		return 0
 	}
 	return 1
@@ -104,7 +120,7 @@ func goCancel() C.int {
 }
 
 //export goStartServer
-func goStartServer(port C.int, cDataDir *C.char) C.int {
+func goStartServer(port C.int, cDataDir *C.char, cEngineType *C.char) C.int {
 	serverMu.Lock()
 	defer serverMu.Unlock()
 
@@ -113,6 +129,8 @@ func goStartServer(port C.int, cDataDir *C.char) C.int {
 	}
 
 	dataDir := C.GoString(cDataDir)
+	engineType := C.GoString(cEngineType)
+
 	cfg := &config.Config{
 		Port:     int(port),
 		DataDir:  dataDir,
@@ -120,7 +138,7 @@ func goStartServer(port C.int, cDataDir *C.char) C.int {
 	}
 
 	opts := server.Options{
-		EngineType: "mock", // Default to mock for now
+		EngineType: engineType,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

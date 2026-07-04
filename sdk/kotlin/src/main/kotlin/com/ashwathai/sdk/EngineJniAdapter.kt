@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.callbackFlow
 
 class EngineJniAdapter(
     private val bridge: AshwathBridge = AshwathBridge(),
+    private val engineType: String = "mock",
+    private val modelPath: String? = null,
+    private val llamaBin: String? = null,
 ) : InferenceEngine {
     override val name: String = "Ashwath Engine"
     override val version: String = "0.1.0"
@@ -19,7 +22,7 @@ class EngineJniAdapter(
         if (!AshwathBridge.isLoaded) {
             return Result.success(Unit)
         }
-        val result = bridge.nativeInit(null, null)
+        val result = bridge.nativeInit(engineType, modelPath, llamaBin)
         return if (result == 1) Result.success(Unit)
         else Result.failure(Exception("Engine initialization failed (code=$result)"))
     }

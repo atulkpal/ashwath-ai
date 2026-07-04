@@ -4,7 +4,7 @@ syntax = "proto3";
 
 package ashwath;
 
-option go_package = "github.com/ashwathai/ashwath-engine/api/proto";
+option go_package = "github.com/ashwathai/ashwath-engine/internal/api/pb";
 option java_multiple_files = true;
 option java_package = "com.ashwathai.sdk.generated";
 
@@ -12,6 +12,7 @@ service AshwathEngine {
   rpc Generate(GenerateRequest) returns (stream GenerateResponse);
   rpc ListModels(Empty) returns (ModelList);
   rpc InstallModel(InstallRequest) returns (InstallResponse);
+  rpc RemoveModel(RemoveRequest) returns (RemoveResponse);
   rpc GetDeviceInfo(Empty) returns (DeviceInfo);
   rpc Shutdown(Empty) returns (Empty);
 }
@@ -51,6 +52,15 @@ message InstallRequest {
 
 message InstallResponse {
   bool started = 1;
+  string message = 2;
+}
+
+message RemoveRequest {
+  string model_id = 1;
+}
+
+message RemoveResponse {
+  bool success = 1;
   string message = 2;
 }
 
