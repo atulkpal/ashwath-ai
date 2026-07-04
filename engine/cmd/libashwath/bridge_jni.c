@@ -57,25 +57,28 @@ void jni_on_token(const char* text, int done) {
 
 // ── Forward declarations of Go functions ────────────────────────────────
 
-extern int  goInit(const char* model_path, const char* data_dir);
+extern int  goInit(const char* engine_type, const char* model_path, const char* llama_bin);
 extern void goShutdown(void);
 extern int  goRunning(void);
 extern int  goGenerate(const char* prompt, int max_tokens,
                         float temperature, int top_k, float top_p);
 extern int  goCancel(void);
-extern int  goStartServer(int port, const char* data_dir);
+extern int  goStartServer(int port, const char* data_dir, const char* engine_type);
 
 // ── JNI entry points ────────────────────────────────────────────────────
 
 JNIEXPORT jint JNICALL
 Java_com_ashwathai_sdk_jni_AshwathBridge_nativeInit(
-    JNIEnv* env, jobject thiz, jstring modelPath, jstring dataDir) {
-    LOGI("nativeInit called");
+    JNIEnv* env, jobject thiz,
+    jstring engineType, jstring modelPath, jstring llamaBin) {
+    LOGI("nativeInit called (type=%s)", engineType ? "set" : "null");
+    const char* et = engineType ? (*env)->GetStringUTFChars(env, engineType, NULL) : "mock";
     const char* mp = modelPath ? (*env)->GetStringUTFChars(env, modelPath, NULL) : "";
-    const char* dd = dataDir   ? (*env)->GetStringUTFChars(env, dataDir,   NULL) : "";
-    jint result = goInit(mp, dd);
-    if (modelPath) (*env)->ReleaseStringUTFChars(env, modelPath, mp);
-    if (dataDir)   (*env)->ReleaseStringUTFChars(env, dataDir,   dd);
+    const char* lb = llamaBin ? (*env)->GetStringUTFChars(env, llamaBin, NULL) : "";
+    jint result = goInit(et, mp, lb);
+    if (engineType) (*env)->ReleaseStringUTFChars(env, engineType, et);
+    if (modelPath)  (*env)->ReleaseStringUTFChars(env, modelPath, mp);
+    if (llamaBin)   (*env)->ReleaseStringUTFChars(env, llamaBin, lb);
     return result;
 }
 
@@ -109,10 +112,14 @@ Java_com_ashwathai_sdk_jni_AshwathBridge_nativeCancel(
 
 JNIEXPORT jint JNICALL
 Java_com_ashwathai_sdk_jni_AshwathBridge_nativeStartServer(
-    JNIEnv* env, jobject thiz, jint port, jstring dataDir) {
-    LOGI("nativeStartServer called on port %d", port);
+    JNIEnv* env, jobject thiz,
+    jint port, jstring dataDir, jstring engineType) {
+    LOGI("nativeStartServer called on port %d (type=%s)", port,
+         engineType ? "set" : "null");
     const char* dd = dataDir ? (*env)->GetStringUTFChars(env, dataDir, NULL) : "";
-    jint result = goStartServer((int)port, dd);
-    if (dataDir) (*env)->ReleaseStringUTFChars(env, dataDir, dd);
+    const char* et = engineType ? (*env)->GetStringUTFChars(env, engineType, NULL) : "mock";
+    jint result = goStartServer((int)port, dd, et);
+    if (dataDir)    (*env)->ReleaseStringUTFChars(env, dataDir, dd);
+    if (engineType) (*env)->ReleaseStringUTFChars(env, engineType, et);
     return result;
 }

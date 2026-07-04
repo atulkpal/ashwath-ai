@@ -16,7 +16,11 @@ class AshwathBridge {
         }
     }
 
-    external fun nativeInit(modelPath: String?, dataDir: String?): Int
+    external fun nativeInit(
+        engineType: String?,
+        modelPath: String?,
+        llamaBin: String?,
+    ): Int
 
     external fun nativeShutdown()
 
@@ -31,5 +35,9 @@ class AshwathBridge {
 
     external fun nativeCancel(): Int
 
-    external fun nativeStartServer(port: Int, dataDir: String?): Int
+    external fun nativeStartServer(
+        port: Int,
+        dataDir: String?,
+        engineType: String?,
+    ): Int
 }

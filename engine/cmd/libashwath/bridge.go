@@ -22,7 +22,11 @@ static void call_token_callback(TokenCallbackFn cb, const char* text, int done, 
 }
 
 // ── Lifecycle ──────────────────────────────────────────────────────────
-int  engine_init      (const char* model_path, const char* data_dir);
+//
+// engine_type: "mock" (default) or "llama".
+// model_path : path to GGUF model (required for "llama").
+// llama_bin  : path to llama-server binary (empty = search PATH).
+int  engine_init      (const char* engine_type, const char* model_path, const char* llama_bin);
 void engine_shutdown  (void);
 int  engine_is_running(void);
 
@@ -47,16 +51,32 @@ import (
 	"unsafe"
 
 	"github.com/ashwathai/ashwath-engine/internal/runtime"
+	"github.com/ashwathai/ashwath-engine/internal/runtime/llama"
 )
 
 var eng runtime.Engine
 
 //export engineInit
-func engineInit(cModelPath, cDataDir *C.char) C.int {
+func engineInit(cEngineType, cModelPath, cLlamaBin *C.char) C.int {
+	engineType := C.GoString(cEngineType)
 	modelPath := C.GoString(cModelPath)
-	eng = runtime.NewMock()
-	opts := runtime.Options{ModelPath: modelPath}
+	llamaBin := C.GoString(cLlamaBin)
+
+	opts := runtime.Options{}
+
+	switch engineType {
+	case "llama":
+		if modelPath == "" {
+			return 0
+		}
+		eng = llama.New(llamaBin)
+		opts.ModelPath = modelPath
+	default:
+		eng = runtime.NewMock()
+	}
+
 	if err := eng.Initialize(context.Background(), opts); err != nil {
+		eng = nil
 		return 0
 	}
 	return 1

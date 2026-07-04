@@ -11,6 +11,7 @@ class EmbeddedInferenceEngine(
     private val clientEngine: InferenceEngine,
     private val port: Int,
     private val dataDir: File,
+    private val engineType: String = "mock",
     private val bridge: AshwathBridge = AshwathBridge()
 ) : InferenceEngine {
     override val name: String get() = clientEngine.name
@@ -25,7 +26,7 @@ class EmbeddedInferenceEngine(
 
         // 1. Start in-process gRPC server
         println("EmbeddedInferenceEngine: Starting native server on port $port...")
-        val result = bridge.nativeStartServer(port, dataDir.absolutePath)
+        val result = bridge.nativeStartServer(port, dataDir.absolutePath, engineType)
         if (result != 1) {
             println("EmbeddedInferenceEngine: Native server failed to start (code=$result)")
             return Result.failure(Exception("Failed to start embedded engine (code=$result)"))
