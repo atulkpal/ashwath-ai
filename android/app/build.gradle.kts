@@ -81,7 +81,6 @@ targetAbis.forEach { abi ->
         val (goArch, clangPrefix) = when (abi) {
             "arm64-v8a" -> "arm64" to "aarch64-linux-android24"
             "x86_64" -> "amd64" to "x86_64-linux-android24"
-            "armeabi-v7a" -> "arm" to "armv7a-linux-androideabi24"
             else -> throw GradleException("Unsupported ABI: $abi")
         }
 
