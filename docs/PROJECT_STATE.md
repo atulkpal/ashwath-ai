@@ -5,9 +5,9 @@ This document provides a real-time operational dashboard for the Ashwath.AI repo
 ---
 
 ### Meta Information
-- **Project Version**: 0.1.0
-- **Current Milestone**: EPIC 2: Android Engine Integration
-- **Last Updated**: 2024-03-07
+- **Project Version**: 0.1.1
+- **Current Milestone**: EPIC 3: Real Inference (llama.cpp)
+- **Last Updated**: 2024-03-21
 
 ---
 
@@ -16,7 +16,7 @@ This document provides a real-time operational dashboard for the Ashwath.AI repo
 | Subsystem | Status | Primary Maintainer |
 | :--- | :--- | :--- |
 | **Platform** | Stable | Platform Team |
-| **Android Client** | Integration | Android Client Team |
+| **Android Client** | Stable | Android Client Team |
 | **Web Client** | Planned | Web Client Team |
 | **Research Lab** | Experimental | Research Lab |
 | **Documentation** | Active | Shared |
@@ -25,31 +25,32 @@ This document provides a real-time operational dashboard for the Ashwath.AI repo
 
 ### Repository Health
 
-- **Build Status**: ✅ Passing (Android & SDK)
-- **Test Status**: ✅ Passing (SDK & Installer unit tests)
+- **Build Status**: ✅ Passing (Android, Engine, & SDK)
+- **Test Status**: ✅ Passing (SDK & Engine integration tests)
 - **Known Issues**: 
-  - SELinux may restrict execution on some physical devices (Fixed with chmod 755).
-  - Ktor 3 migration requires careful header handling.
+  - SELinux restrictions on physical devices bypassed via Embedded Runtime.
+  - Automatic Go build requires Go SDK in system PATH.
 - **Technical Debt**:
-  - `EngineProcessManager` needs a more robust health check (polling port 50051).
-  - Manual JNI/gRPC bridge in SDK needs more comprehensive error mapping.
+  - `libashwath` JNI bridge needs more granular error codes from Go.
+  - Proto definitions should be synchronized across all future frontends.
 
 ---
 
 ### Current Work
 
-- **Platform Team**: Stabilizing gRPC API and preparing for llama.cpp integration (EPIC 3).
-- **Android Client Team**: Finalizing engine downloader UI and testing process lifecycle.
-- **Web Client Team**: Initial project scaffolding and gRPC-Web exploration.
-- **Research Lab**: Evaluating quantization techniques for mobile NPUs.
+- **Platform Team**: Initializing llama.cpp Go bindings (EPIC 3).
+- **Android Client Team**: Enhancing Chat UI with real model metadata.
+- **Web Client Team**: gRPC-Web exploration and WASM build path.
+- **Research Lab**: Evaluating GGUF quantization performance.
 
 ---
 
 ### Recently Completed
+- [x] Migrated Android to **Embedded Go Runtime** (.so) via JNI.
+- [x] Automated Go Engine build within the Gradle pipeline.
+- [x] Established shared gRPC loopback architecture for all platforms.
+- [x] Verified end-to-stream pipeline in the Chat UI.
 - [x] Implemented Kotlin SDK with real gRPC stubs.
-- [x] Added `EngineInstaller` with SHA-256 verification.
-- [x] Resolved "Permission Denied" (error 13) for engine execution on Android.
-- [x] Integrated `ChatViewModel` with streaming gRPC responses.
 - [x] Established Engineering Charter (`GUILD.md`).
 
 ---

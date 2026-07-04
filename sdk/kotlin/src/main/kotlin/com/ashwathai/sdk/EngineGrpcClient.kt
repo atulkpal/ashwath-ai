@@ -16,12 +16,20 @@ class EngineGrpcClient(private val host: String, private val port: Int) {
         var lastException: Exception? = null
         repeat(retries) { attempt ->
             try {
-                channel = ManagedChannelBuilder.forAddress(host, port)
+                println("EngineGrpcClient: Attempting to connect to $host:$port (attempt ${attempt + 1})...")
+                val newChannel = ManagedChannelBuilder.forAddress(host, port)
                     .usePlaintext()
                     .build()
-                // Simple health check could go here
+
+                // Real Health Check: Try to call an RPC
+                val stub = AshwathEngineGrpcKt.AshwathEngineCoroutineStub(newChannel)
+                stub.getDeviceInfo(com.ashwathai.sdk.generated.Empty.getDefaultInstance())
+
+                println("EngineGrpcClient: Successfully connected and verified via RPC")
+                channel = newChannel
                 return Result.success(Unit)
             } catch (e: Exception) {
+                println("EngineGrpcClient: Connection attempt failed: ${e.message}")
                 lastException = e
                 kotlinx.coroutines.delay(1000L * (attempt + 1))
             }

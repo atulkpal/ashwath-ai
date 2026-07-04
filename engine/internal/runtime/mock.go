@@ -26,7 +26,11 @@ func (m *mockEngine) Initialize(ctx context.Context, opts Options) error {
 
 func (m *mockEngine) Generate(ctx context.Context, req Request) (<-chan Result, error) {
 	ch := make(chan Result)
-	words := strings.Fields(mockResponse)
+
+	// Smallest possible change to make the engine "answer questions" by acknowledging the prompt.
+	response := "I received your question: \"" + req.Prompt + "\". " + mockResponse
+
+	words := strings.Fields(response)
 	go func() {
 		defer close(ch)
 		for i, word := range words {

@@ -8,7 +8,20 @@ use the same Engine with different platform adapters.
 
 ---
 
-## Data Flow
+## Unified API Strategy
+
+**Ashwath AI uses gRPC as the primary communication protocol across all platforms.**
+
+While Android embeds the Go engine as a shared library (`.so`), it still utilizes the same gRPC service definition. The JNI bridge is responsible for:
+1. Bootstrapping the Go runtime.
+2. Launching an in-process gRPC server on a loopback interface.
+3. Managing the lifecycle (Shutdown/Init) of the native engine.
+
+This approach ensures that the Kotlin SDK (and future SDKs) remain platform-agnostic, using the same gRPC client logic regardless of whether the engine is a local daemon or an embedded library.
+
+---
+
+## Data Flow (Embedded gRPC)
 
 ```
 ┌──────────────────────────────────────────────────────────┐
@@ -18,10 +31,10 @@ use the same Engine with different platform adapters.
 │  │ Compose  │──▶│ ViewModels │──▶│  Engine SDK      │   │
 │  │   UI     │   │            │   │  (Kotlin)        │   │
 │  └──────────┘   └────────────┘   └───────┬──────────┘   │
-│                                          │              │
+│                                          │ gRPC (localhost)
 │                                  ┌───────▼──────────┐   │
-│                                  │  JNI Adapter     │   │
-│                                  │  (Kotlin native) │   │
+│                                  │  gRPC Server     │   │
+│                                  │  (Inside Go .so) │   │
 │                                  └───────┬──────────┘   │
 │                                          │              │
 │  ════════════════════════════════════════╪═══════════════│
@@ -32,14 +45,8 @@ use the same Engine with different platform adapters.
 │                                  │  libashwath       │   │
 │                                  │  engine.so       │   │
 │                                  │  (Go → c-shared) │   │
-│                                  │                  │   │
-│                                  │  Internal:       │   │
-│                                  │  • runtime.Engine│   │
-│                                  │  • llama backend │   │
-│                                  │  • model registry│   │
-│                                  │  • device detect │   │
-│                                  └──────────────────┘   │
 └──────────────────────────────────────────────────────────┘
+```
 
     Desktop / Server                     iOS                     Web
     ┌──────────────┐              ┌──────────────┐       ┌──────────────┐
@@ -253,9 +260,8 @@ The Kotlin SDK is purely a consumer — it formats requests and delivers results
 
 ---
 
-## Migration Path
+## Status
 
-1. ✅ **Phase 0** (current): gRPC client-server (engine as separate process)
-2. 🔜 **Phase 1**: Go .so + JNI adapter alongside gRPC (dual-path)
-3. 🔜 **Phase 2**: Remove gRPC path from Android, use JNI exclusively
-4. 🔜 **Phase 3**: Desktop, iOS, Web SDKs follow the same adapter pattern
+- **Android Reference Implementation**: ✅ Complete. Uses `libashwath_engine.so` with embedded gRPC server.
+- **Desktop/Daemon**: ✅ Complete. Uses `ashwathd` standalone binary.
+- **iOS/Web**: 🔜 In Roadmap.

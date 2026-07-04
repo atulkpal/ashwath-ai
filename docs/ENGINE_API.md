@@ -4,7 +4,9 @@
 
 Frontends communicate with the Go engine via **gRPC** over localhost.
 
-The engine runs as a child process managed by the frontend. The API port is dynamically assigned and passed to the engine via command-line arguments.
+Depending on the platform, the engine runs in one of two modes:
+- **Daemon Mode (Desktop)**: The engine runs as a standalone child process. The API port is dynamically assigned and passed to the engine via command-line arguments.
+- **Embedded Mode (Android)**: The engine is loaded as a shared library (`.so`) and starts a gRPC server in-process.
 
 ## Service Definition
 
@@ -22,11 +24,15 @@ See `engine/api/proto/service.proto` for the full protobuf schema.
 
 ## Lifecycle
 
-1. Frontend allocates a port
-2. Frontend launches `ashwathd --port <port> --data-dir <path>`
-3. Frontend establishes gRPC connection
-4. Engine serves requests until `Shutdown` or process kill
-5. Frontend terminates engine process on exit
+### Android (Embedded)
+1. App loads `libashwath_engine.so` via JNI.
+2. App calls `nativeStartServer(port, dataDir)`.
+3. Go engine starts a gRPC server in a background goroutine.
+4. App connects to `localhost:port`.
+
+### Desktop (Daemon)
+1. Frontend launches `ashwathd --port <port> --data-dir <path>` as a child process.
+2. Frontend connects to `localhost:port`.
 
 ## Versioning
 

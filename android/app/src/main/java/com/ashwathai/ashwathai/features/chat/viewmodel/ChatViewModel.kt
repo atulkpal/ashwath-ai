@@ -77,15 +77,23 @@ class ChatViewModel(
         _state.update { it.copy(messages = it.messages + aiMessage) }
 
         try {
+            var fullText = ""
             engine.generate(prompt, GenerationOptions()).collect { result ->
                 when (result) {
                     is InferenceResult.Partial -> {
                         _state.update { it.copy(isTyping = false) }
-                        updateLastMessage(result.text)
+                        fullText += result.text
+                        updateLastMessage(fullText)
                     }
                     is InferenceResult.Success -> {
                         _state.update { it.copy(isTyping = false) }
-                        updateLastMessage(result.fullText)
+                        // If it's a success, ensure we use the accumulated text
+                        // or the full text provided (depending on implementation).
+                        // In our case, partial results already accumulated most of it.
+                        if (result.fullText.isNotEmpty() && result.fullText.length > fullText.length) {
+                            fullText = result.fullText
+                        }
+                        updateLastMessage(fullText)
                     }
                     is InferenceResult.Error -> {
                         _state.update { it.copy(isTyping = false) }

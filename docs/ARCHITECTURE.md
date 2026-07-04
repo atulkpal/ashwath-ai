@@ -20,18 +20,20 @@
 │                           │ gRPC                             │
 ├───────────────────────────┼──────────────────────────────────┤
 │  ┌───────────────────────▼──────────────────────────────┐    │
-│  │              Go Engine (ashwathd)                     │    │
+│  │              Go Engine (libashwath)                   │    │
 │  │  Runtime │ Models │ Config │ Device │ Logging        │    │
 │  │  RAG │ Voice │ Vision │ Knowledge │ Plugins          │    │
 │  └───────────────────────┬──────────────────────────────┘    │
-│                           │ GitHub Releases                   │
-│                    Downloaded on first launch                 │
+│                           │ Embedded (Android) / Download     │
+│                    Linked at build time (Android)             │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 ## Engine Architecture
 
-The Go engine (`engine/`) is a standalone binary distributed via GitHub Releases. It exposes a gRPC API on localhost with a dynamically assigned port. The engine uses a JSON codec for gRPC during development (MVP), with a switch to generated protobuf stubs planned before production.
+The Go engine (`engine/`) is the core AI logic of the platform. On most platforms (Desktop), it runs as a standalone binary (`ashwathd`) distributed via GitHub Releases. On Android, to comply with security policies (W^X), it is compiled as a shared library (`libashwath_engine.so`) and embedded directly into the app process.
+
+The engine exposes a gRPC API on localhost (127.0.0.1) using a dynamically assigned port or a fixed port (50051) in embedded mode.
 
 ### Engine Packages
 
@@ -65,11 +67,11 @@ The Android app (`android/`) follows Clean Architecture with MVVM:
 - **`features/`**: Self-contained features (Chat, Library, Explore, Settings, Knowledge, Onboarding)
 - **`domain/`**: Pure Kotlin business logic and repository interfaces
 - **`data/`**: Repository implementations
-- **`core/`**: Engine download, checksum verification
-- **`platform/`**: Engine installer, process manager
-- **`sdk/`** (via Gradle subproject `:sdk`): Shared inference client (`ClientInferenceEngine`, `EngineGrpcClient`)
+- **`core/`**: Model download, checksum verification
+- **`platform/`**: Native bridge management, process control (for non-embedded modes)
+- **`sdk/`** (via Gradle subproject `:sdk`): Shared inference client (`ClientInferenceEngine`, `EngineGrpcClient`, `EmbeddedInferenceEngine`)
 
-The Android app builds independently. It contains zero AI business logic — all inference is delegated to the Go engine over gRPC.
+The Android app builds the Go engine automatically via Gradle custom tasks. It contains zero AI business logic — all inference is delegated to the Go engine over gRPC (loopback).
 
 ## SDK Layer
 
@@ -86,12 +88,13 @@ The Kotlin SDK is included in the Android build as a Gradle subproject. It will 
 
 ## Communication Pattern
 
-1. Frontend launches → checks if Go engine binary is installed
-2. If not installed → download from GitHub Releases → verify SHA256 checksum → extract
-3. Launch engine as child process (`ashwathd --port <port> --data-dir <path>`)
-4. Connect via gRPC on localhost
-5. All AI operations → gRPC calls to engine (ListModels, Generate, InstallModel, etc.)
-6. Shutdown → frontend calls `Shutdown` RPC → terminates engine process
+1. **Frontend launches**:
+   - **Android (Embedded)**: The app loads `libashwath_engine.so` via JNI. `EmbeddedInferenceEngine` calls `nativeStartServer` to launch the gRPC server within the app process.
+   - **Desktop/Others (Daemon)**: The app checks if the `ashwathd` binary is installed. If not, it downloads it from GitHub Releases, verifies the checksum, and launches it as a child process.
+2. **Model Loading**: Both modes check for installed models in the `data-dir`. If a model is missing, it is downloaded from GitHub Releases / HuggingFace.
+3. **Connect via gRPC**: All frontends connect to the local gRPC server (usually on `127.0.0.1:50051`).
+4. **AI Operations**: All requests (Generate, ListModels, etc.) are sent as gRPC calls.
+5. **Shutdown**: Frontend calls `Shutdown` RPC or `nativeShutdown` (JNI) to gracefully terminate the engine.
 
 ## Future Frontends
 

@@ -2,8 +2,17 @@ package com.ashwathai.sdk.jni
 
 class AshwathBridge {
     companion object {
+        var isLoaded = false
+            private set
+
         init {
-            System.loadLibrary("ashwath_engine")
+            try {
+                System.loadLibrary("ashwath_engine")
+                isLoaded = true
+                println("AshwathBridge: Successfully loaded native library")
+            } catch (e: UnsatisfiedLinkError) {
+                println("AshwathBridge: Failed to load native library: ${e.message}")
+            }
         }
     }
 
@@ -21,4 +30,6 @@ class AshwathBridge {
     ): Int
 
     external fun nativeCancel(): Int
+
+    external fun nativeStartServer(port: Int, dataDir: String?): Int
 }
