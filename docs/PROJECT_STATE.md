@@ -6,7 +6,7 @@ This document provides a real-time operational dashboard for the Ashwath AI repo
 
 ### Meta Information
 - **Project Version**: 0.1.0
-- **Current Milestone**: Sprint W3 – Web Client ↔ Go Engine Integration Planning
+- **Current Milestone**: Sprint W3A – Engine Integration Architecture
 - **Last Updated**: 2026-07-04
 
 ---
@@ -38,9 +38,9 @@ This document provides a real-time operational dashboard for the Ashwath AI repo
 
 ### Current Work
 
-- **Platform Team**: Defining the web engine integration contract and preparing the shared API surface for Sprint W3.
+- **Platform Team**: Defining the web engine integration architecture and preparing the shared API surface for Sprint W3A.
 - **Android Client Team**: Continuing engine integration validation while cross-platform contracts are finalized.
-- **Web Client Team**: Advancing the web client ↔ Go engine integration path, focused on transport, state flow, and UX alignment.
+- **Web Client Team**: Advancing the web client ↔ Go engine integration architecture, focused on transport, streaming, lifecycle, and SDK boundaries.
 - **Research Lab**: Evaluating quantization techniques for mobile NPUs.
 
 ---
@@ -65,7 +65,7 @@ This document provides a real-time operational dashboard for the Ashwath AI repo
 ---
 
 ### Next Priorities
-1. **Web ↔ Engine Integration Planning**: Define the client/engine contract, transport strategy, and state synchronization approach for Sprint W3.
+1. **Web ↔ Engine Integration Architecture**: Finalize the transport layer, streaming model, engine lifecycle, SDK boundary, and migration path for Sprint W3A.
 2. **llama.cpp bindings**: Move from mock inference to real local models.
 3. **Model Management**: UI for downloading and switching between specific models.
 4. **App Lifecycle**: Pausing/Stopping the engine process when app is backgrounded.

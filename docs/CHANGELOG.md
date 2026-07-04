@@ -7,7 +7,8 @@
 - Sprint W2 — Chat workspace completed with conversation entry points and chat-focused interaction flow.
 
 ### Changed
-- Active mission shifted to Sprint W3: Web Client ↔ Go Engine Integration Planning.
+- Active mission shifted to Sprint W3A: Engine Integration Architecture.
+- Added a dedicated architecture proposal for the Web Client ↔ Go Engine integration path, covering transport, streaming, lifecycle, SDK, testing, and migration planning.
 
 ## [0.1.0] - 2026-03-07
 ### Added
