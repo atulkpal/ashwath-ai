@@ -1,5 +1,36 @@
 # Ashwath.AI AI Contributor Guide
 
+## Session Context (Jul 4, 2026 — Android Engine Integration)
+**Goal**: Wire Go engine's real model management (list/install/remove) into the Android Kotlin layer.
+**Constraint**: Do not touch UI/theme composables (Stitch/Google Fonts issues in another workspace).
+
+### Files Modified
+- `sdk/kotlin/src/main/kotlin/com/ashwathai/sdk/EngineGrpcClient.kt` — added `listModels()`, `installModel()`, `removeModel()`, `modelId` param on `generate()`
+- `sdk/kotlin/src/main/kotlin/com/ashwathai/sdk/ClientInferenceEngine.kt` — forwards `options.modelId` to gRPC call
+- `sdk/kotlin/src/main/kotlin/com/ashwathai/ashwathai/runtime/api/InferenceEngine.kt` — added `modelId` field to `GenerationOptions`
+- `sdk/kotlin/build.gradle.kts` — protobuf deps changed from `implementation` to `api`
+- `android/app/src/main/java/com/ashwathai/ashwathai/di/ServiceLocator.kt` — added `provideModelRepository()` returning `GrpcModelRepository`
+- `android/app/src/main/java/com/ashwathai/ashwathai/features/explore/viewmodel/ExploreViewModel.kt` — constructor now accepts `modelRepository` + `ioDispatcher`; real download flow
+- `android/app/src/main/java/com/ashwathai/ashwathai/features/library/viewmodel/LibraryViewModel.kt` — same pattern; real delete flow
+- `android/app/src/main/java/com/ashwathai/ashwathai/features/chat/viewmodel/ChatViewModel.kt` — passes `activeModelName` as `modelId` in `GenerateRequest`
+
+### Files Created
+- `android/app/src/main/java/com/ashwathai/ashwathai/data/repository/GrpcModelRepository.kt` — `ModelRepository` impl mapping proto→domain
+- `android/app/src/test/java/com/ashwathai/ashwathai/features/explore/ExploreViewModelTest.kt` — 5 tests with `FakeModelRepository`
+- `android/app/src/test/java/com/ashwathai/ashwathai/features/library/LibraryViewModelTest.kt` — 4 tests with `FakeModelRepository`
+- `sdk/kotlin/src/test/kotlin/com/ashwathai/sdk/EngineGrpcClientTest.kt` — 4 tests for gRPC client RPCs
+- `sdk/kotlin/src/test/kotlin/com/ashwathai/sdk/ClientInferenceEngineTest.kt` — updated matchers for 3-param `generate()`
+
+### Verification
+- `./gradlew test` — 10/10 tests pass, 0 warnings
+- `./gradlew assembleDebug` — passes (verified earlier)
+
+### Key Decisions
+- ViewModels use parameterized constructors with defaults for testability: `ExploreViewModel(modelRepository = ..., ioDispatcher = ...)`
+- `Dispatchers.IO` is injected as `ioDispatcher` parameter for testability; tests use `StandardTestDispatcher`
+- SDK protobuf deps as `api` (not `implementation`) for cross-module proto type visibility
+- gRPC client returns `Result<T>`; repository maps failures to exceptions
+
 ## 1. Purpose
 This document is the operational manual and onboarding guide for every AI agent contributing to Ashwath.AI. Its goal is to provide sufficient context and repository knowledge for an AI to begin productive work with minimal external prompt context.
 

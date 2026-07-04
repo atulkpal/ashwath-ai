@@ -15,7 +15,7 @@ class ClientInferenceEngine(private val grpcClient: EngineGrpcClient) : Inferenc
     }
 
     override suspend fun generate(prompt: String, options: GenerationOptions): Flow<InferenceResult> = flow {
-        grpcClient.generate(prompt, options).collect { response ->
+        grpcClient.generate(prompt, options, options.modelId).collect { response ->
             if (response.done) {
                 emit(InferenceResult.Success(response.text))
             } else {

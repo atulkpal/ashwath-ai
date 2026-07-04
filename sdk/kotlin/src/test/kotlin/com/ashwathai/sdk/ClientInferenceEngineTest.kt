@@ -21,11 +21,11 @@ class ClientInferenceEngineTest {
             .setDone(false)
             .build()
 
-        every { mockGrpcClient.generate(any(), any()) } returns flowOf(response)
+        every { mockGrpcClient.generate(any(), any(), any()) } returns flowOf(response)
 
-        engine.generate("Hi", GenerationOptions()).collect { result ->
-            assertEquals(InferenceResult.Partial("Hello"), result)
-        }
+        val results = mutableListOf<InferenceResult>()
+        engine.generate("Hi", GenerationOptions()).collect { results.add(it) }
+        assertEquals(InferenceResult.Partial("Hello"), results[0])
     }
 
     @Test
@@ -35,10 +35,10 @@ class ClientInferenceEngineTest {
             .setDone(true)
             .build()
 
-        every { mockGrpcClient.generate(any(), any()) } returns flowOf(response)
+        every { mockGrpcClient.generate(any(), any(), any()) } returns flowOf(response)
 
-        engine.generate("Hi", GenerationOptions()).collect { result ->
-            assertEquals(InferenceResult.Success("Final"), result)
-        }
+        val results = mutableListOf<InferenceResult>()
+        engine.generate("Hi", GenerationOptions()).collect { results.add(it) }
+        assertEquals(InferenceResult.Success("Final"), results[0])
     }
 }

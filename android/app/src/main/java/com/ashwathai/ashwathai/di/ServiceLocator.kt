@@ -1,7 +1,7 @@
 package com.ashwathai.ashwathai.di
 
 import android.content.Context
-import com.ashwathai.ashwathai.data.repository.MockModelRepository
+import com.ashwathai.ashwathai.data.repository.GrpcModelRepository
 import com.ashwathai.ashwathai.domain.repository.ModelRepository
 import com.ashwathai.ashwathai.runtime.api.InferenceEngine
 import com.ashwathai.sdk.ClientInferenceEngine
@@ -21,10 +21,6 @@ object ServiceLocator {
         EngineGrpcClient(engineConfig.host, engineConfig.port)
     }
 
-    val modelRepository: ModelRepository by lazy {
-        MockModelRepository()
-    }
-
     fun provideInferenceEngine(): InferenceEngine {
         return when (engineConfig.mode) {
             EngineMode.DEVELOPMENT -> ClientInferenceEngine(grpcClient)
@@ -39,5 +35,9 @@ object ServiceLocator {
                 TODO("Local daemon (process-based) deprecated on Android for security")
             }
         }
+    }
+
+    fun provideModelRepository(): ModelRepository {
+        return GrpcModelRepository(grpcClient)
     }
 }
