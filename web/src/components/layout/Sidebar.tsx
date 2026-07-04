@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   Terminal,
 } from "lucide-react"
+import { ConversationList } from "@/features/chat/ConversationList"
 
 const navItems = [
   { icon: MessageSquare, label: "Chat", id: "chat" },
@@ -21,9 +22,10 @@ const navItems = [
 type SidebarProps = {
   collapsed: boolean
   onToggle: () => void
+  mode?: "navigation" | "conversations"
 }
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, mode = "navigation" }: SidebarProps) {
   return (
     <aside
       data-collapsed={collapsed}
@@ -34,42 +36,51 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <Terminal className="size-4 shrink-0 text-[var(--sn-accent)]" />
         {!collapsed && (
           <span className="text-sm font-semibold tracking-tight text-[var(--sn-text-primary)]">
-            Ashwath.AI
+            Ashwath AI
           </span>
         )}
       </div>
 
       <Separator className="bg-[var(--sn-border)]" />
 
-      {/* Navigation label (expanded only) */}
-      {!collapsed && (
-        <div className="px-4 pt-4 pb-2">
-          <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-[var(--sn-text-secondary)]">
-            Navigation
-          </span>
-        </div>
+      {mode === "navigation" && (
+        <>
+          {/* Navigation label (expanded only) */}
+          {!collapsed && (
+            <div className="px-4 pt-4 pb-2">
+              <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-[var(--sn-text-secondary)]">
+                Navigation
+              </span>
+            </div>
+          )}
+
+          {/* Nav items */}
+          <nav className="flex-1 space-y-0.5 px-2 pb-2">
+            {navItems.map((item) => (
+              <Button
+                key={item.id}
+                variant="ghost"
+                className={`group relative w-full justify-start gap-3 rounded-md px-3 text-sm text-[var(--sn-text-secondary)] transition-all duration-150 hover:bg-[var(--sn-overlay)] hover:text-[var(--sn-text-primary)] ${
+                  collapsed ? "justify-center px-0" : ""
+                }`}
+                asChild
+              >
+                <a href="#">
+                  <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-[var(--sn-accent)] opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
+                  <item.icon className="size-4 shrink-0" />
+                  {!collapsed && <span>{item.label}</span>}
+                </a>
+              </Button>
+            ))}
+          </nav>
+        </>
       )}
 
-      {/* Nav items */}
-      <nav className="flex-1 space-y-0.5 px-2 pb-2">
-        {navItems.map((item) => (
-          <Button
-            key={item.id}
-            variant="ghost"
-            className={`group relative w-full justify-start gap-3 rounded-md px-3 text-sm text-[var(--sn-text-secondary)] transition-all duration-150 hover:bg-[var(--sn-overlay)] hover:text-[var(--sn-text-primary)] ${
-              collapsed ? "justify-center px-0" : ""
-            }`}
-            asChild
-          >
-            <a href="#">
-              {/* Cyan left bar on hover */}
-              <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-[var(--sn-accent)] opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
-              <item.icon className="size-4 shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
-            </a>
-          </Button>
-        ))}
-      </nav>
+      {mode === "conversations" && (
+        <div className="flex-1 min-h-0">
+          <ConversationList />
+        </div>
+      )}
 
       {/* Collapse toggle at bottom */}
       <div className="flex items-center justify-center border-t border-[var(--sn-border)] p-2">

@@ -12,7 +12,7 @@ export function TopBar({ rightPanelOpen, onToggleRightPanel }: TopBarProps) {
       <div className="flex items-center gap-3">
         <Terminal className="size-4 text-[var(--sn-accent)]" />
         <span className="text-sm font-semibold tracking-tight text-[var(--sn-text-primary)]">
-          Ashwath.AI
+          Ashwath AI
         </span>
       </div>
 

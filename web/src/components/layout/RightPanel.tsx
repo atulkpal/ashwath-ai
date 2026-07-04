@@ -4,9 +4,10 @@ import { X } from "lucide-react"
 type RightPanelProps = {
   open: boolean
   onClose: () => void
+  children?: React.ReactNode
 }
 
-export function RightPanel({ open, onClose }: RightPanelProps) {
+export function RightPanel({ open, onClose, children }: RightPanelProps) {
   return (
     <aside
       data-open={open}
@@ -27,7 +28,7 @@ export function RightPanel({ open, onClose }: RightPanelProps) {
         </Button>
       </div>
       <div className="px-4 py-4 text-sm text-[var(--sn-text-secondary)]">
-        {/* Panel content will be added in future sprints */}
+        {children}
       </div>
     </aside>
   )
