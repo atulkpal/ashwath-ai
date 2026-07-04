@@ -9,8 +9,9 @@ class AshwathBridge {
             try {
                 System.loadLibrary("ashwath_engine")
                 isLoaded = true
+                println("AshwathBridge: Successfully loaded native library")
             } catch (e: UnsatisfiedLinkError) {
-                // Library not found, will handle gracefully in adapter
+                println("AshwathBridge: Failed to load native library: ${e.message}")
             }
         }
     }
@@ -29,4 +30,6 @@ class AshwathBridge {
     ): Int
 
     external fun nativeCancel(): Int
+
+    external fun nativeStartServer(port: Int, dataDir: String?): Int
 }

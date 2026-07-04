@@ -1,3 +1,5 @@
+//go:build !android
+
 // Command libashwath produces libashwath_engine.so (or .dylib/.dll) for
 // platforms that embed the engine via C ABI (desktop, iOS).
 //
@@ -14,6 +16,10 @@ package main
 #include <stdlib.h>
 
 typedef void (*TokenCallbackFn)(const char* text, int done, void* userdata);
+
+static void call_token_callback(TokenCallbackFn cb, const char* text, int done, void* userdata) {
+    cb(text, done, userdata);
+}
 
 // ── Lifecycle ──────────────────────────────────────────────────────────
 int  engine_init      (const char* model_path, const char* data_dir);
@@ -45,7 +51,7 @@ import (
 
 var eng runtime.Engine
 
-//export engine_init
+//export engineInit
 func engineInit(cModelPath, cDataDir *C.char) C.int {
 	modelPath := C.GoString(cModelPath)
 	eng = runtime.NewMock()
@@ -56,7 +62,7 @@ func engineInit(cModelPath, cDataDir *C.char) C.int {
 	return 1
 }
 
-//export engine_shutdown
+//export engineShutdown
 func engineShutdown() {
 	if eng != nil {
 		_ = eng.Stop(context.Background())
@@ -64,7 +70,7 @@ func engineShutdown() {
 	}
 }
 
-//export engine_is_running
+//export engineIsRunning
 func engineIsRunning() C.int {
 	if eng != nil {
 		return 1
@@ -72,7 +78,7 @@ func engineIsRunning() C.int {
 	return 0
 }
 
-//export engine_generate
+//export engineGenerate
 func engineGenerate(
 	cPrompt *C.char,
 	cMaxTokens C.int,
@@ -104,14 +110,14 @@ func engineGenerate(
 			if r.Done || r.Error != nil {
 				done = 1
 			}
-			cb(text, C.int(done), userdata)
+			C.call_token_callback(cb, text, C.int(done), userdata)
 			C.free(unsafe.Pointer(text))
 		}
 	}()
 	return 1
 }
 
-//export engine_cancel
+//export engineCancel
 func engineCancel() C.int {
 	return 1
 }
