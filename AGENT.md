@@ -23,11 +23,14 @@ Every AI session MUST begin by reading:
 1. `README.md`
 2. `docs/GUILD.md` (The Engineering Charter)
 3. `docs/PROJECT_STATE.md` (Operational Dashboard)
+4. `docs/PLATFORM_RULES.md` (Platform Constraints)
+5. `docs/ENGINE_CLIENT_CONTRACT.md` (Engine-Client Contract)
+6. The client-specific architecture document appropriate to the assigned client (e.g. `docs/WEB_ARCHITECTURE.md` for the Web Client, `docs/ANDROID_ARCHITECTURE.md` for the Android Client)
 
 ---
 
 ## 4. Current Mission
-After reading the required documents, identify the project's current mission from `docs/PROJECT_STATE.md` before making changes. If `docs/PROJECT_STATE.md` and the implementation disagree, report the inconsistency before implementing changes. **The implementation remains the source of truth.**
+After reading the required documents, identify the project's current mission from `docs/PROJECT_STATE.md` before making changes. Verify consistency between the implementation, `docs/PROJECT_STATE.md`, and the relevant architecture documents (e.g. `docs/ARCHITECTURE.md`, the client-specific architecture document). If any inconsistency is found, report it before implementing changes. **The implementation remains the source of truth.**
 
 ---
 
