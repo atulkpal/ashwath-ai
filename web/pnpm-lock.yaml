@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@ashwathai/sdk':
-        specifier: file:../sdk/typescript
+        specifier: file:..\sdk\typescript
         version: file:../sdk/typescript
       '@fontsource-variable/geist':
         specifier: ^5.2.9

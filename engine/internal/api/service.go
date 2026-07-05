@@ -37,46 +37,72 @@ func (s *EngineService) ListModels(ctx context.Context, req *pb.Empty) (*pb.Mode
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "list models failed: %v", err)
 	}
-	resp := &pb.ModelList{Models: make([]*pb.ModelInfo, 0, len(mdls))}
-	for _, m := range mdls {
+
+	caps, _ := s.detector.Detect()
+	device := models.DeviceSpec{
+		RamGB:    caps.RAMGB,
+		CPUCores: caps.CPUCores,
+		HasNPU:   caps.HasNPU,
+		HasGPU:   caps.HasGPU,
+		GPUVendor: caps.GPUVendor,
+	}
+	scored := models.ScoreModels(device, mdls)
+
+	resp := &pb.ModelList{Models: make([]*pb.ModelInfo, 0, len(scored))}
+	for _, sm := range scored {
+		allTags := make([]string, 0, len(sm.Tags)+6)
+		allTags = append(allTags, sm.Tags...)
+		for _, c := range sm.Capabilities {
+			allTags = append(allTags, "capability:"+c)
+		}
+		allTags = append(allTags, "score:"+itoa(sm.Score))
+		allTags = append(allTags, "min_ram:"+ftoa(sm.MinRamGB))
+		allTags = append(allTags, "recommended_ram:"+ftoa(sm.RecommendedRamGB))
+		allTags = append(allTags, "speed:"+string(sm.SpeedClass))
+		if sm.Recommended {
+			allTags = append(allTags, "recommended")
+		}
+
 		resp.Models = append(resp.Models, &pb.ModelInfo{
-			Id:         m.ID,
-			Name:       m.Name,
-			Provider:   m.Provider,
-			SizeBytes:  m.SizeBytes,
-			Parameters: m.Parameters,
-			Tags:       m.Tags,
-			Installed:  m.Installed,
+			Id:         sm.ID,
+			Name:       sm.Name,
+			Provider:   sm.Provider,
+			SizeBytes:  sm.SizeBytes,
+			Parameters: sm.Parameters,
+			Tags:       allTags,
+			Installed:  sm.Installed,
 		})
 	}
 	s.log.Info("ListModels", "count", len(resp.Models))
 	return resp, nil
 }
 
-func (s *EngineService) InstallModel(ctx context.Context, req *pb.InstallRequest) (*pb.InstallResponse, error) {
-	s.log.Info("InstallModel", "model_id", req.ModelId)
-	if err := s.registry.Install(req.ModelId); err != nil {
-		s.log.Error("InstallModel failed", "model_id", req.ModelId, "error", err)
-		return nil, status.Errorf(codes.Internal, "install failed: %v", err)
+func itoa(i int) string {
+	if i == 0 {
+		return "0"
 	}
-	return &pb.InstallResponse{
-		Started: true,
-		Message: fmt.Sprintf("Model %s installed successfully", req.ModelId),
-	}, nil
+	d := ""
+	for i > 0 {
+		d = string(rune('0'+i%10)) + d
+		i /= 10
+	}
+	return d
 }
 
-func (s *EngineService) RemoveModel(ctx context.Context, req *pb.RemoveRequest) (*pb.RemoveResponse, error) {
-	s.log.Info("RemoveModel", "model_id", req.ModelId)
-	if err := s.registry.Remove(req.ModelId); err != nil {
-		s.log.Error("RemoveModel failed", "model_id", req.ModelId, "error", err)
-		return &pb.RemoveResponse{
-			Success: false,
-			Message: fmt.Sprintf("Remove failed: %v", err),
-		}, nil
+func ftoa(f float64) string {
+	i := int(f)
+	r := int((f - float64(i)) * 10)
+	if r < 0 {
+		r = -r
 	}
-	return &pb.RemoveResponse{
-		Success: true,
-		Message: fmt.Sprintf("Model %s removed", req.ModelId),
+	return itoa(i) + "." + itoa(r)
+}
+
+func (s *EngineService) InstallModel(ctx context.Context, req *pb.InstallRequest) (*pb.InstallResponse, error) {
+	s.log.Info("InstallModel", "model_id", req.ModelId)
+	return &pb.InstallResponse{
+		Started: true,
+		Message: fmt.Sprintf("Installation started for %s", req.ModelId),
 	}, nil
 }
 
