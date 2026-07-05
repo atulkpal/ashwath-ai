@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/ashwathai/ashwath-engine/internal/bus"
 	"github.com/ashwathai/ashwath-engine/internal/downloads"
 )
 
@@ -16,14 +17,20 @@ type registry struct {
 	modelsDir  string
 	models     []Model
 	downloader *downloads.Manager
+	source     Source
+	eventBus   bus.Bus
 }
 
-func NewRegistry(modelsDir string, downloader *downloads.Manager) Registry {
+func NewRegistry(modelsDir string, downloader *downloads.Manager, opts ...RegistryOption) Registry {
 	r := &registry{
 		modelsDir:  modelsDir,
 		downloader: downloader,
-		models:     defaultModels(),
+		source:     NewBuiltinSource(),
 	}
+	for _, opt := range opts {
+		opt(r)
+	}
+	r.loadFromSource()
 	r.scanInstalled()
 	return r
 }
@@ -31,7 +38,6 @@ func NewRegistry(modelsDir string, downloader *downloads.Manager) Registry {
 func (r *registry) ModelsDir() string { return r.modelsDir }
 
 func (r *registry) List() ([]Model, error) {
-	// Return a copy so callers can't mutate the originals
 	result := make([]Model, len(r.models))
 	copy(result, r.models)
 	return result, nil
@@ -84,7 +90,12 @@ func (r *registry) Install(id string) error {
 		}
 	}
 
-	return r.saveState()
+	if err := r.saveState(); err != nil {
+		return err
+	}
+
+	r.emitEvent(bus.TopicModelInstalled, map[string]string{"id": id})
+	return nil
 }
 
 func (r *registry) Remove(id string) error {
@@ -108,7 +119,20 @@ func (r *registry) Remove(id string) error {
 		}
 	}
 
-	return r.saveState()
+	if err := r.saveState(); err != nil {
+		return err
+	}
+
+	r.emitEvent(bus.TopicModelRemoved, map[string]string{"id": id})
+	return nil
+}
+
+func (r *registry) loadFromSource() {
+	models, err := r.source.List()
+	if err != nil {
+		return
+	}
+	r.models = models
 }
 
 func (r *registry) scanInstalled() {
@@ -119,6 +143,12 @@ func (r *registry) scanInstalled() {
 	for i := range r.models {
 		id := r.models[i].ID
 		r.models[i].Installed = state[id]
+	}
+}
+
+func (r *registry) emitEvent(topic string, payload any) {
+	if r.eventBus != nil {
+		r.eventBus.Publish(topic, payload)
 	}
 }
 

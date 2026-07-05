@@ -1,21 +1,25 @@
 # Platform Guide
 
+> **Repository layout**: See [ARCHITECTURE.md](ARCHITECTURE.md) for canonical architecture diagram and [README.md](../README.md) for top-level directory overview.
+>
+> This guide focuses on development workflow and build procedures.
+
 ## Repository Layout
 
 ```
 AshwathAI/
-├── engine/            Go AI Engine (ashwathd binary)
+├── engine/            Go AI Engine (ashwathd binary, libashwath .so)
 ├── android/           Android frontend (Jetpack Compose, standalone Gradle project)
 ├── ios/               iOS frontend (future)
 ├── desktop/           Desktop frontend (future)
-├── web/               Web frontend (future)
+├── web/               Web frontend (React + Vite + TypeScript, active)
 ├── sdk/               Client SDKs for engine API
 │   ├── kotlin/        Kotlin SDK (active MVP, Gradle subproject for Android)
 │   ├── swift/         Swift SDK (scaffold)
 │   ├── go/            Go SDK (scaffold)
 │   └── typescript/    TypeScript SDK (scaffold, for web)
 ├── docs/              Platform documentation
-├── design/            Shared design assets
+├── design/            Shared design assets (Synthetic Noir)
 ├── scripts/           Build & CI scripts
 ├── tools/             Development tools
 ├── examples/          Usage examples
@@ -33,6 +37,8 @@ cd android
 ./gradlew assembleDebug          # Build debug APK + SDK jar
 ./gradlew :sdk:jar                # Build SDK jar only
 ./gradlew :sdk:generateProto      # Regenerate gRPC stubs (when proto changes)
+./gradlew :sdk:test               # Run SDK unit tests
+./gradlew test                    # Run all unit tests
 ```
 
 Open `android/` in Android Studio for UI development.
@@ -41,7 +47,7 @@ Open `android/` in Android Studio for UI development.
 ```bash
 cd engine
 go build ./cmd/ashwathd          # Build binary
-go test -count=1 ./...            # Run all tests
+go test -count=1 ./...            # Run all tests (42+ tests)
 go vet ./...                      # Static analysis
 go run tests/smoke.go             # Manual smoke test (requires running server)
 ```
@@ -86,19 +92,20 @@ make test-all         # Run all tests
 
 - **Go**: Follow standard `gofmt` conventions. Use `internal/` for private packages. Error wrapping with `%w`.
 - **Kotlin/Android**: Follow Kotlin coding conventions. Clean Architecture layers. Jetpack Compose for UI. Material 3 with Synthetic Noir design system.
-- **Swift/TypeScript**: To be defined when those frontends are implemented.
+- **TypeScript/React**: Follow project conventions (see `web/`). Tailwind CSS + shadcn/ui.
+- **Swift/TypeScript SDK**: To be defined when those frontends are implemented.
 
 ## Making Changes
 
 1. **Each platform directory is independent** — changes to `android/` don't affect `engine/` and vice versa.
-2. **The API contract** (`engine/proto/ashwathai/v1/engine.proto`) is the shared dependency between engine and frontends.
+2. **The API contract** (`engine/api/proto/service.proto`) is the shared dependency between engine and frontends. The SDK maintains a synced copy at `sdk/kotlin/src/main/proto/ashwathai/v1/engine.proto`.
 3. **When changing the API**: Update the proto file first, then regenerate SDK stubs for Kotlin and TypeScript.
-4. **Engine MVP uses JSON codec**: During development, the gRPC wire format is JSON. The proto file still serves as the authoritative schema. Before production, switch to generated protobuf stubs.
+4. **Engine uses protobuf codec** (migrated from JSON codec during EPIC 2).
 
 ## Testing Philosophy
 
-- **Engine**: Unit tests for all `internal/` packages. In-memory gRPC integration tests (`bufconn`). Manual smoke test for end-to-end.
-- **Android**: Unit tests for ViewModels, SDK client. Instrumented tests for download/install flow.
+- **Engine**: Unit tests for all `internal/` packages. In-memory gRPC integration tests (`bufconn`). Manual smoke test for end-to-end. 42+ tests across 8 packages.
+- **Android**: Unit tests for ViewModels, SDK client (10+ tests). Instrumented tests for download/install flow (planned).
 - **Web**: Unit tests with Vitest. Component tests with Testing Library. E2E with Playwright (future).
 
 ## Versioning

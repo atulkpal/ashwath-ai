@@ -1,6 +1,47 @@
 # Changelog
 
-## [0.1.0] - Unreleased
+## [Unreleased]
+
+### Added
+- EPIC 3 (Engine Foundation): Architecture Foundation, Runtime, Provider Abstraction, Stabilization.
+  - Event System (`internal/bus`): in-memory pub/sub event bus with 6 predefined topics.
+  - Plugin Framework (`internal/plugins`): Manager implementation, ToolPlugin extension, builtin registry.
+  - Model Abstraction (`internal/models`): Source interface, BuiltinSource, event bus integration.
+  - Agent Runtime (`internal/agent`): Memory, Context Assembly, Tool Pipeline, Agent orchestrator.
+  - Provider Registry (`internal/runtime/provider.go`): RegisterProvider, CreateEngine, ListProviders.
+  - Llama provider registration (`internal/runtime/llama/provider.go`).
+  - Server decoupled: hardcoded engine switch replaced with registry lookup.
+  - Module Boundaries documented (`docs/engine/MODULE_BOUNDARIES.md`).
+- Web Client merged into main (React + Vite + TypeScript, shadcn/ui, engine SDK runtime layer).
+- Design system documentation added (Synthetic Noir v1.0 — brand, tokens, components, icons, motion, accessibility, UX principles).
+
+### Changed
+- AGENT.md: comprehensive rewrite as repository constitution (18 sections: mission, principles, AI duties, Single Writer Principle, branch/worktree/merge policy, sprint workflow, Definition of Done, audit checklist, session management, engineering oath).
+- DOCUMENTATION_GOVERNANCE.md: rewritten with Single Writer Principle, documentation types, creation policy, archive policy.
+- PROJECT_STATE.md: updated for EPIC 3 completion, current milestone set to GOVERNANCE SPRINT 1.
+- ARCHITECTURE.md: Web Client status updated from Planned to Active Development.
+- ENGINE_API.md: added RemoveModel RPC, updated proto file path.
+- EPICS.md: EPIC-3 restructured into Phases A/B/C/D/E; all phases marked complete.
+- ROADMAP.md: Phase 3 (Android Engine Integration) marked complete.
+- DECISIONS.md: Web Frontend status updated; fixed stale SPRINT_W3A reference.
+- PLATFORM_GUIDE.md: web/ directory status updated to active; added cross-reference to ARCHITECTURE.md.
+- GUILD.md: governance sections trimmed; cross-reference to AGENT.md added.
+- SPRINT_W3A_ENGINE_INTEGRATION_ARCHITECTURE.md: moved to docs/analysis/ as historical record; fixed broken relative links.
+- PROJECT_STATE.md: EPIC 3 Phases B–E added to completed milestones.
+- android/.gitignore: added jniLibs/ for build artifacts.
+
+### Removed
+- docs/EPIC1_AGENT_PROMPT.md, docs/EPIC2_AGENT_PROMPT.md, docs/EPIC2_TODO.md, docs/EPIC3_PHASE_A_FINAL.md (obsolete).
+- web/README.md (unused default template).
+- engine/internal/api/jsoncodec.go (dead code).
+- engine/ashwathd.exe (stale binary).
+- docs/CHANGELOG.md (merged into root CHANGELOG.md).
+
+### Added
+- docs/REPOSITORY_MANIFEST.md: authoritative directory/file map with ownership, purpose, lifecycle.
+- docs/analysis/GOVERNANCE_SPRINT_1_FINAL.md: governance sprint final report.
+
+## [0.1.0] - 2026-03-07
 
 ### Added
 - Monorepo platform foundation with multi-frontend architecture.

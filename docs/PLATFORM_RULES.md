@@ -1,4 +1,4 @@
-# Ashwath.AI Platform Rules
+# Ashwath AI Platform Rules
 
 Status: Living Document
 
@@ -128,7 +128,7 @@ Every meaningful milestone should be committed independently.
 
 Platform-first thinking.
 
-Build Ashwath.AI.
+Build Ashwath AI.
 
 Do not build separate applications.
 

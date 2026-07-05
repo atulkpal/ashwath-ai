@@ -1,4 +1,4 @@
-# Ashwath.AI Swift SDK
+# Ashwath AI Swift SDK
 
 Swift client library for communicating with the Go Engine via gRPC.
 

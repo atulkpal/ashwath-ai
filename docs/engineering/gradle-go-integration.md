@@ -23,7 +23,8 @@ The integration handles cross-compilation by mapping Android ABIs to Go architec
 | :--- | :--- | :--- | :--- |
 | `arm64-v8a` | `android` | `arm64` | `aarch64-linux-android24` |
 | `x86_64` | `android` | `amd64` | `x86_64-linux-android24` |
-| `armeabi-v7a` | `android` | `arm` | `armv7a-linux-androideabi24` |
+
+> Note: `armeabi-v7a` was removed during EPIC 3 Phase A because the minimum API level (24) and the Go engine's LLVM requirements make 32-bit ARM builds non-viable. The Android APK targets arm64-v8a and x86_64 (for emulator) only.
 
 ### Requirements
 
@@ -33,9 +34,9 @@ The integration handles cross-compilation by mapping Android ABIs to Go architec
 
 ### Implementation
 
-The integration is implemented in `android/app/go-engine.gradle.kts` and applied in the app's `build.gradle.kts`.
+The integration is implemented directly in `android/app/build.gradle.kts` (inline tasks) rather than a separate script file.
 
-**android/app/go-engine.gradle.kts**:
+**android/app/build.gradle.kts** (Go engine section):
 ```kotlin
 import org.apache.tools.ant.taskdefs.condition.Os
 import java.util.Locale

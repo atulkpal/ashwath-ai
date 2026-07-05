@@ -1,6 +1,10 @@
 # Sprint W3A – Engine Integration Architecture
 
-Status: Draft
+Status: Complete — Archived
+
+> This document defined the architecture for connecting the Web Client to the Go Engine during Sprint W3A.
+> The architecture has been implemented and the Web Client has been merged into `main`.
+> This document is preserved as a historical record of the architectural decision-making process.
 
 ---
 
@@ -8,7 +12,7 @@ Status: Draft
 
 This document defines the architecture required to connect the Web Client to the Go Engine for real inference, session management, and model operations. It is intentionally architecture-focused and does not introduce production implementation changes.
 
-The design is grounded in the existing contract in [docs/ENGINE_CLIENT_CONTRACT.md](ENGINE_CLIENT_CONTRACT.md), the engine API in [docs/ENGINE_API.md](ENGINE_API.md), the current web structure in [docs/WEB_ARCHITECTURE.md](WEB_ARCHITECTURE.md), and the existing gRPC service definition in [engine/api/proto/service.proto](../engine/api/proto/service.proto).
+The design is grounded in the existing contract in [docs/ENGINE_CLIENT_CONTRACT.md](../ENGINE_CLIENT_CONTRACT.md), the engine API in [docs/ENGINE_API.md](../ENGINE_API.md), the current web structure in [docs/WEB_ARCHITECTURE.md](../WEB_ARCHITECTURE.md), and the existing gRPC service definition in [engine/api/proto/service.proto](../../engine/api/proto/service.proto).
 
 ---
 
@@ -290,7 +294,7 @@ Treat the existing proto schema as the canonical contract and generate web-facin
 
 ### Why this was chosen
 
-- The engine contract is already defined in [engine/api/proto/service.proto](../engine/api/proto/service.proto).
+- The engine contract is already defined in [engine/api/proto/service.proto](../../engine/api/proto/service.proto).
 - Generated code ensures parity across Android, Go, and the Web Client.
 - It reduces the chance of contract drift.
 

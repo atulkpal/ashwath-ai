@@ -1,4 +1,4 @@
-# Contributing to Ashwath.AI
+# Contributing to Ashwath AI
 
 ## Repository Structure
 

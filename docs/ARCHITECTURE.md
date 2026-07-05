@@ -1,4 +1,4 @@
-# Ashwath.AI Architecture
+# Ashwath AI Architecture
 
 ## Platform Overview
 
@@ -15,6 +15,7 @@
 │  │  ┌─────────┐ ┌────────┐ ┌────────┐ ┌──────────────┐  │   │
 │  │  │ Kotlin  │ │ Swift  │ │   Go   │ │ TypeScript   │  │   │
 │  │  │  SDK    │ │  SDK   │ │  SDK   │ │    SDK       │  │   │
+│  │  │ Active  │ │Scaffold│ │Scaffold│ │ In Progress  │  │   │
 │  │  └─────────┘ └────────┘ └────────┘ └──────────────┘  │   │
 │  └────────────────────────┬──────────────────────────────┘   │
 │                           │ gRPC                             │
@@ -23,8 +24,9 @@
 │  │              Go Engine (libashwath)                   │    │
 │  │  Runtime │ Models │ Config │ Device │ Logging        │    │
 │  │  RAG │ Voice │ Vision │ Knowledge │ Plugins          │    │
+│  │  Benchmark │ Downloads │ Service                      │    │
 │  └───────────────────────┬──────────────────────────────┘    │
-│                           │ Embedded (Android) / Download     │
+│                           │ Embedded (Android) / Daemon       │
 │                    Linked at build time (Android)             │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -39,27 +41,32 @@ The engine exposes a gRPC API on localhost (127.0.0.1) using a dynamically assig
 
 | Package | Purpose | Status |
 |---------|---------|--------|
-| `cmd/ashwathd` | Main entry point, wires all services | ✅ Implemented |
-| `internal/api` | gRPC service definitions, JSON codec, request/response types | ✅ Implemented |
-| `internal/config` | JSON file + env var config loader | ✅ Implemented |
-| `internal/device` | Hardware detection (OS, arch, CPU, RAM) | ✅ Implemented |
-| `internal/logging` | Structured slog-based logger | ✅ Implemented |
-| `internal/models` | Persistent model registry (`registry.json`) | ✅ Implemented (Phase A) |
-| `internal/runtime` | Engine abstraction (llama.cpp and mock backends) | ✅ Implemented (Phase A) |
-| `internal/downloads` | Multi-threaded download manager with verification | ✅ Implemented (Phase A) |
-| `internal/benchmark` | On-device performance evaluation (tokens/sec, memory) | ✅ Implemented (Phase A) |
+| `cmd/ashwathd` | Main entry point, wires all services | ✅ |
+| `cmd/libashwath` | C-shared library for Android (JNI) | ✅ |
+| `internal/api` | gRPC service definitions, JSON codec, request/response types | ✅ |
+| `internal/api/pb` | Generated protobuf Go stubs | ✅ |
+| `internal/benchmark` | Performance benchmarking | ✅ |
+| `internal/config` | JSON file + env var config loader | ✅ |
+| `internal/device` | Hardware detection (OS, arch, CPU, RAM) | ✅ |
+| `internal/downloads` | Model download manager | ✅ |
+| `internal/logging` | Structured slog-based logger | ✅ |
+| `internal/models` | Model registry (installed + available) | ✅ |
+| `internal/runtime` | Engine abstraction + Provider registry (mock, llama.cpp) | ✅ |
+| `internal/runtime/llama` | llama.cpp adapter (binary process wrapper) | ✅ |
+| `internal/server` | gRPC server wiring | ✅ |
 | `internal/rag` | Retrieval-augmented generation | 🗂️ Planned |
 | `internal/voice` | STT/TTS | 🗂️ Planned |
 | `internal/vision` | Image understanding | 🗂️ Planned |
 | `internal/knowledge` | Knowledge base management | 🗂️ Planned |
-| `internal/plugins` | Plugin system | 🗂️ Planned |
-| `pkg/api` | Public API types for external consumers | ✅ Implemented |
+| `internal/plugins` | Plugin system (Manager, ToolPlugin) | ✅ |
+| `mobile` | Mobile-specific Go package (backend selection) | ✅ |
+| ~~`pkg/api`~~ | Removed — protobuf (`api/proto/service.proto`) is the API contract | ❌ |
 
 ### Testing
-- Unit tests: 45 tests across 8 packages (including downloads and runtime).
+- Unit tests: 42+ tests across 8 packages.
 - In-memory gRPC integration tests using `bufconn` (no external server needed).
 - Smoke test in `engine/tests/smoke.go` for manual verification.
-- `go vet` and `golangci-lint` integrated into CI.
+- Android SDK tests: 10+ unit tests for gRPC client, ViewModels.
 
 ## Android Architecture
 
@@ -68,7 +75,7 @@ The Android app (`android/`) follows Clean Architecture with MVVM:
 - **`app/`**: Orchestration, navigation, DI root (`ServiceLocator`)
 - **`features/`**: Self-contained features (Chat, Library, Explore, Settings, Knowledge, Onboarding)
 - **`domain/`**: Pure Kotlin business logic and repository interfaces
-- **`data/`**: Repository implementations
+- **`data/`**: Repository implementations (GrpcModelRepository)
 - **`core/`**: Model download, checksum verification
 - **`platform/`**: Native bridge management, process control (for non-embedded modes)
 - **`sdk/`** (via Gradle subproject `:sdk`): Shared inference client (`ClientInferenceEngine`, `EngineGrpcClient`, `EmbeddedInferenceEngine`)
@@ -84,7 +91,7 @@ The SDK (`sdk/`) provides language-specific gRPC clients for the engine API:
 | Kotlin | ✅ Active (MVP) | `sdk/kotlin/` |
 | Swift | 🗂️ Scaffold only | `sdk/swift/` |
 | Go | 🗂️ Scaffold only | `sdk/go/` |
-| TypeScript | 🗂️ Scaffold only | `sdk/typescript/` |
+| TypeScript | 🔄 In Progress | `sdk/typescript/` |
 
 The Kotlin SDK is included in the Android build as a Gradle subproject. It will be published as a standalone artifact for other consumers.
 
@@ -93,25 +100,13 @@ The Kotlin SDK is included in the Android build as a Gradle subproject. It will 
 1. **Frontend launches**:
    - **Android (Embedded)**: The app loads `libashwath_engine.so` via JNI. `EmbeddedInferenceEngine` calls `nativeStartServer` to launch the gRPC server within the app process.
    - **Desktop/Others (Daemon)**: The app checks if the `ashwathd` binary is installed. If not, it downloads it from GitHub Releases, verifies the checksum, and launches it as a child process.
-2. **Engine Initialization**:
-   - The engine loads its configuration and initializes the **Persistent Model Registry**.
-   - If a backend (e.g., `llama.cpp`) is requested, the engine wires the specific runtime backend.
-3. **Model Management**:
-   - The engine exposes `ListModels`, `InstallModel`, and `RemoveModel` RPCs.
-   - `InstallModel` triggers the **Download Manager**, which handles multi-threaded GGUF downloads with background verification.
-   - The registry state is persisted to `registry.json` in the `data-dir`.
-4. **Connect via gRPC**: All frontends connect to the local gRPC server (usually on `127.0.0.1:50051`).
-5. **AI Operations**: All requests (Generate, ListModels, etc.) are sent as gRPC calls.
-6. **Performance Monitoring**: The engine periodically runs benchmarks (if enabled) to report hardware utilization and inference speed to the frontend via `GetDeviceInfo` or custom telemetry.
-7. **Shutdown**: Frontend calls `Shutdown` RPC or `nativeShutdown` (JNI) to gracefully terminate the engine and all child processes (like `llama-server`).
+   - **Web (Runtime)**: The browser connects to the Ashwath AI Runtime via gRPC-Web. The Runtime manages the engine process lifecycle.
+2. **Model Loading**: Both modes check for installed models in the `data-dir`. If a model is missing, it is downloaded from GitHub Releases / HuggingFace.
+3. **Connect via gRPC**: All frontends connect to the local gRPC server (usually on `127.0.0.1:50051`).
+4. **AI Operations**: All requests (Generate, ListModels, InstallModel, RemoveModel, etc.) are sent as gRPC calls.
+5. **Shutdown**: Frontend calls `Shutdown` RPC or `nativeShutdown` (JNI) to gracefully terminate the engine.
 
 ## Future Frontends
-
-### Web (Planned)
-- TypeScript/React with gRPC-Web
-- Deferred until engine API stabilizes with real inference (EPIC-3)
-- Requires gRPC-Web support in the engine (Envoy proxy or native Go gRPC-Web)
-- Progressive Web App for mobile and desktop
 
 ### iOS (Planned)
 - Swift with gRPC Swift library
