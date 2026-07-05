@@ -45,26 +45,23 @@ func Run(ctx context.Context, cfg *config.Config, opts Options) error {
 		)
 	}
 
-	initOpts := runtime.Options{ModelPath: cfg.ModelsDir}
+	llama.Register()
 
-	var eng runtime.Engine
-	switch opts.EngineType {
-	case "llama":
-		if opts.ModelPath == "" {
-			return fmt.Errorf("--model is required when --engine=llama")
-		}
-		eng = llama.New(opts.LlamaBin)
-		initOpts.ModelPath = opts.ModelPath
-		log.Info("Using llama.cpp backend", "model", opts.ModelPath)
-	default:
-		eng = runtime.NewMock()
-		log.Info("Using mock backend")
+	engType := opts.EngineType
+	if engType == "" {
+		engType = "mock"
 	}
 
-	if err := eng.Initialize(ctx, initOpts); err != nil {
-		return fmt.Errorf("engine initialization failed: %w", err)
+	initOpts := runtime.Options{
+		ModelPath: opts.ModelPath,
+		LlamaBin:  opts.LlamaBin,
 	}
-	log.Info("Engine initialized", "name", eng.Name())
+
+	eng, err := runtime.CreateEngine(ctx, engType, initOpts)
+	if err != nil {
+		return fmt.Errorf("create engine: %w", err)
+	}
+	log.Info("Engine initialized", "name", eng.Name(), "type", engType)
 
 	reg := models.NewRegistry(cfg.ModelsDir, downloads.NewManager())
 

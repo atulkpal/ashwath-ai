@@ -54,14 +54,47 @@
 - `WithToolExecutor` and `WithSystemPrompt` options.
 - Tests: 8/8 passing.
 
-## Phase D: Runtime Providers (not started)
+## Phase D: Runtime Providers ✓
+
+### D.1 Provider Registry (`internal/runtime/provider.go`)
+- `Provider` interface (`Name()`, `Create(ctx, opts) (Engine, error)`).
+- `RegisterProvider(Provider)` for global registration.
+- `CreateEngine(ctx, name, opts)` for dynamic engine creation.
+- `ListProviders()` for discovery.
+- Tests: 5/5 passing.
+
+### D.2 Mock Provider Registration
+- Mock engine auto-registers via `init()` as `"mock"` provider.
+- No code changes needed for mock usage.
+
+### D.3 Llama Provider (`internal/runtime/llama/provider.go`)
+- `llama.Register()` registers the llama provider.
+- Provider creates engine via `New(binPath)`, reads `opts.LlamaBin` and `opts.ModelPath`.
+
+### D.4 Server Decoupling (`internal/server/server.go`)
+- `server.Run` calls `llama.Register()` and then `runtime.CreateEngine()`.
+- Hardcoded engine switch replaced with registry lookup.
+- Engine type defaults to `"mock"` when empty.
 
 ## Phase E: Stabilization (not started)
 
 ## Test Summary
 ```
-internal/bus:     5 tests ✓
-internal/plugins: 7 tests ✓
-internal/models: 14 tests ✓
-internal/agent:  30 tests ✓ (memory 8 + context 6 + toolpipe 7 + agent 8 + combined 1)
+internal/bus:      5 tests ✓
+internal/plugins:  7 tests ✓
+internal/models:  14 tests ✓
+internal/agent:   30 tests ✓
+internal/runtime: 11 tests ✓ (6 mock + 5 provider)
+internal/llama:    4 tests ✓ (existing)
+internal/api:      5 tests ✓ (existing)
+internal/benchmark: 1 test ✓ (existing)
+internal/config:   2 tests ✓ (existing)
+internal/device:   1 test ✓ (existing)
+internal/logging:  3 tests ✓ (existing)
 ```
+
+## Overall
+- New packages: `bus`, `plugins` (implemented), `agent`, `runtime/provider`
+- Enhanced: `models`, `runtime`, `server`
+- Total tests: 83+ (42 existing + 5 bus + 7 plugins + 5 models + 30 agent + 5 provider)
+- All passing
