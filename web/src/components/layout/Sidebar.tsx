@@ -1,5 +1,7 @@
-import { MessageSquare, Library, Database, Compass, Settings, ChevronLeft, Terminal } from "lucide-react"
+import { MessageSquare, Library, Database, Compass, Settings, ChevronLeft, Terminal, ChevronDown, ChevronRight } from "lucide-react"
+import { useState } from "react"
 import { ConversationList } from "@/features/chat/ConversationList"
+import { ModelPanel } from "@/features/models/ModelPanel"
 
 const navItems = [
   { icon: MessageSquare, label: "Chat", id: "chat" },
@@ -60,8 +62,9 @@ export function Sidebar({ collapsed = false, onToggle, mode = "navigation" }: Si
       )}
 
       {mode === "conversations" && (
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 flex flex-col min-h-0">
           <ConversationList />
+          <ModelsSection />
         </div>
       )}
 
@@ -81,5 +84,22 @@ export function Sidebar({ collapsed = false, onToggle, mode = "navigation" }: Si
         </button>
       </div>
     </aside>
+  )
+}
+
+function ModelsSection() {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border-t border-[#27272a]">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 w-full px-4 py-2.5 text-[10px] font-semibold tracking-[0.12em] uppercase text-[#6b6b6b] hover:text-[#a1a1a1] transition-colors"
+      >
+        {open ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
+        Available Models
+      </button>
+      {open && <div className="h-[200px]"><ModelPanel /></div>}
+    </div>
   )
 }
