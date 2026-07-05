@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ashwathai.ashwathai.app.theme.BorderSubtle
 import com.ashwathai.ashwathai.app.theme.CyanPrimary
+import com.ashwathai.ashwathai.app.theme.OnSurfaceVariant
 import com.ashwathai.ashwathai.app.theme.SurfaceTier2
 
 @Composable
@@ -30,7 +31,7 @@ fun AshwathTextField(
         modifier = modifier.fillMaxWidth(),
         enabled = enabled,
         singleLine = singleLine,
-        placeholder = { Text(placeholder, color = Color.Gray) },
+        placeholder = { Text(placeholder, color = OnSurfaceVariant.copy(alpha = 0.6f)) },
         shape = RoundedCornerShape(4.dp), // Soft-Sharp
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = SurfaceTier2,

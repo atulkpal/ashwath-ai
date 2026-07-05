@@ -22,10 +22,18 @@ fun AshwathNavHost(
         startDestination = Screen.Explore.route,
         modifier = modifier
     ) {
-        composable(Screen.Onboarding.route) { OnboardingScreen() }
+        composable(Screen.Onboarding.route) {
+            OnboardingScreen(
+                onGetStarted = { navController.navigate(Screen.Explore.route) }
+            )
+        }
         composable(Screen.Explore.route) { ExploreScreen() }
         composable(Screen.Chat.route) { ChatScreen() }
-        composable(Screen.Library.route) { LibraryScreen() }
+        composable(Screen.Library.route) {
+            LibraryScreen(
+                onNavigateToExplore = { navController.navigate(Screen.Explore.route) }
+            )
+        }
         composable(Screen.Knowledge.route) { KnowledgeScreen() }
         composable(Screen.Settings.route) { SettingsScreen() }
     }
