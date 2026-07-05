@@ -24,7 +24,9 @@ import com.ashwathai.ashwathai.app.theme.JetBrainsMonoFontFamily
 import com.ashwathai.ashwathai.app.theme.OnSurfaceVariant
 import com.ashwathai.ashwathai.app.theme.PureBlack
 import com.ashwathai.ashwathai.app.theme.SurfaceTier1
+import com.ashwathai.ashwathai.app.theme.SurfaceTier2
 import com.ashwathai.ashwathai.core.HfTokenProvider
+import com.ashwathai.ashwathai.core.Prefs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -134,6 +136,53 @@ fun SettingsScreen() {
                                 )
                             }
                         }
+                    }
+                }
+            }
+
+            item { SettingHeader("Ollama") }
+            item {
+                val ctx = androidx.compose.ui.platform.LocalContext.current
+                var ollamaHost by remember { mutableStateOf(Prefs.getOllamaHost(ctx)) }
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.Transparent,
+                ) {
+                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                        Text(
+                            "Ollama Server",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                            color = Color.White,
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            if (ollamaHost.isNotBlank()) "Connected to $ollamaHost:11434" else "Enter your Ollama server IP",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = OnSurfaceVariant,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = ollamaHost,
+                            onValueChange = {
+                                ollamaHost = it
+                                Prefs.setOllamaHost(ctx, it)
+                            },
+                            placeholder = { Text("192.168.1.100", color = Color.Gray) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            textStyle = MaterialTheme.typography.bodySmall.copy(
+                                fontFamily = JetBrainsMonoFontFamily,
+                                color = Color.White,
+                            ),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = CyanPrimary,
+                                unfocusedBorderColor = SurfaceTier1,
+                                cursorColor = CyanPrimary,
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                            ),
+                        )
                     }
                 }
             }

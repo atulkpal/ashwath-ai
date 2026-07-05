@@ -1,8 +1,11 @@
 package com.ashwathai.ashwathai.di
 
 import android.content.Context
+import com.ashwathai.ashwathai.data.ollama.OllamaClient
 import com.ashwathai.ashwathai.data.repository.GrpcModelRepository
+import com.ashwathai.ashwathai.data.repository.OllamaModelRepository
 import com.ashwathai.ashwathai.domain.repository.ModelRepository
+import com.ashwathai.ashwathai.core.Prefs
 import java.io.File
 import com.ashwathai.ashwathai.runtime.api.InferenceEngine
 import com.ashwathai.sdk.ClientInferenceEngine
@@ -44,9 +47,16 @@ object ServiceLocator {
     }
 
     fun provideModelRepository(): ModelRepository {
-        return GrpcModelRepository(
-            grpcClient = grpcClient,
-            modelsDir = File(applicationContext.filesDir, "models"),
-        )
+        val modelsDir = File(applicationContext.filesDir, "models")
+        val ollamaHost = Prefs.getOllamaHost()
+
+        if (ollamaHost.isNotBlank()) {
+            val ollama = OllamaClient("http://$ollamaHost:11434")
+            if (ollama.isReachable()) {
+                return OllamaModelRepository(ollama, modelsDir)
+            }
+        }
+
+        return GrpcModelRepository(grpcClient = grpcClient, modelsDir = modelsDir)
     }
 }
