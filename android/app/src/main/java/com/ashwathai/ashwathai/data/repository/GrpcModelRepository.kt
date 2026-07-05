@@ -8,8 +8,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.concurrent.CopyOnWriteArrayList
 
 class GrpcModelRepository(
     private val grpcClient: EngineGrpcClient,
@@ -17,23 +21,94 @@ class GrpcModelRepository(
     private val downloader: DirectModelDownloader = DirectModelDownloader(),
 ) : ModelRepository {
 
-    private val knownUrls = mapOf(
-        "gemma-3-4b" to "https://huggingface.co/google/gemma-3-4b-it-gguf/resolve/main/gemma-3-4b-it-Q4_K_M.gguf",
-        "phi-4-mini" to "https://huggingface.co/microsoft/Phi-4-mini-instruct-gguf/resolve/main/Phi-4-mini-instruct-Q4_K_M.gguf",
-        "llama-3.2-3b" to "https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct-gguf/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
-        "qwen-2.5-3b" to "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-gguf/resolve/main/Qwen2.5-3B-Instruct-Q4_K_M.gguf",
+    private val upstreamUrl = "https://raw.githubusercontent.com/atulkpal/ashwath-ai/main/models/index.json"
+    private val cacheFile: File get() = File(modelsDir.parentFile, "model-index.json")
+
+    private data class ModelSource(val id: String, val name: String, val sources: List<String>, val filename: String, val sizeBytes: Long)
+
+    private val hardcodedSources = listOf(
+        ModelSource("gemma-3-4b", "Gemma 3 4B", listOf(
+            "https://huggingface.co/google/gemma-3-4b-it-gguf/resolve/main/gemma-3-4b-it-Q4_K_M.gguf",
+        ), "gemma-3-4b-it-Q4_K_M.gguf", 2_800_000_000L),
+        ModelSource("phi-4-mini", "Phi-4 Mini", listOf(
+            "https://huggingface.co/microsoft/Phi-4-mini-instruct-gguf/resolve/main/Phi-4-mini-instruct-Q4_K_M.gguf",
+        ), "Phi-4-mini-instruct-Q4_K_M.gguf", 2_100_000_000L),
+        ModelSource("llama-3.2-3b", "Llama 3.2 3B", listOf(
+            "https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct-gguf/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+        ), "Llama-3.2-3B-Instruct-Q4_K_M.gguf", 2_500_000_000L),
+        ModelSource("qwen-2.5-3b", "Qwen 2.5 3B", listOf(
+            "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-gguf/resolve/main/Qwen2.5-3B-Instruct-Q4_K_M.gguf",
+        ), "Qwen2.5-3B-Instruct-Q4_K_M.gguf", 3_100_000_000L),
     )
 
-    private val modelFilenames = mapOf(
-        "gemma-3-4b" to "gemma-3-4b-it-Q4_K_M.gguf",
-        "phi-4-mini" to "Phi-4-mini-instruct-Q4_K_M.gguf",
-        "llama-3.2-3b" to "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
-        "qwen-2.5-3b" to "Qwen2.5-3B-Instruct-Q4_K_M.gguf",
-    )
+    private val sources = CopyOnWriteArrayList(hardcodedSources)
 
-    private fun downloadedModelFile(modelId: String): File? {
-        val filename = modelFilenames[modelId] ?: return null
-        val file = File(modelsDir, filename)
+    init {
+        refreshUpstream()
+    }
+
+    private fun refreshUpstream() {
+        try {
+            val url = URL(upstreamUrl)
+            val conn = url.openConnection() as HttpURLConnection
+            conn.setRequestProperty("User-Agent", "AshwathAI/0.1")
+            conn.connectTimeout = 8000
+            conn.readTimeout = 8000
+
+            if (conn.responseCode == 200) {
+                val body = BufferedReader(InputStreamReader(conn.inputStream)).readText()
+                val parsed = parseUpstream(body)
+                if (parsed.isNotEmpty()) {
+                    sources.clear()
+                    sources.addAll(parsed)
+                    cacheFile.parentFile?.mkdirs()
+                    cacheFile.writeText(body)
+                }
+            } else if (cacheFile.exists()) {
+                val cached = parseUpstream(cacheFile.readText())
+                if (cached.isNotEmpty()) {
+                    sources.clear()
+                    sources.addAll(cached)
+                }
+            }
+            conn.disconnect()
+        } catch (_: Exception) {
+            if (cacheFile.exists()) {
+                try {
+                    val cached = parseUpstream(cacheFile.readText())
+                    if (cached.isNotEmpty()) {
+                        sources.clear()
+                        sources.addAll(cached)
+                    }
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
+    private fun parseUpstream(json: String): List<ModelSource> {
+        val models = org.json.JSONObject(json).getJSONArray("models")
+        val result = mutableListOf<ModelSource>()
+        for (i in 0 until models.length()) {
+            val m = models.getJSONObject(i)
+            val id = m.getString("id")
+            val name = m.getString("name")
+            val filename = m.getString("filename")
+            val sizeBytes = m.optLong("sizeBytes", 0L)
+            val srcArr = m.getJSONArray("sources")
+            val srcList = mutableListOf<String>()
+            for (j in 0 until srcArr.length()) {
+                srcList.add(srcArr.getString(j))
+            }
+            result.add(ModelSource(id, name, srcList, filename, sizeBytes))
+        }
+        return result
+    }
+
+    private fun sourceFor(id: String): ModelSource? = sources.find { it.id == id }
+
+    private fun downloadedFile(id: String): File? {
+        val src = sourceFor(id) ?: return null
+        val file = File(modelsDir, src.filename)
         return if (file.exists()) file else null
     }
 
@@ -44,7 +119,7 @@ class GrpcModelRepository(
         if (gRpcModels.isNotEmpty()) {
             emit(gRpcModels)
         } else {
-            emit(catalogModels())
+            emit(sources.map { it.toModelInfo() })
         }
     }
 
@@ -52,10 +127,10 @@ class GrpcModelRepository(
         val scanned = modelsDir.listFiles()
             ?.filter { it.name.endsWith(".gguf") }
             ?.map { file ->
-                val matchedId = modelFilenames.entries.firstOrNull { file.name == it.value }?.key
+                val matched = sources.firstOrNull { it.filename == file.name }
                 ModelInfo(
-                    id = matchedId ?: "local:${file.nameWithoutExtension}",
-                    name = matchedId?.let { id -> knownUrls.keys.firstOrNull { it == id } } ?: file.nameWithoutExtension,
+                    id = matched?.id ?: "local:${file.nameWithoutExtension}",
+                    name = matched?.name ?: file.nameWithoutExtension,
                     provider = "Local",
                     description = "Downloaded model",
                     size = formatSize(file.length()),
@@ -65,7 +140,6 @@ class GrpcModelRepository(
                 )
             } ?: emptyList()
 
-        // Also try gRPC for models installed via engine
         val result = grpcClient.listModels()
         val grpcModels = result.map { list ->
             list.modelsList.filter { it.installed }.map { it.toDomain() }
@@ -75,86 +149,61 @@ class GrpcModelRepository(
     }
 
     override fun getModel(id: String): Flow<ModelInfo?> = flow {
-        val local = downloadedModelFile(id)
-        if (local != null) {
-            emit(ModelInfo(
-                id = id,
-                name = id,
-                provider = "Local",
-                description = "Downloaded model",
-                size = formatSize(local.length()),
-                parameters = "",
-                tags = emptyList(),
-                isInstalled = true,
-            ))
+        downloadedFile(id)?.let {
+            emit(ModelInfo(id, id, "Local", "Downloaded model", formatSize(it.length()), "", emptyList(), true))
             return@flow
         }
         val result = grpcClient.listModels()
-        emit(result.map { list ->
-            list.modelsList.firstOrNull { it.id == id }?.toDomain()
-        }.getOrDefault(null))
+        emit(result.map { list -> list.modelsList.firstOrNull { it.id == id }?.toDomain() }.getOrDefault(null))
     }
 
     override suspend fun downloadModel(id: String) {
-        val url = knownUrls[id] ?: throw IllegalArgumentException("Unknown model: $id")
-        val filename = modelFilenames[id] ?: throw IllegalArgumentException("Unknown model: $id")
-        val dest = File(modelsDir, filename)
-
+        val src = sourceFor(id) ?: throw IllegalArgumentException("Unknown model: $id")
+        val dest = File(modelsDir, src.filename)
         modelsDir.mkdirs()
 
-        withContext(Dispatchers.IO) {
-            var lastProgress = -1f
-            downloader.download(url, dest).collect { progress ->
-                if (progress.fraction >= 1f && lastProgress < 1f) {
-                    lastProgress = 1f
-                }
-            }
+        for (url in src.sources) {
+            try {
+                downloader.download(url, dest).collect { }
+                return
+            } catch (_: Exception) { continue }
         }
+        throw Exception("All download sources failed for $id")
     }
 
     override suspend fun deleteModel(id: String) {
-        downloadedModelFile(id)?.delete()
+        downloadedFile(id)?.delete()
     }
 
     override fun downloadProgress(modelId: String): Flow<Float> = flow {
-        val url = knownUrls[modelId] ?: return@flow
-        val filename = modelFilenames[modelId] ?: return@flow
-        val dest = File(modelsDir, filename)
+        val src = sourceFor(modelId) ?: return@flow
+        val dest = File(modelsDir, src.filename)
 
-        if (dest.exists()) {
-            emit(1f)
-            return@flow
-        }
-
+        if (dest.exists()) { emit(1f); return@flow }
         modelsDir.mkdirs()
 
-        var done = false
-        downloader.download(url, dest).collect { progress ->
-            emit(progress.fraction)
-            if (progress.fraction >= 1f) {
-                done = true
-                return@collect
-            }
+        for (url in src.sources) {
+            var done = false
+            try {
+                downloader.download(url, dest).collect { p ->
+                    emit(p.fraction)
+                    if (p.fraction >= 1f) { done = true; return@collect }
+                }
+                if (done || dest.exists()) { if (!done) emit(1f); return@flow }
+            } catch (_: Exception) { continue }
         }
-        if (!done && dest.exists()) emit(1f)
+        throw Exception("All download sources failed for $modelId")
     }.flowOn(kotlinx.coroutines.Dispatchers.IO)
 
     private fun com.ashwathai.sdk.generated.ModelInfo.toDomain(): ModelInfo = ModelInfo(
-        id = id,
-        name = name,
-        provider = provider,
-        description = "",
-        size = formatSize(sizeBytes),
-        parameters = parameters,
-        tags = tagsList,
-        isInstalled = installed,
+        id = id, name = name, provider = provider, description = "",
+        size = formatSize(sizeBytes), parameters = parameters, tags = tagsList, isInstalled = installed,
     )
 
-    private fun catalogModels(): List<ModelInfo> = listOf(
-        ModelInfo("gemma-3-4b", "Gemma 3 4B", "Google", "Lightweight, state-of-the-art open model. Excels at reasoning and chat.", "2.8 GB", "4B", listOf("General", "Efficient", "Chat")),
-        ModelInfo("phi-4-mini", "Phi-4 Mini", "Microsoft", "Extremely capable small model. Strong at reasoning, coding, and math.", "2.1 GB", "3.8B", listOf("Reasoning", "Coding", "Math")),
-        ModelInfo("llama-3.2-3b", "Llama 3.2 3B", "Meta", "Optimized for mobile and edge devices. Well-balanced chat and general tasks.", "2.5 GB", "3B", listOf("Balanced", "Chat", "General")),
-        ModelInfo("qwen-2.5-3b", "Qwen 2.5 3B", "Alibaba", "High performance multilingual model with strong coding abilities.", "3.1 GB", "3B", listOf("Multilingual", "Coding")),
+    private fun ModelSource.toModelInfo() = ModelInfo(
+        id = id, name = name, provider = if (id.startsWith("local:")) "Local" else id.split("-").firstOrNull()?.replaceFirstChar { it.uppercase() } ?: "Unknown",
+        description = "", size = formatSize(sizeBytes), parameters = "",
+        tags = emptyList(), isInstalled = downloadedFile(id) != null,
     )
 
     private fun formatSize(bytes: Long): String = when {

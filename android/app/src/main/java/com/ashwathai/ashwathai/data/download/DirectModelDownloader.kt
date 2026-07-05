@@ -21,8 +21,10 @@ class DirectModelDownloader {
         val tempFile = File(destFile.parentFile, destFile.name + ".tmp")
         try {
             val connection = URL(url).openConnection() as HttpURLConnection
+            connection.setRequestProperty("User-Agent", "AshwathAI/0.1")
             connection.connectTimeout = 15000
-            connection.readTimeout = 30000
+            connection.readTimeout = 60000
+            connection.instanceFollowRedirects = true
             connection.connect()
 
             val contentLength = connection.contentLengthLong
