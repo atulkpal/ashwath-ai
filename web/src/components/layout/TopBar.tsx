@@ -1,4 +1,4 @@
-import { PanelRightOpen, PanelRightClose, Terminal, Cpu } from "lucide-react"
+import { PanelRightOpen, PanelRightClose, Terminal, Cpu, Menu } from "lucide-react"
 
 type TopBarProps = {
   rightPanelOpen: boolean
@@ -8,6 +8,7 @@ type TopBarProps = {
   contextUsed?: number
   contextMax?: number
   tokenSec?: number
+  onMenuClick?: () => void
 }
 
 export function TopBar({
@@ -18,6 +19,7 @@ export function TopBar({
   contextUsed = 8,
   contextMax = 32,
   tokenSec = 0,
+  onMenuClick,
 }: TopBarProps) {
   const statusConfig = {
     connected: { dot: "bg-[#22c55e]", label: "Connected" },
@@ -31,6 +33,16 @@ export function TopBar({
     <header className="flex h-full items-center justify-between border-b border-[#27272a] bg-[#121212] px-5">
       {/* Left */}
       <div className="flex items-center gap-3">
+        {onMenuClick && (
+          <button
+            type="button"
+            onClick={onMenuClick}
+            className="md:hidden flex items-center justify-center size-7 rounded-md text-[#a1a1a1] hover:text-white hover:bg-[#1e1e1e] transition-colors duration-150"
+            aria-label="Open sidebar"
+          >
+            <Menu className="size-3.5" />
+          </button>
+        )}
         <div className="size-7 rounded-md bg-[#00f0ff]/10 flex items-center justify-center">
           <Terminal className="size-3.5 text-[#00f0ff]" />
         </div>

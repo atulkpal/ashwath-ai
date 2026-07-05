@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Sidebar } from "@/components/layout/Sidebar"
 import { TopBar } from "@/components/layout/TopBar"
 import { StatusBar } from "@/components/layout/StatusBar"
@@ -7,11 +7,36 @@ import { ChatInput } from "@/features/chat/ChatInput"
 import { ParameterPanel } from "@/features/chat/ParameterPanel"
 import { ThinkingIndicator } from "@/features/chat/ThinkingIndicator"
 import { useChatState } from "@/features/chat/useChatState"
+import { X } from "lucide-react"
+
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia(query)
+    setMatches(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches)
+    mq.addEventListener("change", handler)
+    return () => mq.removeEventListener("change", handler)
+  }, [query])
+  return matches
+}
 
 export function MainLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [rightPanelOpen, setRightPanelOpen] = useState(true)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const isMobile = useMediaQuery("(max-width: 768px)")
   const { scrollRef, messages, isLoading, input, setInput, sendMessage, handleKeyDown } = useChatState()
+
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarCollapsed(true)
+      setRightPanelOpen(false)
+    }
+  }, [isMobile])
+
+  const sidebarWidth = sidebarCollapsed ? "60px" : "280px"
+  const rightPanelWidth = rightPanelOpen ? "320px" : "0px"
 
   return (
     <div className="flex h-screen flex-col bg-black text-white overflow-hidden">
@@ -24,14 +49,37 @@ export function MainLayout() {
           contextUsed={8}
           contextMax={32}
           tokenSec={0}
+          onMenuClick={isMobile ? () => setMobileSidebarOpen(true) : undefined}
         />
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        <div className={`
-          shrink-0 transition-all duration-300 ease-out
-          ${sidebarCollapsed ? "w-[60px]" : "w-[280px]"}
-        `}>
+      <div className="flex flex-1 overflow-hidden relative">
+        {isMobile && mobileSidebarOpen && (
+          <div className="fixed inset-0 z-50 flex">
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setMobileSidebarOpen(false)}
+            />
+            <div className="relative w-[280px] h-full">
+              <button
+                onClick={() => setMobileSidebarOpen(false)}
+                className="absolute top-3 right-3 z-10 p-1 text-[#a1a1a1] hover:text-white"
+              >
+                <X className="size-4" />
+              </button>
+              <Sidebar
+                collapsed={false}
+                onToggle={() => setMobileSidebarOpen(false)}
+                mode="conversations"
+              />
+            </div>
+          </div>
+        )}
+
+        <div
+          className="hidden md:block shrink-0 transition-all duration-300 ease-out overflow-hidden"
+          style={{ width: sidebarWidth }}
+        >
           <Sidebar
             collapsed={sidebarCollapsed}
             onToggle={() => setSidebarCollapsed((prev) => !prev)}
@@ -45,7 +93,7 @@ export function MainLayout() {
               ref={scrollRef}
               className="absolute inset-0 overflow-y-auto sn-scrollbar"
             >
-              <div className="max-w-[800px] mx-auto px-8 pt-8 pb-4 min-h-full flex flex-col justify-end">
+              <div className="max-w-[800px] mx-auto px-4 md:px-8 pt-8 pb-4 min-h-full flex flex-col justify-end">
                 <div className="space-y-6">
                   {messages.map((m) => (
                     <ChatMessage key={m.id} message={m} />
@@ -94,13 +142,32 @@ export function MainLayout() {
           </div>
         </div>
 
-        <div className={`
-          shrink-0 border-l border-[#27272a] bg-[#121212]
-          transition-all duration-300 ease-out
-          ${rightPanelOpen ? "w-[320px]" : "w-0 overflow-hidden"}
-        `}>
-          <ParameterPanel />
-        </div>
+        {isMobile ? (
+          rightPanelOpen && (
+            <div className="fixed inset-0 z-50 flex">
+              <div
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                onClick={() => setRightPanelOpen(false)}
+              />
+              <div className="relative w-full h-full">
+                <button
+                  onClick={() => setRightPanelOpen(false)}
+                  className="absolute top-3 right-3 z-10 p-1 text-[#a1a1a1] hover:text-white"
+                >
+                  <X className="size-4" />
+                </button>
+                <ParameterPanel />
+              </div>
+            </div>
+          )
+        ) : (
+          <div
+            className="shrink-0 border-l border-[#27272a] bg-[#121212] transition-all duration-300 ease-out overflow-hidden"
+            style={{ width: rightPanelWidth }}
+          >
+            <ParameterPanel />
+          </div>
+        )}
       </div>
 
       <StatusBar />
