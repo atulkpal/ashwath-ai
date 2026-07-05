@@ -23,7 +23,7 @@ Every line of code written should contribute to the stability, portability, and 
 
 To maintain high velocity and clear focus, engineering efforts are divided into functional teams and roles:
 
-### Platform Team
+### Engine Team
 Responsible for the "Heart of Ashwath." They maintain the Engine, platform communication interfaces, cross-platform build pipelines, and shared SDKs. Their focus is performance, resource management, and hardware acceleration.
 
 ### Android Client Team
@@ -34,6 +34,9 @@ Responsible for bringing Ashwath to the browser. They maintain the web-client im
 
 ### Research Lab
 The innovation wing. They explore new LLM architectures, quantization techniques, and multimodal capabilities. Their work is experimental and serves as the roadmap for future platform features.
+
+### Marketing (Future)
+Responsible for the Ashwath AI brand, website, community engagement, release announcements, and marketing materials. Interfaces with engineering for technical accuracy but operates independently.
 
 ### Chief Architect
 A critical role responsible for architecture reviews, engineering standards, repository organization, API consistency, and the long-term technical direction of the platform.
@@ -61,14 +64,18 @@ Ownership in this repository defines responsibility, not isolation.
 
 Ashwath AI uses a monorepo structure. While visibility is open to all, responsibility is assigned to **Primary Maintainers**. This concept signifies responsibility and stewardship, not exclusivity. Contributors may propose improvements outside their primary area, but significant cross-boundary modifications should be discussed and approved by the respective Primary Maintainer or the Chief Architect.
 
- Directory | Primary Maintainer | Description |
+  Directory | Primary Maintainer | Description |
  :--- | :--- | :--- |
- `engine/` | **Platform Team** | Core Engine logic and low-level bindings. |
- `sdk/` | **Platform Team** | Language-specific platform wrappers. |
- `docs/` | **Platform Team / Docs** | Core platform documentation and API specs. |
- `android/` | **Android Client Team** | Native Android application and mobile assets. |
- `web/` | **Web Client Team** | Web frontend and related tooling. |
- `research/` | **Research Lab** | Experimental models and evaluation data. |
+ `engine/` | **Engine Agent** | Go engine, gRPC server, agent runtime, providers, SDKs |
+ `sdk/kotlin/` | **Android Agent** | Kotlin SDK (gRPC client, JNI bridge) |
+ `sdk/go/`, `sdk/typescript/`, `sdk/swift/` | **Engine Agent** | Go, TS, Swift SDKs |
+ `docs/` | **Chief Architect** | Platform documentation, governance, planning |
+ `android/` | **Android Agent** | Android application (Compose + MVVM) |
+ `web/` | **Web Agent** | Web frontend (React + Vite + TypeScript) |
+ `research/` | **Research Agent** | Model evaluation, quantization experiments |
+ `design/` | **Design Team** | Synthetic Noir design system, screen designs |
+ `scripts/` | **Chief Architect** | Repository tooling, worktree setup |
+ `marketing/` | **Marketing Agent** (Future) | Website, community, release announcements |
 
 ---
 
@@ -95,7 +102,7 @@ Technical and product decisions follow a structured hierarchy to ensure consiste
 
 ## 8. AI Agent Responsibilities
 
-### Platform Agent (OpenCode)
+### Engine Agent (OpenCode)
 Primary Maintainer of `engine/`, `sdk/`, repository architecture, Engine APIs, and platform documentation.
 
 ### Android Agent (Android Studio Gemini)

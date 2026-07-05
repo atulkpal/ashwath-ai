@@ -11,8 +11,11 @@ import "C"
 import (
 	"context"
 	"fmt"
+	"net"
+	"os"
 	"path/filepath"
 	"sync"
+	"time"
 	"unsafe"
 
 	"github.com/ashwathai/ashwath-engine/internal/config"
@@ -34,20 +37,19 @@ func goInit(cEngineType, cModelPath, cLlamaBin *C.char) C.int {
 	engineType := C.GoString(cEngineType)
 	modelPath := C.GoString(cModelPath)
 	llamaBin := C.GoString(cLlamaBin)
-
 	opts := runtime.Options{}
-
 	switch engineType {
+	case "mock":
+		eng = runtime.NewMock()
 	case "llama":
+		fallthrough
+	default:
 		if modelPath == "" {
 			return ErrInitFailed
 		}
 		eng = llama.New(llamaBin)
 		opts.ModelPath = modelPath
-	default:
-		eng = runtime.NewMock()
 	}
-
 	if err := eng.Initialize(context.Background(), opts); err != nil {
 		eng = nil
 		return ErrInitFailed
@@ -63,7 +65,6 @@ func goShutdown() {
 		serverCancel = nil
 	}
 	serverMu.Unlock()
-
 	if eng != nil {
 		_ = eng.Stop(context.Background())
 		eng = nil
@@ -79,13 +80,7 @@ func goRunning() C.int {
 }
 
 //export goGenerate
-func goGenerate(
-	cPrompt *C.char,
-	cMaxTokens C.int,
-	cTemperature C.float,
-	cTopK C.int,
-	cTopP C.float,
-) C.int {
+func goGenerate(cPrompt *C.char, cMaxTokens C.int, cTemperature C.float, cTopK C.int, cTopP C.float) C.int {
 	if eng == nil {
 		return ErrEngineNil
 	}
@@ -132,7 +127,7 @@ func goStartServer(port C.int, cDataDir *C.char, cEngineType *C.char) C.int {
 	defer serverMu.Unlock()
 
 	if serverCancel != nil {
-		return ErrOK // Already running
+		return ErrOK
 	}
 
 	dataDir := C.GoString(cDataDir)
@@ -145,11 +140,9 @@ func goStartServer(port C.int, cDataDir *C.char, cEngineType *C.char) C.int {
 	llama.Register()
 
 	var modelPath string
-
 	if engineType == "llama" {
-		downloader := downloads.NewManager()
 		modelsDir := filepath.Join(dataDir, "models")
-		reg := models.NewRegistry(modelsDir, downloader, models.WithOllamaSource(), models.WithUpstreamIndex("", dataDir))
+		reg := models.NewRegistry(modelsDir, downloads.NewManager())
 
 		mdls, _ := reg.List()
 		for _, m := range mdls {
@@ -178,23 +171,39 @@ func goStartServer(port C.int, cDataDir *C.char, cEngineType *C.char) C.int {
 
 	opts := server.Options{
 		EngineType: engineType,
-		LlamaBin:   "",
 		ModelPath:  modelPath,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	serverCancel = cancel
 
+	serverReady := make(chan error, 1)
 	go func() {
-		if err := server.Run(ctx, cfg, opts); err != nil {
-			fmt.Printf("Embedded server error: %v\n", err)
-		}
+		err := server.Run(ctx, cfg, opts)
+		serverReady <- err
 		serverMu.Lock()
 		serverCancel = nil
 		serverMu.Unlock()
 	}()
 
-	return ErrOK
+	addr := fmt.Sprintf("127.0.0.1:%d", int(port))
+	deadline := time.Now().Add(60 * time.Second)
+	for time.Now().Before(deadline) {
+		select {
+		case err := <-serverReady:
+			fmt.Fprintf(os.Stderr, "Embedded server exited early: %v\n", err)
+			return ErrInitFailed
+		default:
+		}
+		conn, err := net.DialTimeout("tcp", addr, 500*time.Millisecond)
+		if err == nil {
+			conn.Close()
+			return ErrOK
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	return ErrInitFailed
 }
 
 func main() {}

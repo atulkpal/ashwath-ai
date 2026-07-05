@@ -36,7 +36,7 @@ Agents may propose changes to any document (via issue, PR, or request), but only
 ```
 docs/
   architecture/       Living architecture documents (one source of truth per topic)          Owner: Chief Architect
-  engine/             Engine workspace progress (append-only)                                Owner: Platform Agent
+  engine/             Engine workspace progress (append-only)                                Owner: Engine Agent
   android/            Android workspace docs (append-only)                                   Owner: Android Agent
   web/                Web workspace docs (append-only)                                       Owner: Web Agent
   platform/           Platform-wide technical documentation                                  Owner: Chief Architect
@@ -150,7 +150,7 @@ New documents may only be created in these locations:
 | `docs/decisions/` | ADRs | Chief Architect |
 | `docs/proposals/` | Proposals for review | Any agent |
 | `docs/architecture/` | New architecture documents | Chief Architect |
-| `docs/engine/` | Engine workspace docs | Platform Agent |
+| `docs/engine/` | Engine workspace docs | Engine Agent |
 | `docs/android/` | Android workspace docs | Android Agent |
 | `docs/web/` | Web workspace docs | Web Agent |
 

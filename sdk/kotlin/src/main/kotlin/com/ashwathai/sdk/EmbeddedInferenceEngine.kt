@@ -12,7 +12,7 @@ class EmbeddedInferenceEngine(
     private val clientEngine: InferenceEngine,
     private val port: Int,
     private val dataDir: File,
-    private val engineType: String = "mock",
+    private val engineType: String = "llama",
     private val bridge: AshwathBridge = AshwathBridge()
 ) : InferenceEngine {
     override val name: String get() = clientEngine.name

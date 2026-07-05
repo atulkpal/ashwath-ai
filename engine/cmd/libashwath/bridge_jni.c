@@ -72,7 +72,7 @@ Java_com_ashwathai_sdk_jni_AshwathBridge_nativeInit(
     JNIEnv* env, jobject thiz,
     jstring engineType, jstring modelPath, jstring llamaBin) {
     LOGI("nativeInit called (type=%s)", engineType ? "set" : "null");
-    const char* et = engineType ? (*env)->GetStringUTFChars(env, engineType, NULL) : "mock";
+    const char* et = engineType ? (*env)->GetStringUTFChars(env, engineType, NULL) : "llama";
     const char* mp = modelPath ? (*env)->GetStringUTFChars(env, modelPath, NULL) : "";
     const char* lb = llamaBin ? (*env)->GetStringUTFChars(env, llamaBin, NULL) : "";
     jint result = goInit(et, mp, lb);
@@ -117,7 +117,7 @@ Java_com_ashwathai_sdk_jni_AshwathBridge_nativeStartServer(
     LOGI("nativeStartServer called on port %d (type=%s)", port,
          engineType ? "set" : "null");
     const char* dd = dataDir ? (*env)->GetStringUTFChars(env, dataDir, NULL) : "";
-    const char* et = engineType ? (*env)->GetStringUTFChars(env, engineType, NULL) : "mock";
+    const char* et = engineType ? (*env)->GetStringUTFChars(env, engineType, NULL) : "llama";
     jint result = goStartServer((int)port, dd, et);
     if (dataDir)    (*env)->ReleaseStringUTFChars(env, dataDir, dd);
     if (engineType) (*env)->ReleaseStringUTFChars(env, engineType, et);
