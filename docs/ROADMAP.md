@@ -1,78 +1,81 @@
 # Ashwath AI Roadmap
 
-## Phase 1: Platform Foundation ✅ (Complete)
-- [x] Monorepo structure established
-- [x] Android standalone project migrated to `android/`
-- [x] Go engine scaffold with interface definitions
-- [x] Synthetic Noir design system basics
-- [x] Navigation and feature skeletons (Chat, Library, Explore, Settings, Knowledge, Onboarding)
-- [x] Platform documentation suite (Vision, Architecture, Roadmap, API, Decisions, Design System)
-- [x] SDK module scaffolding (Kotlin, Swift, Go, TypeScript)
+> **Model:** Five parallel tracks, coordinated at epoch boundaries (every 3 weeks).
+> See `docs/analysis/PROJECT_PLANNING_SPRINT_1.md` for full context.
 
-## Phase 2: Engine MVP ✅ (Complete)
-- [x] gRPC server implementation in Go engine with JSON codec
-- [x] Mock inference engine returning streaming word-by-word responses
-- [x] Config loading from JSON file + environment variables
-- [x] Device detection (OS, arch, CPU cores, RAM)
-- [x] Model registry with 4 curated models (Gemma, Phi, Llama, Qwen)
-- [x] Structured logging via slog
-- [x] All 6 gRPC RPCs implemented (Generate, ListModels, InstallModel, RemoveModel, GetDeviceInfo, Shutdown)
-- [x] Engine binary release pipeline (GitHub Actions, 7 cross-compile targets)
-- [x] Go CI workflow (lint, test, build)
-- [x] Unit test suite: 42+ tests across 8 packages
-- [x] In-memory gRPC integration tests for all RPCs
+---
 
-## Phase 3: Android Engine Integration ✅ (Complete)
-- [x] Kotlin SDK module with gRPC client infrastructure
-- [x] JNI bridge for embedded Go engine (.so)
-- [x] Automated Gradle build for Go shared library (arm64-v8a, x86_64)
-- [x] EmbeddedInferenceEngine for managing native server lifecycle
-- [x] ServiceLocator wiring SDK to app (EMBEDDED and DEVELOPMENT modes)
-- [x] ChatViewModel connected to InferenceEngine interface
-- [x] Generate real gRPC stubs from proto file
-- [x] Wire EngineGrpcClient.generate() to real stub calls
-- [x] Backend selection wiring (mobile -> bridge -> JNI -> SDK)
-- [x] Model download pipeline with registry persistence
-- [x] Full model lifecycle (ListModels, InstallModel, RemoveModel)
-- [x] Real benchmark implementation
-- [x] Proto synchronization between engine and SDK
-- [x] GrpcModelRepository (domain repository via gRPC)
-- [x] ExploreViewModel and LibraryViewModel wired to real models
-- [x] SDK protobuf deps visibility fix
-- [x] Test suite for SDK and ViewModels
-- [x] Android build cleanup (armeabi-v7a removed)
+## Foundation ✅ (Complete)
 
-## Phase 3b: Android Polish (In Progress)
-- [ ] Handle engine not installed / offline state properly
-- [ ] Add instrumented tests for download → install → connect flow
-- [ ] Resolve Stitch/Google Fonts theme conflict
-- [ ] Connect UI screens to wired ViewModels (Explore, Library)
-- [ ] Model download progress UI
-- [ ] Fix deprecation warnings (icons, statusBar, use import)
+All foundation work is delivered. Engine v1 is certified. Repository governance is established.
 
-## Phase 4: Real Inference (Next)
-- [ ] llama.cpp Go bindings
-- [ ] Model download from GitHub Releases / HuggingFace
-- [ ] Streaming token generation with real models
-- [ ] Basic chat flow end-to-end (Android app ↔ Go engine)
-- [ ] Performance benchmarking with real models
+| Milestone | Date | Tag |
+|---|---|---|
+| Platform Foundation | March 2026 | — |
+| Engine MVP (EPIC 1) | March 2026 | — |
+| Android Engine Integration (EPIC 2) | June 2026 | — |
+| Engine Architecture (EPIC 3 A–E) | July 2026 | — |
+| Governance Sprint 1 | July 2026 | — |
+| Engine v1 Certification | July 2026 | `arch-engine-v1` |
+| Project Planning Sprint 1 | July 2026 | — |
 
-## Phase 5: Knowledge & RAG
-- [ ] SQLite-based vector store
-- [ ] Document parser (PDF, text, markdown)
-- [ ] Embedding generation
-- [ ] Retrieval-augmented generation pipeline
-- [ ] Knowledge management UI in Android
+---
 
-## Phase 6: Voice & Vision
-- [ ] STT integration
-- [ ] TTS integration
-- [ ] Image description
-- [ ] Voice chat UI in Android
-- [ ] Camera integration in Android
+## Epoch 1 — Client Polish (July 2026)
 
-## Phase 7: Platform Expansion
-- [ ] iOS frontend (Swift)
-- [ ] Desktop frontend (Tauri/TBD)
-- [ ] Plugin system
-- [ ] Community model hub
+```
+Engine Track           Android Track         Web Track            Platform Track       Research Track
+────────────────────   ────────────────      ────────────────     ─────────────────    ────────────────
+E4: Stability          E5: App v1            E6: Web v1           E12: Release Eng.    E13: Research
+  Downloads tests       Stitch fix            gRPC-Web SDK         Semver policy        Quant benchmarks
+  Progress events       Screen wiring         Connection mgmt      Pipeline audit       NPU study
+  Llama bundling        Progress UI           Model browser        Android release      Eval harness
+  JNI error codes       Offline state         Chat end-to-end      Web deploy
+  Benchmark CI          Lifecycle mgmt        PWA support          Changelog gen
+  Provider docs         Instrumented tests    Responsive layout
+```
+
+---
+
+## Epoch 2 — Knowledge (August 2026)
+
+```
+Engine Track           Android Track         Web Track
+────────────────────   ────────────────      ────────────────
+E7: Knowledge BE       E7: Knowledge UI      E7: Knowledge UI
+  Vector store          Document list         Document list
+  Document parser       Upload UI             Upload UI
+  Embedding gen         RAG indicator         RAG indicator
+  Retrieval pipeline
+  gRPC RPCs
+```
+
+---
+
+## Epoch 3 — Intelligence (September 2026)
+
+```
+Engine Track           Android Track
+────────────────────   ────────────────
+E8: Voice/Vision BE    E8: Voice/Vision UI
+  STT (whisper.cpp)     Voice input
+  TTS                   Voice output
+  Image description     Camera integration
+  gRPC RPCs
+```
+
+---
+
+## Epoch 4 — Platform Expansion (October 2026+)
+
+```
+Engine Track           Platform Track
+────────────────────   ─────────────────
+E9: Plugins v2         E10: Desktop
+  External loading       Tauri scaffold
+  Plugin manager v2      Engine bundling
+                        E11: iOS
+                          Swift SDK
+                          Engine embed
+                          Chat UI
+```

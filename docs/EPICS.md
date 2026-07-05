@@ -1,141 +1,201 @@
 # EPICs
 
-## EPIC-1: Engine MVP ✅ (Complete)
+> **Planning model:** Epochs (time-boxed parallel tracks) with EPICs as units of work.
+> See `docs/analysis/PROJECT_PLANNING_SPRINT_1.md` for the full planning context.
+
+---
+
+## Foundation (Complete)
+
+### EPIC-1: Engine MVP ✅
 
 **Goal**: Go engine compiles, starts, and serves a gRPC API with mock responses.
 
-### Stories
+**Owner:** Platform Team
+
 - [x] E1.1: Implement gRPC server with service stubs (JSON codec, all 5 RPCs)
-- [x] E1.2: Implement config loading from file/env (`config.Load()`, 7 env vars)
-- [x] E1.3: Implement device detection (OS, arch, CPU cores, RAM via /proc/meminfo)
-- [x] E1.4: Implement mock inference engine (streaming, 50ms word delay, cancellation)
-- [x] E1.5: Implement model registry (4 hardcoded models: Gemma, Phi, Llama, Qwen)
-- [x] E1.6: Implement structured logging (slog-based, 4 levels, `With` support)
-- [x] E1.7: Engine release pipeline in CI (7 targets: linux/amd64/arm64, darwin/amd64/arm64, windows/amd64, android/arm64)
-- [x] E1.8: Unit test suite (21 tests across config, logging, device, models, runtime, api)
+- [x] E1.2: Implement config loading from file/env
+- [x] E1.3: Implement device detection
+- [x] E1.4: Implement mock inference engine (streaming, cancellation)
+- [x] E1.5: Implement model registry (4 hardcoded models)
+- [x] E1.6: Implement structured logging
+- [x] E1.7: Engine release pipeline in CI (7 targets)
+- [x] E1.8: Unit test suite (21 tests)
+
+### EPIC-2: Android Engine Integration ✅
+
+**Goal**: Android app embeds and communicates with the Go engine via JNI.
+
+**Owner:** Android Team
+
+- [x] E2.1–E2.9: JNI bridge, embedded .so, Kotlin SDK, ChatViewModel, ServiceLocator, end-to-end verified
+
+### EPIC-3: Engine Architecture Foundation ✅ (A–E)
+
+**Goal**: Event bus, plugin system, agent runtime, provider decoupling, stabilization.
+
+**Owner:** Platform Team
+
+- [x] E3.A: Engine Foundation + Android Integration (15 stories)
+- [x] E3.B: Architecture Foundation — bus, plugins, source abstraction, module boundaries
+- [x] E3.C: Runtime — memory, context assembly, tool pipeline, agent orchestrator
+- [x] E3.D: Runtime Providers — provider registry, mock, llama, server decoupling
+- [x] E3.E: Stabilization — code review, edge tests, naming, final docs
+
+### EPIC-G1: Governance Sprint 1 ✅
+
+**Goal**: Repository cleanup, rename, documentation governance, engine v1 certification.
+
+**Owner:** Chief Architect
+
+- [x] G1.1: Repository cleanup (6 obsolete files deleted)
+- [x] G1.2: Ashwath.AI → Ashwath AI rename (34 files)
+- [x] G1.3: AGENT.md rewrite (18-section repository constitution)
+- [x] G1.4: DOCUMENTATION_GOVERNANCE.md (Single Writer Principle)
+- [x] G1.5: Consistency audit + fixes
+- [x] G1.6: REPOSITORY_MANIFEST.md
+- [x] G1.7: Engine v1 certification (`arch-engine-v1`)
+- [x] G1.8: Project Planning Sprint 1
 
 ---
 
-## EPIC-2: Android Engine Integration ✅ (Complete)
+## Epoch 1 — Client Polish (July 2026)
 
-**Goal**: Android app embeds and communicates with the Go engine via JNI loopback.
+Three parallel tracks. No track blocks another.
 
-### Stories
-- [x] E2.1: Implement JNI bridge in Go (`engine/cmd/libashwath`)
-- [x] E2.2: Implement `nativeStartServer` to launch in-process gRPC
-- [x] E2.3: Automated Gradle build for Go shared library (`.so`)
-- [x] E2.4: gRPC client in Kotlin SDK (`EngineGrpcClient`, `ClientInferenceEngine`)
-- [x] E2.5: `EmbeddedInferenceEngine` for managing native server lifecycle
-- [x] E2.6: Connect ChatViewModel to real engine via loopback
-- [x] E2.7: ServiceLocator wiring for EMBEDDED mode
-- [x] E2.8: Verified end-to-stream pipeline in Android UI
-- [x] E2.9: Establish Engineering Charter (`GUILD.md`)
+### EPIC-4: Engine Stability (E4-ENG)
 
----
+**Owner:** Platform Agent
+**Dependencies:** None (Engine v1 certified)
 
-## EPIC-3: Real Inference
+- [ ] E4.1: Downloads package test coverage (156 lines, 0 tests)
+- [ ] E4.2: Download progress streaming via event bus
+- [ ] E4.3: llama.cpp binary bundling in release pipeline
+- [ ] E4.4: JNI error code granularity (numeric error codes from Go)
+- [ ] E4.5: Engine benchmark CI (nightly benchmark runs)
+- [ ] E4.6: Provider documentation (how to write a new runtime provider)
 
-**Goal**: Engine runs real AI models with full model lifecycle management.
+### EPIC-5: Android App v1 (E5-AND)
 
-### Phase A: Engine Foundation & Android Integration ✅ (Complete)
+**Owner:** Android Agent
+**Dependencies:** EPIC 3, Engine v1 (stable API)
 
-**Stories**:
-- [x] E3.A1: Wire backend selection through mobile + bridge + JNI + SDK
-- [x] E3.A2: Model download pipeline with registry persistence (downloads.go, models.go, registry.go)
-- [x] E3.A3: RemoveModel RPC — full model lifecycle (install, list, remove)
-- [x] E3.A4: Real benchmark implementation for performance measurement
-- [x] E3.A5: Proto drift fix — sync SDK proto with engine proto
-- [x] E3.A6: Extend EngineGrpcClient with listModels, installModel, removeModel, modelId parameter
-- [x] E3.A7: GrpcModelRepository implementing ModelRepository via gRPC
-- [x] E3.A8: ServiceLocator provideModelRepository
-- [x] E3.A9: ExploreViewModel and LibraryViewModel real repository wiring
-- [x] E3.A10: ChatViewModel modelId passing
-- [x] E3.A11: SDK protobuf deps api visibility
-- [x] E3.A12: Tests for gRPC client, ViewModels, ClientInferenceEngine
-- [x] E3.A13: Android build fixed (armeabi-v7a removed)
-- [x] E3.A14: Web client merged into main
-- [x] E3.A15: All worktrees synchronized with main
+- [ ] E5.1: Resolve Stitch/Google Fonts theme conflict
+- [ ] E5.2: Connect Explore and Library screens to wired ViewModels
+- [ ] E5.3: Model download progress UI
+- [ ] E5.4: Handle engine not installed / offline state
+- [ ] E5.5: App lifecycle management (pause/stop engine when backgrounded)
+- [ ] E5.6: Instrumented tests for download → install → connect flow
+- [ ] E5.7: Fix deprecation warnings (icons, statusBar, use import)
+- [ ] E5.8: Android CI reliability improvements
 
-### Phase B: Architecture Foundation ✅ (Complete)
+### EPIC-6: Web Frontend v1 (E6-WEB)
 
-**Stories**:
-- [x] E3.B1: Event System (`internal/bus`) — in-memory pub/sub, 6 topics, 9 tests
-- [x] E3.B2: Plugin Framework (`internal/plugins`) — Manager implementation, ToolPlugin extension
-- [x] E3.B3: Model Abstraction Layer (`internal/models`) — Source interface, BuiltinSource, bus events
-- [x] E3.B4: Module Boundaries documented (`docs/engine/MODULE_BOUNDARIES.md`)
+**Owner:** Web Agent
+**Dependencies:** EPIC 3, Engine v1 (stable API via Runtime)
 
-### Phase C: Runtime ✅ (Complete)
-
-**Stories**:
-- [x] E3.C1: Memory Architecture (`internal/agent/memory.go`) — Message types, ring buffer
-- [x] E3.C2: Context Assembly (`internal/agent/context.go`) — Chat template + tool schema injection
-- [x] E3.C3: Tool Execution Pipeline (`internal/agent/toolpipe.go`) — ToolExecutor
-- [x] E3.C4: Agent Runtime (`internal/agent/agent.go`) — Engine + Memory + Tools orchestrator
-
-### Phase D: Runtime Providers ✅ (Complete)
-
-**Stories**:
-- [x] E3.D1: Provider Registry (`internal/runtime/provider.go`) — RegisterProvider, CreateEngine
-- [x] E3.D2: Mock provider auto-registration
-- [x] E3.D3: Llama provider (`internal/runtime/llama/provider.go`)
-- [x] E3.D4: Server decoupling — hardcoded switch replaced with registry lookup
-
-### Phase E: Stabilization ✅ (Complete)
-
-**Stories**:
-- [x] E3.E1: Code review and dead code removal (jsoncodec.go, unused fields)
-- [x] E3.E2: Edge case tests (bus, plugins, agent)
-- [x] E3.E3: Naming consistency (InMemory → inMemory)
-- [x] E3.E4: Final documentation (`docs/analysis/EPIC3_FINAL.md`)
+- [ ] E6.1: gRPC-Web client in TypeScript SDK
+- [ ] E6.2: Engine connection management (connected/disconnected/reconnecting)
+- [ ] E6.3: Model browser UI (list, install, remove models)
+- [ ] E6.4: Chat UI end-to-end (prompt → stream → display)
+- [ ] E6.5: Progressive Web App support (service worker, offline fallback)
+- [ ] E6.6: Responsive layout (mobile + desktop breakpoints)
 
 ---
 
-## EPIC-4: RAG & Knowledge 🔜 (Future)
+## Epoch 2 — Knowledge (August 2026)
 
-**Goal**: Users can ingest local documents and query them via chat.
+### EPIC-7: Knowledge & RAG (E7-KNOW)
 
-### Stories
-- [ ] E4.1: SQLite-based vector store
-- [ ] E4.2: Document parser (PDF, text, markdown)
-- [ ] E4.3: Embedding generation
-- [ ] E4.4: Retrieval-augmented generation pipeline
-- [ ] E4.5: Knowledge management UI in Android
+**Backend Owner:** Platform Agent
+**Android UI Owner:** Android Agent
+**Web UI Owner:** Web Agent
+**Dependencies:** EPIC 4 (tested downloads)
+
+**Backend Stories:**
+- [ ] E7.B1: Vector store implementation
+- [ ] E7.B2: Document parser (PDF, text, markdown)
+- [ ] E7.B3: Embedding generation
+- [ ] E7.B4: Retrieval pipeline (search → rerank → augment → generate)
+- [ ] E7.B5: New gRPC RPCs for knowledge operations
+- [ ] E7.B6: Knowledge backend tests
+
+**Android Stories:**
+- [ ] E7.A1: Knowledge management UI (document list, upload, search)
+- [ ] E7.A2: Document upload UI (file picker, progress)
+- [ ] E7.A3: In-chat RAG retrieval indicator
+
+**Web Stories:**
+- [ ] E7.W1: Knowledge management UI (document list, upload, search)
+- [ ] E7.W2: In-chat RAG retrieval indicator
 
 ---
 
-## EPIC-5: Voice & Vision 🔜 (Future)
+## Epoch 3 — Intelligence (September 2026)
 
-**Goal**: Multi-modal AI capabilities.
+### EPIC-8: Voice & Vision (E8-MODAL)
 
-### Stories
-- [ ] E5.1: STT integration
-- [ ] E5.2: TTS integration
-- [ ] E5.3: Image description
-- [ ] E5.4: Voice chat UI in Android
-- [ ] E5.5: Camera integration in Android
+**Backend Owner:** Platform Agent
+**Android UI Owner:** Android Agent
+**Dependencies:** EPIC 7 (optional parallel)
+
+**Backend Stories:**
+- [ ] E8.B1: Speech-to-Text integration (whisper.cpp)
+- [ ] E8.B2: Text-to-Speech integration
+- [ ] E8.B3: Image description (multimodal model support)
+- [ ] E8.B4: New gRPC RPCs for voice/vision
+
+**Android Stories:**
+- [ ] E8.A1: Voice input UI (microphone → STT → generate)
+- [ ] E8.A2: Voice output UI (TTS playback)
+- [ ] E8.A3: Camera integration → image description
 
 ---
 
-## EPIC-6: Web Frontend 🔄 (Merged to main — Active Development)
+## Epoch 4 — Platform Expansion (October 2026+)
 
-**Goal**: TypeScript/React web frontend communicates with the Go engine via gRPC-Web and Ashwath AI Runtime.
+### EPIC-10: Desktop App (E10-DESKTOP)
 
-### Completed
-- [x] E6.1: Web project scaffold (Vite + React + TypeScript)
-- [x] E6.2: Design system port (Synthetic Noir → Tailwind/shadcn)
-- [x] E6.3: Chat UI components (input, message, conversation list, model selector, parameter panel)
-- [x] E6.4: Application shell with navigation (sidebar, top bar, status bar)
-- [x] E6.5: Engine SDK foundation (RuntimeClient, EngineClient, status monitoring, transport)
-- [x] E6.6: Merged into main
+**Owner:** Platform Agent
+**Dependencies:** EPIC 4 (binary bundling)
 
-### Remaining Stories (In Progress)
-- [ ] E6.7: gRPC-Web client in TypeScript SDK
-- [ ] E6.8: Engine connection management (WebSocket / gRPC-Web)
-- [ ] E6.9: Model browser UI
-- [ ] E6.10: Progressive Web App support
-- [ ] E6.11: Responsive layout (mobile + desktop)
+- [ ] E10.1: Tauri app scaffold
+- [ ] E10.2: Engine bundling (ashwathd in installer)
+- [ ] E10.3: Chat UI
+- [ ] E10.4: System tray integration
 
-### Notes
-- The Kotlin SDK serves as the reference implementation for gRPC client patterns.
-- Web frontend was previously deferred until EPIC 3 API stabilization; now merged and actively developed.
-- gRPC-Web requires the Ashwath AI Runtime (not direct browser→engine).
+### EPIC-11: iOS App (E11-IOS)
+
+**Owner:** Platform Agent (future: iOS Agent)
+**Dependencies:** EPIC 3 (stable API), EPIC 2 patterns
+
+- [ ] E11.1: Swift SDK with gRPC client
+- [ ] E11.2: Engine embedding (XCFramework)
+- [ ] E11.3: Chat UI (SwiftUI)
+- [ ] E11.4: Knowledge UI
+
+### EPIC-12: Release Engineering (E12-REL)
+
+**Owner:** Chief Architect
+**Dependencies:** None (begins in Epoch 1)
+
+- [ ] E12.1: Semantic versioning policy
+- [ ] E12.2: Engine binary release automation audit
+- [ ] E12.3: Android release pipeline (signed APK/AAB)
+- [ ] E12.4: Web deployment pipeline (static hosting)
+- [ ] E12.5: Changelog generation automation
+- [ ] E12.6: Integration test gate
+
+---
+
+## Ongoing (No Fixed Epoch)
+
+### EPIC-13: Model Research (E13-RESEARCH)
+
+**Owner:** Research Agent
+**Dependencies:** None
+
+- [ ] E13.1: GGUF quantization benchmark (q4/q5/q8 across architectures)
+- [ ] E13.2: Mobile NPU feasibility study
+- [ ] E13.3: Model evaluation harness (perplexity, latency, memory)
+- [ ] E13.4: Alternative runtime research (ONNX, TFLite, ExecuTorch)

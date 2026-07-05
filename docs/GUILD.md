@@ -61,14 +61,17 @@ Ownership in this repository defines responsibility, not isolation.
 
 Ashwath AI uses a monorepo structure. While visibility is open to all, responsibility is assigned to **Primary Maintainers**. This concept signifies responsibility and stewardship, not exclusivity. Contributors may propose improvements outside their primary area, but significant cross-boundary modifications should be discussed and approved by the respective Primary Maintainer or the Chief Architect.
 
- Directory | Primary Maintainer | Description |
+  Directory | Primary Maintainer | Description |
  :--- | :--- | :--- |
- `engine/` | **Platform Team** | Core Engine logic and low-level bindings. |
- `sdk/` | **Platform Team** | Language-specific platform wrappers. |
- `docs/` | **Platform Team / Docs** | Core platform documentation and API specs. |
- `android/` | **Android Client Team** | Native Android application and mobile assets. |
- `web/` | **Web Client Team** | Web frontend and related tooling. |
- `research/` | **Research Lab** | Experimental models and evaluation data. |
+ `engine/` | **Platform Agent** | Go engine, gRPC server, agent runtime, providers, SDKs |
+ `sdk/kotlin/` | **Android Agent** | Kotlin SDK (gRPC client, JNI bridge) |
+ `sdk/go/`, `sdk/typescript/`, `sdk/swift/` | **Platform Agent** | Go, TS, Swift SDKs |
+ `docs/` | **Chief Architect** | Platform documentation, governance, planning |
+ `android/` | **Android Agent** | Android application (Compose + MVVM) |
+ `web/` | **Web Agent** | Web frontend (React + Vite + TypeScript) |
+ `research/` | **Research Agent** | Model evaluation, quantization experiments |
+ `design/` | **Design Team** | Synthetic Noir design system, screen designs |
+ `scripts/` | **Chief Architect** | Repository tooling, worktree setup |
 
 ---
 

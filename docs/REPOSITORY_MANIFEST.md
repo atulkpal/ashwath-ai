@@ -3,7 +3,7 @@
 **Authoritative map of every directory and file.**
 **Owner:** Chief Architect
 **Lifecycle:** Active — update when directories or files are added/removed.
-**Last updated:** July 2026
+**Last updated:** July 2026 (Planning Sprint 1)
 
 ---
 
@@ -147,8 +147,8 @@
 
 | Path | Type | Owner | Lifecycle | Purpose |
 |---|---|---|---|---|
-| `README.md` | doc | Platform Team | Active | Scripts overview |
-| `setup-worktrees.ps1` | src | Platform Team | Active | Git worktree setup script |
+| `README.md` | doc | Chief Architect | Active | Scripts overview |
+| `setup-worktrees.ps1` | src | Chief Architect | Active | Git worktree setup script |
 
 ---
 
