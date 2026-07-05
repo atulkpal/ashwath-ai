@@ -1,6 +1,6 @@
 # Web Architecture
 
-**Status:** Draft
+**Status:** Active
 
 ---
 
