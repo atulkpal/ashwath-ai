@@ -1,15 +1,13 @@
 # Documentation Governance
 
 **Status**: Active  
-**Last Updated**: 2026-07-04  
+**Last Updated**: 2026-07-05
 
 ---
 
 ## Documentation Philosophy
 
-Documentation is code.
-
-It requires ownership, review, and version control. Every document in this repository has a designated owner. Everyone may read any document, but only the designated owner may modify it.
+Documentation is code. It requires ownership, review, and version control. Every document in this repository has a designated owner. Everyone may read any document, but only the designated owner may modify it.
 
 This policy exists to:
 - Prevent documentation conflicts when multiple AI agents work in parallel.
@@ -25,11 +23,45 @@ Every project document has exactly one owner.
 
 | Role | May Read | May Edit |
 |------|----------|----------|
-| Any agent | ✅ All documents | ❌ |
-| Document owner | ✅ | ✅ Their documents only |
-| Project Orchestrator | ✅ | ✅ All documents |
+| Any agent | All documents | Nothing without owner approval |
+| Document owner | All documents | Their documents only |
+| Chief Architect | All documents | Repository-wide documents only |
 
 Agents may propose changes to any document (via issue, PR, or request), but only the designated owner applies the change.
+
+---
+
+## Documentation Structure
+
+```
+docs/
+  architecture/       Living architecture documents (one source of truth per topic)          Owner: Chief Architect
+  engine/             Engine workspace progress (append-only)                                Owner: Platform Agent
+  android/            Android workspace docs (append-only)                                   Owner: Android Agent
+  web/                Web workspace docs (append-only)                                       Owner: Web Agent
+  platform/           Platform-wide technical documentation                                  Owner: Chief Architect
+  analysis/           Historical reports — NEVER EDITED after creation                        Owner: Chief Architect
+  decisions/          ADRs — Append-only                                                      Owner: Chief Architect
+  proposals/          Proposals — Reviewed, archived, or implemented                         Owner: Author → Chief Architect
+  governance/         Governance rules (AGENT.md, DOCUMENTATION_GOVERNANCE.md)               Owner: Chief Architect
+```
+
+---
+
+## Documentation Types
+
+| Type | Owner | Lifecycle | Editable By |
+|------|-------|-----------|-------------|
+| Constitution (`AGENT.md`) | Chief Architect | Living | Chief Architect only |
+| Governance (`DOCUMENTATION_GOVERNANCE.md`) | Chief Architect | Living | Chief Architect only |
+| Architecture (`docs/architecture/*.md`) | Chief Architect | Living | Chief Architect only |
+| Snapshot (`PROJECT_STATE.md`) | Chief Architect | Per sprint overwrite | Chief Architect only |
+| Progress Log (`docs/{engine,android,web}/*.md`) | Workspace owner | Append-only | Workspace owner |
+| ADR (`docs/decisions/*.md`) | Chief Architect | Append-only | Chief Architect only |
+| Proposal (`docs/proposals/*.md`) | Any agent | Review → Archive/Implement | Author (until review) |
+| Historical Report (`docs/analysis/*.md`) | Chief Architect | Permanent | Never edited |
+| Design System (`design/shared/*.md`) | Design Team | Draft → Living | Design Team |
+| Workspace Document | Workspace owner | Per sprint | Workspace owner |
 
 ---
 
@@ -43,7 +75,6 @@ Each workspace owns its own append-only progress log.
 - `docs/engine/PROGRESS.md` — Platform/Engine Team
 - `docs/android/PROGRESS.md` — Android Client Team
 - `docs/web/PROGRESS.md` — Web Client Team
-- `docs/platform/PROGRESS.md` — Platform Team
 
 **Rules:**
 - Append only — never rewrite history.
@@ -64,7 +95,7 @@ Each workspace may maintain a local decisions log for design choices made during
 - Only the owning workspace edits its decisions document.
 - Decisions are timestamped and link to relevant commits or issues.
 
-### Level 3 — Architecture Documents (Orchestrator Maintained)
+### Level 3 — Architecture Documents (Chief Architect Maintained)
 
 These documents describe the permanent architecture of the platform and its clients. They are reference documents, not progress logs.
 
@@ -76,21 +107,21 @@ These documents describe the permanent architecture of the platform and its clie
 - `docs/JNI_ARCHITECTURE.md` — JNI bridge design
 
 **Rules:**
-- Maintained only by the Project Orchestrator after reviewing workspace progress.
+- Maintained only by the Chief Architect after reviewing workspace progress.
 - Feature agents should not edit architecture documents directly.
 - Architecture documents are updated when a milestone changes the public contract.
 
-### Level 4 — Repository State (Orchestrator Maintained)
+### Level 4 — Repository State (Chief Architect Maintained)
 
 These documents track the live state of the project. They are the single source of truth for what is happening now and what happened in the past.
 
 **Files:**
 - `docs/PROJECT_STATE.md` — Operational dashboard
-- `docs/CHANGELOG.md` — Release history
+- `CHANGELOG.md` — Release history (root level)
 - `docs/ROADMAP.md` — Future plans
 
 **Rules:**
-- Maintained only by the Project Orchestrator.
+- Maintained only by the Chief Architect.
 - Feature agents never modify repository state documents.
 - Changes are made after milestone completion, not during development.
 
@@ -99,7 +130,8 @@ These documents track the live state of the project. They are the single source 
 Permanent milestone summaries stored under `docs/analysis/`.
 
 **Files:**
-- `docs/analysis/EPIC3_PHASE_A_FINAL.md`
+- `docs/analysis/EPIC3_FINAL.md`
+- `docs/analysis/SPRINT_W3A_ENGINE_INTEGRATION_ARCHITECTURE.md` (archived)
 
 **Rules:**
 - Never modify historical reports. They are permanent records.
@@ -108,36 +140,34 @@ Permanent milestone summaries stored under `docs/analysis/`.
 
 ---
 
-## AGENT.md
+## Documentation Creation Policy
 
-- `AGENT.md` is maintained only by the Project Orchestrator.
-- Feature agents may propose changes via pull request or issue, but should not edit AGENT.md directly.
-- AGENT.md is the onboarding guide for all AI agents. It should change rarely.
+New documents may only be created in these locations:
 
----
+| Location | Purpose | Creator |
+|----------|---------|---------|
+| `docs/analysis/` | Historical reports after EPIC completion | Chief Architect |
+| `docs/decisions/` | ADRs | Chief Architect |
+| `docs/proposals/` | Proposals for review | Any agent |
+| `docs/architecture/` | New architecture documents | Chief Architect |
+| `docs/engine/` | Engine workspace docs | Platform Agent |
+| `docs/android/` | Android workspace docs | Android Agent |
+| `docs/web/` | Web workspace docs | Web Agent |
 
-## Merge Policy
-
-- Merge latest `main` into the feature branch before debugging.
-- Never debug stale branches — always sync with `main` first.
-- Keep documentation synchronized with implementation when merging.
-
----
-
-## Main Branch Policy
-
-- `main` is the integration branch.
-- No feature development occurs directly on `main`.
-- All implementation work happens in feature branches / worktrees.
-- Only the Project Orchestrator merges into `main`.
+No new documents may be created at `docs/` root level without Chief Architect approval.
 
 ---
 
-## Worktree Policy
+## Archive Policy
 
-- Each feature branch has its own worktree.
-- Feature work stays in its own worktree until merged and verified.
-- After merging, the worktree branch is deleted.
+| Type | Location | Policy |
+|------|----------|--------|
+| Historical reports | `docs/analysis/` | Never edited after creation |
+| Architecture docs | `docs/architecture/` | Living — updated when architecture changes |
+| Progress logs | `docs/{engine,android,web}/` | Append-only — new entries added, old entries preserved |
+| Project state | `PROJECT_STATE.md` | Snapshot — overwritten each sprint |
+| ADRs | `docs/decisions/` | Append-only — new entries added, old entries never changed |
+| Proposals | `docs/proposals/` | Reviewed → archive or implement; never edited after review |
 
 ---
 
@@ -151,13 +181,13 @@ Workspace Progress (Level 1)
 Workspace Decisions (Level 2)
       │
       ▼
-Project Orchestrator Review
+Chief Architect Review
       │
       ▼
 Architecture (Level 3) / Repository State (Level 4) / Historical Reports (Level 5)
 ```
 
-Only the Project Orchestrator updates Level 3, Level 4, and Level 5 documents. Feature agents contribute by keeping Level 1 and Level 2 documents accurate during development.
+Only the Chief Architect updates Level 3, Level 4, and Level 5 documents. Feature agents contribute by keeping Level 1 and Level 2 documents accurate during development.
 
 ---
 

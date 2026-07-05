@@ -1,4 +1,4 @@
-# Ashwath.AI iOS
+# Ashwath AI iOS
 
 Future iOS frontend. Not yet implemented.
 

@@ -1,6 +1,6 @@
-# Ashwath.AI Engine
+# Ashwath AI Engine
 
-The core AI engine powering all Ashwath.AI frontends.
+The core AI engine powering all Ashwath AI frontends.
 
 Written in Go. Platform-independent. Distributed as a standalone binary.
 

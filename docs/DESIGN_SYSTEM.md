@@ -1,4 +1,4 @@
-# Ashwath.AI Design System: Synthetic Noir
+# Ashwath AI Design System: Synthetic Noir
 
 ## Visual Narrative
 - **Minimalism & Futurism**: A cold, precise, and authoritative aesthetic.

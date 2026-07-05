@@ -1,4 +1,4 @@
-# Ashwath.AI Roadmap
+# Ashwath AI Roadmap
 
 ## Phase 1: Platform Foundation ✅ (Complete)
 - [x] Monorepo structure established

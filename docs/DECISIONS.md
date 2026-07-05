@@ -29,7 +29,7 @@
 
 ## [2026-07-04] Web Frontend Merged into Main
 - **Decision**: Web frontend (TypeScript/React) project is now merged into main and actively developed.
-- **Rationale**: The engine API is stable enough (EPIC 2 and EPIC 3 Phase A complete) for parallel web development. The Web Client follows the Ashwath AI Runtime + gRPC-Web architecture described in `docs/SPRINT_W3A_ENGINE_INTEGRATION_ARCHITECTURE.md`.
+- **Rationale**: The engine API is stable enough (EPIC 2 and EPIC 3 Phase A complete) for parallel web development. The Web Client follows the Ashwath AI Runtime + gRPC-Web architecture described in `docs/analysis/SPRINT_W3A_ENGINE_INTEGRATION_ARCHITECTURE.md`.
 - **Status**: Active development. Engine SDK and chat UI components established. Merged into main on 2026-07-04.
 
 ## [2026-03-07] Initial Architecture Selection

@@ -1,5 +1,9 @@
 # Platform Guide
 
+> **Repository layout**: See [ARCHITECTURE.md](ARCHITECTURE.md) for canonical architecture diagram and [README.md](../README.md) for top-level directory overview.
+>
+> This guide focuses on development workflow and build procedures.
+
 ## Repository Layout
 
 ```

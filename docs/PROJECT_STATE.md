@@ -6,7 +6,7 @@
 
 ### Meta Information
 - **Project Version**: 0.2.0
-- **Current Milestone**: EPIC 3 Phase B — Real Inference (llama.cpp)
+- **Current Milestone**: GOVERNANCE SPRINT 1 — Repository Stabilization (cleanup, rename, documentation governance)
 - **Last Updated**: 2026-07-04
 
 ---
@@ -40,7 +40,8 @@
 
 ### Current Work
 
-- **Platform Team**: Preparing for EPIC 3 Phase B — llama.cpp Go bindings for real local inference.
+- **Governance Sprint 1**: Repository stabilization — cleanup, rename, documentation governance, consistency audit, repository manifest.
+- **Platform Team**: EPIC 3 complete (all phases A–E). Awaiting next EPIC.
 - **Android Client Team**: Awaiting UI compile fix (Stitch); model management ViewModels wired and tested.
 - **Web Client Team**: Continuing engine SDK and runtime foundation for browser-based interaction.
 - **Research Lab**: Evaluating GGUF quantization performance and mobile NPU targets.
@@ -52,10 +53,14 @@
 - [x] **EPIC 1: Engine MVP** — gRPC server, config, device detection, mock inference, model registry, logging, CI release pipeline.
 - [x] **EPIC 2: Android Engine Integration** — JNI bridge, embedded .so, Gradle build, Kotlin SDK gRPC client, ChatViewModel wired, ServiceLocator.
 - [x] **EPIC 3 Phase A: Engine Foundation & Android Integration** — Backend selection, model download/registry persistence, RemoveModel RPC, real benchmark implementation, proto drift fix, Android build fixed, Web merged into main, all worktrees synchronized.
+- [x] **EPIC 3 Phase B: Architecture Foundation** — Event System (internal/bus), Plugin Framework (internal/plugins), Model Abstraction Layer (internal/models), Module Boundaries documented.
+- [x] **EPIC 3 Phase C: Runtime** — Memory Architecture, Context Assembly, Tool Execution Pipeline, Agent Runtime (internal/agent).
+- [x] **EPIC 3 Phase D: Runtime Providers** — Provider Registry, Mock provider, Llama provider, Server decoupling.
+- [x] **EPIC 3 Phase E: Stabilization** — Dead code removal, edge case tests, naming consistency, final documentation.
 
 ### Next Priorities
 
-1. **EPIC 3 Phase B**: llama.cpp Go bindings, real model download from HuggingFace/GitHub Releases, streaming token generation.
+1. **GOVERNANCE SPRINT 1**: Finalize repository manifest, commit all documentation changes.
 2. **Android UI Fix**: Resolve Stitch/Google Fonts conflict for full UI compile.
 3. **Model Management UI**: Connect Explore and Library screens to wired ViewModels.
 4. **App Lifecycle**: Pause/stop engine when app is backgrounded.

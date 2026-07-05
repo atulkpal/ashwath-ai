@@ -1,4 +1,4 @@
-# Ashwath.AI Architecture
+# Ashwath AI Architecture
 
 ## Platform Overview
 

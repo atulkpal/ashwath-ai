@@ -56,22 +56,37 @@
 - [x] E3.A14: Web client merged into main
 - [x] E3.A15: All worktrees synchronized with main
 
-### Phase B: Real Models 🔜 (Next)
+### Phase B: Architecture Foundation ✅ (Complete)
 
 **Stories**:
-- [ ] E3.B1: llama.cpp Go bindings for on-device inference
-- [ ] E3.B2: Model download from GitHub Releases / HuggingFace
-- [ ] E3.B3: Streaming token generation with real models
-- [ ] E3.B4: Performance benchmarking with real models
-- [ ] E3.B5: Model management UI in Android (Explore + Library screens)
+- [x] E3.B1: Event System (`internal/bus`) — in-memory pub/sub, 6 topics, 9 tests
+- [x] E3.B2: Plugin Framework (`internal/plugins`) — Manager implementation, ToolPlugin extension
+- [x] E3.B3: Model Abstraction Layer (`internal/models`) — Source interface, BuiltinSource, bus events
+- [x] E3.B4: Module Boundaries documented (`docs/engine/MODULE_BOUNDARIES.md`)
 
-### Phase C: Platform Hardening 🔜 (Future)
+### Phase C: Runtime ✅ (Complete)
 
 **Stories**:
-- [ ] E3.C1: Model download progress streaming
-- [ ] E3.C2: App lifecycle management (pause/resume engine)
-- [ ] E3.C3: Error recovery and reconnection
-- [ ] E3.C4: Granular JNI error codes from Go
+- [x] E3.C1: Memory Architecture (`internal/agent/memory.go`) — Message types, ring buffer
+- [x] E3.C2: Context Assembly (`internal/agent/context.go`) — Chat template + tool schema injection
+- [x] E3.C3: Tool Execution Pipeline (`internal/agent/toolpipe.go`) — ToolExecutor
+- [x] E3.C4: Agent Runtime (`internal/agent/agent.go`) — Engine + Memory + Tools orchestrator
+
+### Phase D: Runtime Providers ✅ (Complete)
+
+**Stories**:
+- [x] E3.D1: Provider Registry (`internal/runtime/provider.go`) — RegisterProvider, CreateEngine
+- [x] E3.D2: Mock provider auto-registration
+- [x] E3.D3: Llama provider (`internal/runtime/llama/provider.go`)
+- [x] E3.D4: Server decoupling — hardcoded switch replaced with registry lookup
+
+### Phase E: Stabilization ✅ (Complete)
+
+**Stories**:
+- [x] E3.E1: Code review and dead code removal (jsoncodec.go, unused fields)
+- [x] E3.E2: Edge case tests (bus, plugins, agent)
+- [x] E3.E3: Naming consistency (InMemory → inMemory)
+- [x] E3.E4: Final documentation (`docs/analysis/EPIC3_FINAL.md`)
 
 ---
 

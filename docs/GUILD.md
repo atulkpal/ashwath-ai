@@ -1,12 +1,14 @@
-# Ashwath.AI Engineering Charter (The Guild)
+# Ashwath AI Engineering Charter (The Guild)
 
-This document serves as the official Engineering Charter for Ashwath.AI. It defines the responsibilities, workflows, and technical philosophies that guide all human and AI contributors to the project.
+> **Governance reference**: See [AGENT.md](../AGENT.md) for repository constitution, branch policy, worktree policy, merge policy, AI agent responsibilities, and Definition of Done.
+>
+> This document defines team structure, roles, and cultural principles only. Repetition of governance content is avoided.
 
 ---
 
 ## 1. Project Philosophy
 
-Ashwath.AI is a **local-first AI platform**, not merely a collection of standalone applications. Our goal is to democratize private, offline artificial intelligence by providing a robust, high-performance **Engine** that can be leveraged across multiple frontends.
+Ashwath AI is a **local-first AI platform**, not merely a collection of standalone applications. Our goal is to democratize private, offline artificial intelligence by providing a robust, high-performance **Engine** that can be leveraged across multiple frontends.
 
 The long-term vision is a unified AI core (the Engine) that serves as the "brain" for various clients:
 - **Mobile**: Android (primary) and iOS.
@@ -57,7 +59,7 @@ Ownership in this repository defines responsibility, not isolation.
 
 ## 4. Repository Primary Maintainers
 
-Ashwath.AI uses a monorepo structure. While visibility is open to all, responsibility is assigned to **Primary Maintainers**. This concept signifies responsibility and stewardship, not exclusivity. Contributors may propose improvements outside their primary area, but significant cross-boundary modifications should be discussed and approved by the respective Primary Maintainer or the Chief Architect.
+Ashwath AI uses a monorepo structure. While visibility is open to all, responsibility is assigned to **Primary Maintainers**. This concept signifies responsibility and stewardship, not exclusivity. Contributors may propose improvements outside their primary area, but significant cross-boundary modifications should be discussed and approved by the respective Primary Maintainer or the Chief Architect.
 
  Directory | Primary Maintainer | Description |
  :--- | :--- | :--- |
@@ -70,20 +72,7 @@ Ashwath.AI uses a monorepo structure. While visibility is open to all, responsib
 
 ---
 
-## 5. Development Workflow
-
-We utilize a **Git Worktree** workflow to facilitate parallel development.
-
-### Branching Strategy
-- **`main`**: The integration branch. It must always be stable, building, and passing all tests. **Never commit directly to `main`.**
-- **`feature/platform`**: Active development of the Engine and core services.
-- **`feature/android-client`**: Active development of the mobile application.
-- **`feature/web-client`**: Active development of the browser application.
-- **`research/lab`**: Experimental branch for the Research Lab.
-
----
-
-## 6. Decision Making
+## 5. Decision Making
 
 Technical and product decisions follow a structured hierarchy to ensure consistency:
 - **Product Decisions**: Belong to the Product Owner.
@@ -140,7 +129,7 @@ Documentation is a shared responsibility. Each subsystem maintains its own techn
 
 ## 11. Engineering Oath
 
-Every contribution should leave Ashwath.AI in a better state than it was found. Before completing any milestone, contributors should ask:
+Every contribution should leave Ashwath AI in a better state than it was found. Before completing any milestone, contributors should ask:
 
 • Is the architecture clearer?
 • Is the code easier to understand?
@@ -154,4 +143,4 @@ The goal is continuous improvement of both the software and the engineering orga
 
 ## 12. Final Mission Statement
 
-**Ashwath.AI is a long-term open-source platform dedicated to local, private AI. We believe that intelligence should be accessible to everyone, everywhere, without compromising privacy or performance.**
+**Ashwath AI is a long-term open-source platform dedicated to local, private AI. We believe that intelligence should be accessible to everyone, everywhere, without compromising privacy or performance.**

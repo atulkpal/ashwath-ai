@@ -90,7 +90,7 @@ fun SettingsScreen() {
             item { SettingHeader("About") }
             item {
                 SettingItem(
-                    title = "Ashwath.AI Version",
+                    title = "Ashwath AI Version",
                     description = "0.1.0-alpha (Open Source)",
                     icon = Icons.Default.Info
                 )

@@ -6,7 +6,7 @@
 
 # Purpose
 
-The Web Client is a presentation layer for the Ashwath.AI platform.
+The Web Client is a presentation layer for the Ashwath AI platform.
 
 It is responsible for:
 

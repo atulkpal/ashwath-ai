@@ -1,10 +1,10 @@
-# Ashwath.AI
+# Ashwath AI
 
 Offline-first AI platform. Private. Modular. Cross-platform.
 
 ## Overview
 
-Ashwath.AI is an offline-first AI platform that runs entirely on-device.
+Ashwath AI is an offline-first AI platform that runs entirely on-device.
 The engine is written in Go. The Android frontend is built with Kotlin & Jetpack Compose.
 Future frontends will include iOS, Desktop, and Web — all powered by the same Go engine.
 
@@ -44,7 +44,7 @@ go build ./cmd/ashwathd
 
 ## Architecture
 
-Ashwath.AI uses a modular, engine-client architecture:
+Ashwath AI uses a modular, engine-client architecture:
 - **Unified Go Engine**: A single high-performance AI core written in Go.
 - **Platform-Specific Runtime**: 
   - **Android**: Embedded as a native library (`.so`) via JNI for security (W^X compliance) and performance.
