@@ -45,6 +45,23 @@ class GrpcModelRepository(
 
     init {
         refreshUpstream()
+        migrateFlatModels()
+    }
+
+    private fun migrateFlatModels() {
+        try {
+            modelsDir.listFiles()?.forEach { file ->
+                if (file.isFile && file.name.endsWith(".gguf")) {
+                    val src = sources.firstOrNull { it.filename == file.name }
+                    if (src != null) {
+                        val targetDir = File(modelsDir, src.id)
+                        targetDir.mkdirs()
+                        file.renameTo(File(targetDir, file.name))
+                        markInstalled(src.id, true)
+                    }
+                }
+            }
+        } catch (_: Exception) {}
     }
 
     private fun refreshUpstream() {
@@ -146,30 +163,49 @@ class GrpcModelRepository(
     }
 
     override fun getInstalledModels(): Flow<List<ModelInfo>> = flow {
-        val scanned = modelsDir.listFiles()
-            ?.filter { it.isDirectory }
-            ?.flatMap { dir ->
-                dir.listFiles()?.filter { it.name.endsWith(".gguf") }?.map { file ->
+        val installed = mutableListOf<ModelInfo>()
+
+        modelsDir.listFiles()?.forEach { entry ->
+            if (entry.isDirectory) {
+                entry.listFiles()?.filter { it.name.endsWith(".gguf") }?.forEach { file ->
                     val matched = sources.firstOrNull { it.filename == file.name }
-                    ModelInfo(
-                        id = matched?.id ?: "local:${dir.name}",
-                        name = matched?.name ?: dir.name,
+                    installed.add(ModelInfo(
+                        id = matched?.id ?: "local:${entry.name}",
+                        name = matched?.name ?: entry.name,
                         provider = "Local",
                         description = "Downloaded model",
                         size = formatSize(file.length()),
-                        parameters = "",
+                        parameters = if (matched != null) catalogueParam(matched.id) else "",
                         tags = emptyList(),
                         isInstalled = true,
-                    )
-                } ?: emptyList()
-            } ?: emptyList()
+                    ))
+                }
+            } else if (entry.isFile && entry.name.endsWith(".gguf")) {
+                val matched = sources.firstOrNull { it.filename == entry.name }
+                installed.add(ModelInfo(
+                    id = matched?.id ?: "local:${entry.nameWithoutExtension}",
+                    name = matched?.name ?: entry.nameWithoutExtension,
+                    provider = "Local",
+                    description = "Downloaded model (legacy location)",
+                    size = formatSize(entry.length()),
+                    parameters = "",
+                    tags = emptyList(),
+                    isInstalled = true,
+                ))
+            }
+        }
 
         val result = grpcClient.listModels()
         val grpcModels = result.map { list ->
             list.modelsList.filter { it.installed }.map { it.toDomain() }
         }.getOrDefault(emptyList())
 
-        emit(scanned + grpcModels)
+        emit(installed + grpcModels)
+    }
+
+    private fun catalogueParam(id: String): String {
+        val params = mapOf("phi-4-mini" to "3.8B", "phi-3.1-mini" to "3.8B", "llama-3.2-3b" to "3B", "qwen-2.5-3b" to "3B")
+        return params[id] ?: ""
     }
 
     override fun getModel(id: String): Flow<ModelInfo?> = flow {
