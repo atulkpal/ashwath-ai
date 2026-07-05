@@ -1,22 +1,22 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import type { Message, Conversation } from "./chat-data"
+import { conversations as initialConversations, messages as initialMessages } from "./chat-data"
 
 export function useChatState() {
-  const [conversations] = useState<Conversation[]>([
-    { id: "1", title: "Transformer Architecture", preview: "Explain how attention handles long-range dependencies...", timestamp: "14:02", active: true },
-    { id: "2", title: "Model Fine-tuning", preview: "What are the best practices for LoRA adapters?", timestamp: "Yesterday", active: false },
-    { id: "3", title: "RAG Pipeline Design", preview: "How to chunk documents for vector retrieval?", timestamp: "Yesterday", active: false },
-    { id: "4", title: "Quantization Strategies", preview: "Compare GPTQ vs AWQ for 4-bit inference.", timestamp: "Mon", active: false },
-  ])
-
-  const [messages, setMessages] = useState<Message[]>([
-    { id: "1", role: "user", content: "Explain how the Transformer architecture handles long-range dependencies in text sequences.", timestamp: "14:02:11" },
-    { id: "2", role: "assistant", content: "The Transformer architecture handles long-range dependencies primarily through its Self-Attention Mechanism. Unlike RNNs that process sequences token-by-token linearly, Transformers process all tokens simultaneously, allowing every token to \"attend\" to every other token regardless of distance.\n\nKey mechanisms include:\n\n• Positional Encoding: Injects spatial information since attention is permutation-invariant.\n• Multi-Head Attention: Allows the model to jointly attend to information from different representation subspaces.", timestamp: "14:02:14" },
-  ])
+  const [conversations, setConversations] = useState<Conversation[]>(initialConversations)
+  const [messages, setMessages] = useState<Message[]>(initialMessages)
 
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [activeConversationId, setActiveConversationId] = useState("1")
+  const [searchQuery, setSearchQuery] = useState("")
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [messages, isLoading])
 
   const sendMessage = useCallback(() => {
     const trimmed = input.trim()
@@ -33,17 +33,19 @@ export function useChatState() {
     setInput("")
     setIsLoading(true)
 
-    // Simulate assistant response for presentation realism
     setTimeout(() => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "This is a presentation-only response. In production, the Go Engine would stream the actual inference result here.",
+        content: "This is a presentation-only response. In production, the Go Engine would stream the actual inference result here.\n\n```javascript\nconsole.log(\"Hello from Ashwath AI\");\n```\n\nThe response includes **markdown** formatting with code blocks, lists, and other rich text features.",
         timestamp: new Date().toLocaleTimeString("en-US", { hour12: false }),
+        model: "ashwath-7b-v1",
+        tokens: 128,
+        token_sec: 52.3,
       }
       setMessages((prev) => [...prev, assistantMessage])
       setIsLoading(false)
-    }, 800)
+    }, 1200)
   }, [input])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -57,8 +59,45 @@ export function useChatState() {
     setActiveConversationId(id)
   }, [])
 
+  const togglePin = useCallback((id: string) => {
+    setConversations((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, pinned: !c.pinned } : c))
+    )
+  }, [])
+
+  const deleteConversation = useCallback((id: string) => {
+    setConversations((prev) => prev.filter((c) => c.id !== id))
+  }, [])
+
+  const renameConversation = useCallback((id: string, title: string) => {
+    setConversations((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, title } : c))
+    )
+  }, [])
+
+  const addConversation = useCallback(() => {
+    const newId = Date.now().toString()
+    const newConv: Conversation = {
+      id: newId,
+      title: "New Chat",
+      preview: "Start a new conversation...",
+      timestamp: "Now",
+      active: true,
+    }
+    setConversations((prev) =>
+      prev.map((c) => ({ ...c, active: false })).concat(newConv)
+    )
+    setActiveConversationId(newId)
+    setMessages([])
+  }, [])
+
+  const filteredConversations = conversations.filter((c) =>
+    c.title.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   return {
-    conversations,
+    conversations: filteredConversations,
+    allConversations: conversations,
     messages,
     input,
     setInput,
@@ -67,5 +106,12 @@ export function useChatState() {
     handleKeyDown,
     activeConversationId,
     selectConversation,
+    searchQuery,
+    setSearchQuery,
+    togglePin,
+    deleteConversation,
+    renameConversation,
+    addConversation,
+    scrollRef,
   }
 }
