@@ -32,16 +32,14 @@ func (m *mockToolPlugin) Schema() plugins.ToolSchema {
 }
 
 func TestNewToolExecutor(t *testing.T) {
-	mgr := plugins.NewManager()
-	e := NewToolExecutor(mgr)
+	e := NewToolExecutor()
 	if e == nil {
 		t.Fatal("NewToolExecutor returned nil")
 	}
 }
 
 func TestRegisterAndExecute(t *testing.T) {
-	mgr := plugins.NewManager()
-	e := NewToolExecutor(mgr)
+	e := NewToolExecutor()
 
 	tool := &mockToolPlugin{
 		name:    "test-tool",
@@ -65,8 +63,7 @@ func TestRegisterAndExecute(t *testing.T) {
 }
 
 func TestExecuteUnknownTool(t *testing.T) {
-	mgr := plugins.NewManager()
-	e := NewToolExecutor(mgr)
+	e := NewToolExecutor()
 
 	_, err := e.Execute(context.Background(), "unknown", nil)
 	if err == nil {
@@ -75,8 +72,7 @@ func TestExecuteUnknownTool(t *testing.T) {
 }
 
 func TestDuplicateRegistration(t *testing.T) {
-	mgr := plugins.NewManager()
-	e := NewToolExecutor(mgr)
+	e := NewToolExecutor()
 
 	tool := &mockToolPlugin{name: "dup-tool"}
 	if err := e.Register("dup-tool", tool); err != nil {
@@ -88,8 +84,7 @@ func TestDuplicateRegistration(t *testing.T) {
 }
 
 func TestListTools(t *testing.T) {
-	mgr := plugins.NewManager()
-	e := NewToolExecutor(mgr)
+	e := NewToolExecutor()
 
 	e.Register("a", &mockToolPlugin{name: "a"})
 	e.Register("b", &mockToolPlugin{name: "b"})
@@ -101,8 +96,7 @@ func TestListTools(t *testing.T) {
 }
 
 func TestSchemas(t *testing.T) {
-	mgr := plugins.NewManager()
-	e := NewToolExecutor(mgr)
+	e := NewToolExecutor()
 
 	e.Register("weather", &mockToolPlugin{
 		name: "weather",
@@ -127,8 +121,7 @@ func TestSchemas(t *testing.T) {
 }
 
 func TestExecuteError(t *testing.T) {
-	mgr := plugins.NewManager()
-	e := NewToolExecutor(mgr)
+	e := NewToolExecutor()
 
 	tool := &mockToolPlugin{
 		name: "error-tool",

@@ -9,15 +9,13 @@ import (
 )
 
 type ToolExecutor struct {
-	mu      sync.RWMutex
-	tools   map[string]plugins.ToolPlugin
-	manager plugins.Manager
+	mu    sync.RWMutex
+	tools map[string]plugins.ToolPlugin
 }
 
-func NewToolExecutor(mgr plugins.Manager) *ToolExecutor {
+func NewToolExecutor() *ToolExecutor {
 	return &ToolExecutor{
-		tools:   make(map[string]plugins.ToolPlugin),
-		manager: mgr,
+		tools: make(map[string]plugins.ToolPlugin),
 	}
 }
 

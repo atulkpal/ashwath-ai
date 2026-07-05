@@ -116,7 +116,7 @@ func TestAgentWithEventBus(t *testing.T) {
 
 func TestAgentWithToolExecutor(t *testing.T) {
 	eng := runtime.NewMock()
-	ex := NewToolExecutor(nil)
+	ex := NewToolExecutor()
 	a := New(eng, WithToolExecutor(ex))
 
 	if a.executor != ex {

@@ -76,14 +76,36 @@
 - Hardcoded engine switch replaced with registry lookup.
 - Engine type defaults to `"mock"` when empty.
 
-## Phase E: Stabilization (not started)
+## Phase E: Stabilization ✓
+
+### E.1 Code Review and Dead Code Removal
+- Removed unused `manager` field from `ToolExecutor` struct.
+- Removed unused `plugins` import from `agent.go`.
+- Changed `InMemory` to unexported `inMemory`; `NewMemory` returns `Memory` interface.
+- All `NewToolExecutor()` calls updated to no-arg signature.
+- Verified all exports are necessary and used.
+
+### E.2 Test Improvements
+- Added edge case tests for `bus`: empty topic, no subscribers, unsubscribe ordering.
+- Added edge case tests for `plugins`: init failure, list after unload, duplicate builtin.
+- Added edge case tests for `agent`: empty prompt, multiple runs, reset then run, options.
+
+### E.3 Naming and Consistency
+- `InMemory` → unexported `inMemory` (returned through `Memory` interface).
+- `ToolExecutor` cleaned of unused dependencies.
+- All exported types have package-level doc comments.
+
+### E.4 Final Documentation
+- `docs/analysis/EPIC3_FINAL.md` — comprehensive epic summary.
+- `docs/engine/PROGRESS.md` updated through Phase E.
+- `docs/engine/MODULE_BOUNDARIES.md` updated through Phase D.
 
 ## Test Summary
 ```
-internal/bus:      5 tests ✓
-internal/plugins:  7 tests ✓
+internal/bus:      9 tests ✓ (5 original + 4 edge)
+internal/plugins: 10 tests ✓ (7 original + 3 edge)
 internal/models:  14 tests ✓
-internal/agent:   30 tests ✓
+internal/agent:   37 tests ✓ (30 original + 4 edge + 3 combined)
 internal/runtime: 11 tests ✓ (6 mock + 5 provider)
 internal/llama:    4 tests ✓ (existing)
 internal/api:      5 tests ✓ (existing)
@@ -96,5 +118,5 @@ internal/logging:  3 tests ✓ (existing)
 ## Overall
 - New packages: `bus`, `plugins` (implemented), `agent`, `runtime/provider`
 - Enhanced: `models`, `runtime`, `server`
-- Total tests: 83+ (42 existing + 5 bus + 7 plugins + 5 models + 30 agent + 5 provider)
-- All passing
+- Total tests: 97+ (42 existing + 9 bus + 10 plugins + 5 models + 37 agent + 5 provider)
+- All passing, 0 vet warnings

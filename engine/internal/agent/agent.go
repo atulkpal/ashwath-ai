@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/ashwathai/ashwath-engine/internal/bus"
-	"github.com/ashwathai/ashwath-engine/internal/plugins"
 	"github.com/ashwathai/ashwath-engine/internal/runtime"
 )
 
@@ -45,7 +44,7 @@ func New(eng runtime.Engine, opts ...AgentOption) *Agent {
 	a := &Agent{
 		engine:   eng,
 		memory:   NewMemory(Config{MaxMessages: 100}),
-		executor: NewToolExecutor(plugins.NewManager()),
+		executor: NewToolExecutor(),
 		context:  NewContextBuilder(""),
 	}
 	for _, opt := range opts {

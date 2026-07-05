@@ -34,22 +34,22 @@ type Config struct {
 	MaxMessages int
 }
 
-type InMemory struct {
+type inMemory struct {
 	mu          sync.RWMutex
 	messages    []Message
 	maxMessages int
 }
 
-func NewMemory(cfg Config) *InMemory {
+func NewMemory(cfg Config) Memory {
 	if cfg.MaxMessages <= 0 {
 		cfg.MaxMessages = 100
 	}
-	return &InMemory{
+	return &inMemory{
 		maxMessages: cfg.MaxMessages,
 	}
 }
 
-func (m *InMemory) AddMessage(msg Message) error {
+func (m *inMemory) AddMessage(msg Message) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.messages = append(m.messages, msg)
@@ -60,7 +60,7 @@ func (m *InMemory) AddMessage(msg Message) error {
 	return nil
 }
 
-func (m *InMemory) Messages() []Message {
+func (m *inMemory) Messages() []Message {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	result := make([]Message, len(m.messages))
@@ -68,13 +68,13 @@ func (m *InMemory) Messages() []Message {
 	return result
 }
 
-func (m *InMemory) Clear() {
+func (m *inMemory) Clear() {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.messages = nil
 }
 
-func (m *InMemory) Len() int {
+func (m *inMemory) Len() int {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	return len(m.messages)
