@@ -11,8 +11,11 @@ import "C"
 import (
 	"context"
 	"fmt"
+	"net"
+	"os"
 	"path/filepath"
 	"sync"
+	"time"
 	"unsafe"
 
 	"github.com/ashwathai/ashwath-engine/internal/config"
@@ -180,16 +183,38 @@ func goStartServer(port C.int, cDataDir *C.char, cEngineType *C.char) C.int {
 	ctx, cancel := context.WithCancel(context.Background())
 	serverCancel = cancel
 
+	serverReady := make(chan error, 1)
 	go func() {
-		if err := server.Run(ctx, cfg, opts); err != nil {
-			fmt.Fprintf(os.Stderr, "Embedded server error: %v\n", err)
-		}
+		err := server.Run(ctx, cfg, opts)
+		serverReady <- err
 		serverMu.Lock()
 		serverCancel = nil
 		serverMu.Unlock()
 	}()
 
-	return 1
+	// Wait up to 60s for the gRPC server to start listening
+	addr := fmt.Sprintf("127.0.0.1:%d", int(port))
+	deadline := time.Now().Add(60 * time.Second)
+	for time.Now().Before(deadline) {
+		// Check if the goroutine already failed
+		select {
+		case err := <-serverReady:
+			fmt.Fprintf(os.Stderr, "Embedded server exited early: %v\n", err)
+			return 0
+		default:
+		}
+
+		conn, err := net.DialTimeout("tcp", addr, 500*time.Millisecond)
+		if err == nil {
+			conn.Close()
+			fmt.Printf("Server ready on %s\n", addr)
+			return 1
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	fmt.Fprintf(os.Stderr, "Server failed to start on %s within 60s\n", addr)
+	return 0
 }
 
 func main() {}
