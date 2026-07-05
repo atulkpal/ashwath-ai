@@ -58,7 +58,9 @@ fun AshwathAITheme(
             val insetsController = WindowCompat.getInsetsController(window, view)
             insetsController.isAppearanceLightStatusBars = false
             insetsController.isAppearanceLightNavigationBars = false
+            @Suppress("DEPRECATION")
             window.statusBarColor = android.graphics.Color.BLACK
+            @Suppress("DEPRECATION")
             window.navigationBarColor = android.graphics.Color.BLACK
         }
     }

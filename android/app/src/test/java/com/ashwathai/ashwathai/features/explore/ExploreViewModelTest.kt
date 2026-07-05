@@ -38,6 +38,8 @@ class FakeModelRepository(private val models: List<ModelInfo> = emptyList()) : M
     override suspend fun deleteModel(id: String) {
         deletedIds.add(id)
     }
+
+    override fun downloadProgress(modelId: String) = flowOf(1f)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)

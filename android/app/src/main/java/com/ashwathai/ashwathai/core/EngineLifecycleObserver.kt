@@ -3,8 +3,8 @@ package com.ashwathai.ashwathai.core
 import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.ashwathai.ashwathai.runtime.api.InferenceEngine
 import com.ashwathai.sdk.EmbeddedInferenceEngine
-import com.ashwathai.sdk.InferenceEngine
 
 class EngineLifecycleObserver(
     private val engine: InferenceEngine,

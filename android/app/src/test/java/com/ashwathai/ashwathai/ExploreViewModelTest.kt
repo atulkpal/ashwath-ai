@@ -5,6 +5,7 @@ import com.ashwathai.ashwathai.domain.repository.ModelRepository
 import com.ashwathai.ashwathai.features.explore.events.ExploreEvent
 import com.ashwathai.ashwathai.features.explore.viewmodel.ExploreViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -14,6 +15,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ExploreViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()

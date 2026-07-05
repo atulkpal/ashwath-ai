@@ -14,6 +14,7 @@ sealed class Screen(
     val icon: ImageVector? = null
 ) {
     object Onboarding : Screen("onboarding")
+    object Download : Screen("download")
 
     object Chat : Screen(
         route = "chat",

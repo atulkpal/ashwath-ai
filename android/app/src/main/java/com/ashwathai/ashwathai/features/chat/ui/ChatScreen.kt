@@ -52,6 +52,7 @@ import com.ashwathai.ashwathai.features.chat.viewmodel.ChatViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
+    onNavigateToDownload: () -> Unit = {},
     viewModel: ChatViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -162,7 +163,8 @@ fun ChatScreen(
             ) {
                 EngineStatusOverlay(
                     status = state.engineStatus,
-                    onRetry = { viewModel.onEvent(ChatEvent.RetryEngine) }
+                    onRetry = { viewModel.onEvent(ChatEvent.RetryEngine) },
+                    onExploreModels = onNavigateToDownload,
                 )
             }
         }
@@ -268,7 +270,7 @@ fun EmptyChatContent(onSuggestionClick: (String) -> Unit) {
 }
 
 @Composable
-fun EngineStatusOverlay(status: EngineStatus, onRetry: () -> Unit) {
+fun EngineStatusOverlay(status: EngineStatus, onRetry: () -> Unit, onExploreModels: () -> Unit = {}) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -331,8 +333,8 @@ fun EngineStatusOverlay(status: EngineStatus, onRetry: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.height(40.dp))
                     AshwathPrimaryButton(
-                        text = "EXPLORE MODELS",
-                        onClick = { /* Navigation should be handled by app level */ }
+                        text = "DOWNLOAD A MODEL",
+                        onClick = onExploreModels,
                     )
                 }
                 is EngineStatus.Error -> {
