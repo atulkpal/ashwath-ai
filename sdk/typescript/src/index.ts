@@ -22,5 +22,6 @@ export {
 } from "./recommend"
 export type { LocalModel } from "./scanner"
 export { probeEngine, probeOllama } from "./scanner"
+export { loadCatalog, fetchModelIndex, getCachedIndex } from "./upstream"
 export { createEngineClient } from "./connect"
 export type { AshwathEngineClient } from "./connect"

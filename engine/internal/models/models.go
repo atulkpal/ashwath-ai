@@ -1,6 +1,10 @@
 package models
 
-import "github.com/ashwathai/ashwath-engine/internal/bus"
+import (
+	"path/filepath"
+
+	"github.com/ashwathai/ashwath-engine/internal/bus"
+)
 
 type SpeedClass string
 
@@ -59,6 +63,17 @@ func WithBus(b bus.Bus) RegistryOption {
 
 func WithSource(s Source) RegistryOption {
 	return func(r *registry) { r.source = s }
+}
+
+func WithUpstreamIndex(indexURL, cacheDir string) RegistryOption {
+	return func(r *registry) {
+		cachePath := ""
+		if cacheDir != "" {
+			cachePath = filepath.Join(cacheDir, "model-index.json")
+		}
+		upstreamModels := CatalogFromUpstream(indexURL, cachePath)
+		r.models = mergeSources(r.models, upstreamModels)
+	}
 }
 
 func WithOllamaSource() RegistryOption {
