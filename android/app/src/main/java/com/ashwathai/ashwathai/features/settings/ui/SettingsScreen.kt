@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -13,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ashwathai.ashwathai.app.components.AshwathTopBar
@@ -21,6 +24,7 @@ import com.ashwathai.ashwathai.app.theme.JetBrainsMonoFontFamily
 import com.ashwathai.ashwathai.app.theme.OnSurfaceVariant
 import com.ashwathai.ashwathai.app.theme.PureBlack
 import com.ashwathai.ashwathai.app.theme.SurfaceTier1
+import com.ashwathai.ashwathai.core.HfTokenProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,6 +78,64 @@ fun SettingsScreen() {
                     description = "Automatic indexing enabled",
                     icon = Icons.Default.Search
                 )
+            }
+
+            item { SettingHeader("Hugging Face") }
+            item {
+                var hfToken by remember { mutableStateOf(HfTokenProvider.getToken()) }
+                var showToken by remember { mutableStateOf(false) }
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.Transparent,
+                ) {
+                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                        Text(
+                            "Hugging Face Access Token",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                            color = Color.White,
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            if (hfToken.isNotBlank()) "Token set (${hfToken.take(8)}...)" else "Required for model downloads",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = OnSurfaceVariant,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            OutlinedTextField(
+                                value = hfToken,
+                                onValueChange = {
+                                    hfToken = it
+                                    HfTokenProvider.setToken(it)
+                                },
+                                placeholder = { Text("hf_...", color = Color.Gray) },
+                                visualTransformation = if (showToken) VisualTransformation.None else PasswordVisualTransformation(),
+                                singleLine = true,
+                                modifier = Modifier.weight(1f),
+                                textStyle = MaterialTheme.typography.bodySmall.copy(
+                                    fontFamily = JetBrainsMonoFontFamily,
+                                    color = Color.White,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = CyanPrimary,
+                                    unfocusedBorderColor = SurfaceTier1,
+                                    cursorColor = CyanPrimary,
+                                    focusedTextColor = Color.White,
+                                    unfocusedTextColor = Color.White,
+                                ),
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            IconButton(onClick = { showToken = !showToken }) {
+                                Icon(
+                                    if (showToken) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                    contentDescription = "Toggle visibility",
+                                    tint = Color.Gray,
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             item { SettingHeader("Advanced") }

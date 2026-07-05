@@ -183,14 +183,53 @@ class GrpcModelRepository(
         modelsDir.mkdirs()
 
         for (url in src.sources) {
-            var done = false
+            val tempFile = File(modelsDir, dest.name + ".tmp")
+            if (tempFile.exists()) tempFile.delete()
+
             try {
-                downloader.download(url, dest).collect { p ->
-                    emit(p.fraction)
-                    if (p.fraction >= 1f) { done = true; return@collect }
+                val conn = URL(url).openConnection() as java.net.HttpURLConnection
+                conn.setRequestProperty("User-Agent", "AshwathAI/0.1 (Android)")
+                val token = com.ashwathai.ashwathai.core.HfTokenProvider.getToken()
+                if (token.isNotBlank()) conn.setRequestProperty("Authorization", "Bearer $token")
+                conn.connectTimeout = 30000
+                conn.readTimeout = 120000
+                conn.instanceFollowRedirects = true
+                conn.connect()
+
+                val code = conn.responseCode
+                if (code == 401) {
+                    throw Exception("Auth required. Set HF token in Settings")
                 }
-                if (done || dest.exists()) { if (!done) emit(1f); return@flow }
-            } catch (_: Exception) { continue }
+                if (code != 200) throw Exception("HTTP $code")
+
+                val total = conn.contentLengthLong
+                val input = conn.inputStream
+                val output = java.io.FileOutputStream(tempFile)
+                val buf = ByteArray(32 * 1024)
+                var downloaded = 0L
+
+                while (true) {
+                    val read = input.read(buf)
+                    if (read < 0) break
+                    output.write(buf, 0, read)
+                    downloaded += read
+                    val t = if (total > 0) total else downloaded
+                    emit(downloaded.toFloat() / t)
+                }
+
+                input.close()
+                output.close()
+                conn.disconnect()
+
+                if (tempFile.exists() && tempFile.length() > 0) {
+                    tempFile.renameTo(dest)
+                    emit(1f)
+                    return@flow
+                }
+            } catch (_: Exception) {
+                tempFile.delete()
+                continue
+            }
         }
         throw Exception("All download sources failed for $modelId")
     }.flowOn(kotlinx.coroutines.Dispatchers.IO)
