@@ -16,13 +16,14 @@ import java.util.concurrent.TimeUnit
 class EngineGrpcClient(private val host: String, private val port: Int) {
     private var channel: ManagedChannel? = null
 
-    suspend fun connect(retries: Int = 3): Result<Unit> {
+    suspend fun connect(retries: Int = 15): Result<Unit> {
         var lastException: Exception? = null
         repeat(retries) { attempt ->
             try {
-                println("EngineGrpcClient: Attempting to connect to $host:$port (attempt ${attempt + 1})...")
+                println("EngineGrpcClient: Attempting to connect to $host:$port (attempt ${attempt + 1}/$retries)...")
                 val newChannel = ManagedChannelBuilder.forAddress(host, port)
                     .usePlaintext()
+                    .keepAliveTime(30, java.util.concurrent.TimeUnit.SECONDS)
                     .build()
 
                 val stub = AshwathEngineGrpcKt.AshwathEngineCoroutineStub(newChannel)
@@ -34,7 +35,7 @@ class EngineGrpcClient(private val host: String, private val port: Int) {
             } catch (e: Exception) {
                 println("EngineGrpcClient: Connection attempt failed: ${e.message}")
                 lastException = e
-                delay(1000L * (attempt + 1))
+                delay(2000L * (attempt + 1))
             }
         }
         return Result.failure(lastException ?: Exception("Failed to connect after $retries attempts"))
