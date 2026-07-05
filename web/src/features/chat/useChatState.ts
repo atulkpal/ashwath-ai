@@ -49,8 +49,8 @@ export function useChatState() {
       await client.streamGenerate(
         { prompt: trimmed },
         (event) => {
-          if (event.type === "token" || event.type === "delta") {
-            fullText += event.text ?? ""
+          if (event.text) {
+            fullText += event.text
             setMessages((prev) =>
               prev.map((m) => (m.id === assistantId ? { ...m, content: fullText } : m))
             )
