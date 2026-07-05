@@ -152,7 +152,7 @@ func newTestServer(t *testing.T) (*grpc.Server, *bufconn.Listener) {
 	t.Helper()
 	eng := runtime.NewMock()
 	det := device.New()
-	reg := models.NewRegistry()
+	reg := models.NewRegistry("", nil)
 	log := logging.NewDefault()
 
 	svc := NewEngineService(eng, det, reg, log)
