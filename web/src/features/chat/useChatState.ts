@@ -57,11 +57,14 @@ export function useChatState() {
           }
         }
       )
-    } catch {
+    } catch (e) {
+      const msg = e instanceof TypeError
+        ? "⚡ Engine not running. Start it with:  cd engine && go run ./cmd/ashwathd/"
+        : `Error: ${e instanceof Error ? e.message : "Unknown error"}`
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantId
-            ? { ...m, content: "Error: Engine unavailable. Please check your connection." }
+            ? { ...m, content: msg }
             : m
         )
       )

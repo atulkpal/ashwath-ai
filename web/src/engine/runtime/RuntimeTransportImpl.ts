@@ -116,6 +116,19 @@ export class RuntimeTransportImpl implements RuntimeTransport {
   }
 
   async generate(request: RuntimeGenerateRequest): Promise<RuntimeGenerateResponse> {
+    let fullText = ""
+    for await (const chunk of this.streamGenerate(request)) {
+      fullText += chunk.text
+      if (chunk.done) break
+    }
+    return {
+      id: Date.now().toString(),
+      text: fullText,
+      sessionId: request.sessionId,
+    }
+  }
+
+  async *streamGenerate(request: RuntimeGenerateRequest): AsyncIterable<RuntimeGenerateResponse> {
     const iterable = this.sdkClient.generate({
       model: request.modelId,
       prompt: request.prompt,
@@ -123,16 +136,14 @@ export class RuntimeTransportImpl implements RuntimeTransport {
       temperature: request.metadata?.temperature as number | undefined,
     })
 
-    let fullText = ""
     for await (const chunk of iterable) {
-      fullText += chunk.text
-      if (chunk.done) break
-    }
-
-    return {
-      id: Date.now().toString(),
-      text: fullText,
-      sessionId: request.sessionId,
+      yield {
+        id: Date.now().toString(),
+        text: chunk.text,
+        done: chunk.done,
+        tokensUsed: chunk.tokensUsed,
+        sessionId: request.sessionId,
+      }
     }
   }
 

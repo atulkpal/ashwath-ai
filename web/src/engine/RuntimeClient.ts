@@ -81,21 +81,30 @@ export class RuntimeClient extends EngineClient {
     onEvent: (event: EngineStreamEvent) => void,
     _options?: EngineRequestOptions,
   ): Promise<GenerateResponse> {
-    const iterable = this.runtimeApi.generate({
+    let fullText = "";
+    let lastId = "";
+
+    for await (const chunk of this.runtimeApi.streamGenerate({
       prompt: request.prompt,
       sessionId: request.sessionId,
       modelId: request.modelId,
-      stream: true,
       metadata: request.metadata,
-    });
+    })) {
+      fullText += chunk.text;
+      lastId = chunk.id;
 
-    const response = await iterable;
-    onEvent({
-      type: "done",
-      text: response.text,
-      metadata: { id: response.id, sessionId: response.sessionId },
-    });
-    return response;
+      onEvent({
+        type: chunk.done ? "done" : "token",
+        text: chunk.text,
+        metadata: { id: chunk.id, sessionId: chunk.sessionId },
+      });
+    }
+
+    return {
+      id: lastId,
+      text: fullText,
+      sessionId: request.sessionId,
+    };
   }
 
   override async createSession(): Promise<{ sessionId: string }> {
