@@ -1,8 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from "react"
 import type { Message, Conversation } from "./chat-data"
 import { conversations as initialConversations, messages as initialMessages } from "./chat-data"
+import { useEngine } from "@/engine"
 
 export function useChatState() {
+  const { client } = useEngine()
   const [conversations, setConversations] = useState<Conversation[]>(initialConversations)
   const [messages, setMessages] = useState<Message[]>(initialMessages)
 
@@ -18,7 +20,7 @@ export function useChatState() {
     }
   }, [messages, isLoading])
 
-  const sendMessage = useCallback(() => {
+  const sendMessage = useCallback(async () => {
     const trimmed = input.trim()
     if (!trimmed) return
 
@@ -33,20 +35,40 @@ export function useChatState() {
     setInput("")
     setIsLoading(true)
 
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "This is a presentation-only response. In production, the Go Engine would stream the actual inference result here.\n\n```javascript\nconsole.log(\"Hello from Ashwath AI\");\n```\n\nThe response includes **markdown** formatting with code blocks, lists, and other rich text features.",
-        timestamp: new Date().toLocaleTimeString("en-US", { hour12: false }),
-        model: "ashwath-7b-v1",
-        tokens: 128,
-        token_sec: 52.3,
-      }
-      setMessages((prev) => [...prev, assistantMessage])
+    const assistantId = (Date.now() + 1).toString()
+    const assistantMessage: Message = {
+      id: assistantId,
+      role: "assistant",
+      content: "",
+      timestamp: new Date().toLocaleTimeString("en-US", { hour12: false }),
+    }
+    setMessages((prev) => [...prev, assistantMessage])
+
+    try {
+      let fullText = ""
+      await client.streamGenerate(
+        { prompt: trimmed },
+        (event) => {
+          if (event.type === "token" || event.type === "delta") {
+            fullText += event.text ?? ""
+            setMessages((prev) =>
+              prev.map((m) => (m.id === assistantId ? { ...m, content: fullText } : m))
+            )
+          }
+        }
+      )
+    } catch {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? { ...m, content: "Error: Engine unavailable. Please check your connection." }
+            : m
+        )
+      )
+    } finally {
       setIsLoading(false)
-    }, 1200)
-  }, [input])
+    }
+  }, [input, client])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {

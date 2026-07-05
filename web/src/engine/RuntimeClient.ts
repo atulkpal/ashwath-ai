@@ -77,11 +77,25 @@ export class RuntimeClient extends EngineClient {
   }
 
   override async streamGenerate(
-    _request: GenerateRequest,
-    _onEvent: (event: EngineStreamEvent) => void,
+    request: GenerateRequest,
+    onEvent: (event: EngineStreamEvent) => void,
     _options?: EngineRequestOptions,
   ): Promise<GenerateResponse> {
-    throw new NotImplementedError("Runtime streaming is not implemented yet.");
+    const iterable = this.runtimeApi.generate({
+      prompt: request.prompt,
+      sessionId: request.sessionId,
+      modelId: request.modelId,
+      stream: true,
+      metadata: request.metadata,
+    });
+
+    const response = await iterable;
+    onEvent({
+      type: "done",
+      text: response.text,
+      metadata: { id: response.id, sessionId: response.sessionId },
+    });
+    return response;
   }
 
   override async createSession(): Promise<{ sessionId: string }> {

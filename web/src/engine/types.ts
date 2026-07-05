@@ -51,5 +51,7 @@ export interface EngineClientLike {
   createSession(): Promise<{ sessionId: string }>;
   getRuntimeConnectionStatus(): Promise<RuntimeStatusResponse>;
   getRuntimeVersion(): Promise<RuntimeVersionResponse>;
+  listRuntimeModels(request?: { includeInstalled?: boolean }): Promise<import("./runtime/RuntimeApi").RuntimeListModelsResponse>;
+  installRuntimeModel(request: { modelId: string }): Promise<import("./runtime/RuntimeApi").RuntimeInstallModelResponse>;
   shutdown(): Promise<void>;
 }
