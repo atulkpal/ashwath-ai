@@ -1,0 +1,22 @@
+name: Nightly Benchmarks
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    name: Benchmark
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Run benchmarks
+        run: go test ./internal/benchmark/... -bench=. -benchmem -count=3 -timeout 120s
+        working-directory: engine
+      - name: Run all benchmarks
+        run: go test ./internal/... -bench=. -benchmem -count=1 -timeout 300s
+        working-directory: engine
