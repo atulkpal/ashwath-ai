@@ -38,3 +38,35 @@ func WithSource(s Source) RegistryOption {
 		r.source = s
 	}
 }
+
+func WithOllamaSource() RegistryOption {
+	return func(r *registry) {
+		ollama := NewOllamaSource()
+		ollamaModels, _ := ollama.List()
+		existing := make(map[string]bool)
+		for _, m := range r.models {
+			existing[m.ID] = true
+		}
+		for _, m := range ollamaModels {
+			if !existing[m.ID] {
+				r.models = append(r.models, m)
+				existing[m.ID] = true
+			}
+		}
+	}
+}
+
+func mergeSources(base, extra []Model) []Model {
+	seen := make(map[string]bool)
+	var merged []Model
+	for _, m := range base {
+		seen[m.ID] = true
+		merged = append(merged, m)
+	}
+	for _, m := range extra {
+		if !seen[m.ID] {
+			merged = append(merged, m)
+		}
+	}
+	return merged
+}

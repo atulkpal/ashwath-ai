@@ -47,7 +47,7 @@ export class RuntimeClient extends EngineClient {
 
   constructor(options: RuntimeClientOptions = {}) {
     super();
-    this.endpoint = options.endpoint ?? options.configuration?.endpoint ?? "http://127.0.0.1:8080";
+    this.endpoint = options.endpoint ?? options.configuration?.endpoint ?? "http://127.0.0.1:50052";
     const configuration = options.configuration ?? createRuntimeConfiguration({ endpoint: this.endpoint });
     this.runtimeApi = options.transport ?? new RuntimeTransportImpl(configuration);
   }
