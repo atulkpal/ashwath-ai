@@ -92,3 +92,40 @@ Final cleanup pass before merging `feature/web-client` into `main`. Removed dead
 - `pnpm run build` — clean (TypeScript + Vite)
 - `pnpm run lint` — 0 errors, 0 warnings
 - `pnpm run dev` — renders without console errors
+
+---
+
+## 2026-07-05 — Worktree Synchronization
+
+### Summary
+Split the mixed engine+web commit on `feature/web-client` into two semantic commits. Cherry-picked the engine-only commit to `main`. Both branches now share identical engine code (engine/, sdk/). Worktrees can develop independently.
+
+### Git History After Sync
+
+**`main`** (AshwathAI worktree — engine hub):
+```
+77e4497 engine: default llama provider, model registry auto-install
+e976b41 Planning refinements: rename, epochs clarification, Marketing workspace
+c28c9d5 Project Planning Sprint 1: Epoch + Track model
+247720f Engine v1 Readiness Certification
+```
+
+**`feature/web-client`** (AshwathAI-Web worktree — web frontend):
+```
+e55c807 web: UI redesign, docs updates, release candidate review
+9868d97 engine: default llama provider, model registry auto-install  (same tree as 77e4497)
+247720f Engine v1 Readiness Certification
+```
+
+### Sync Procedure
+1. `git reset --soft HEAD~2` on `feature/web-client`
+2. Staged only engine/ + sdk/ → committed as `9868d97`
+3. Staged rest (web/, docs/) → committed as `e55c807`
+4. `git checkout main` in AshwathAI worktree
+5. `git cherry-pick 9868d97` → clean, no conflicts → `77e4497`
+
+### Result
+- Engine code is identical: `git diff 9868d97..77e4497 -- engine/ sdk/` → empty
+- `main` is the authoritative engine branch
+- All worktrees get engine updates by cherry-picking from `main` or rebasing
+- Each worktree (web, android, etc.) works independently on its frontend
