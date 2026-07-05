@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/ashwathai/ashwath-engine/internal/config"
+	"github.com/ashwathai/ashwath-engine/internal/runtime/llama"
 	"github.com/ashwathai/ashwath-engine/internal/server"
 )
 
@@ -36,6 +37,8 @@ func main() {
 	if *logLevel != "" {
 		cfg.LogLevel = *logLevel
 	}
+
+	llama.Register()
 
 	opts := server.Options{
 		EngineType: *engineType,

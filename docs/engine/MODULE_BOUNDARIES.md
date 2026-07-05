@@ -5,10 +5,9 @@
 ```
 cmd/ashwathd → server, config
 cmd/libashwath → (c-shared; build-tag gated)
-mobile → runtime, models, bus, logging
-pkg/api → runtime, models, bus, logging
+mobile → runtime
 
-internal/server → api, api/pb, config, device, downloads, logging, models, runtime, runtime/llama
+internal/server → api, api/pb, config, device, downloads, logging, models, runtime
 internal/api → api/pb, device, logging, models, runtime
 internal/api/pb → (generated protobuf stubs, external only)
 internal/agent → runtime, plugins, bus
@@ -54,7 +53,7 @@ internal/voice   → (interface scaffold only)
 3. **Service layer** (api) imports core domain packages but not server.
 4. **Orchestrator** (server) imports everything — it wires the graph.
 5. **No circular dependencies** — verified by `go list`.
-6. **Providers** are registered at runtime, not imported at compile time (server imports llama to call Register()).
+6. **Providers** are registered at runtime — auto-registered via init() (mock, llama) or explicitly at the entry point (cmd/ashwathd).
 
 ## Package Responsibilities
 

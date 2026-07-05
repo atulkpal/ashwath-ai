@@ -12,7 +12,7 @@ type testPlugin struct {
 
 func (p *testPlugin) Name() string          { return p.name }
 func (p *testPlugin) Version() string        { return p.version }
-func (p *testPlugin) Init(ctx interface{}) error { return nil }
+func (p *testPlugin) Init(ctx context.Context) error { return nil }
 
 type testToolPlugin struct {
 	testPlugin

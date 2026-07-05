@@ -17,11 +17,15 @@ func (p *llamaProvider) Create(ctx context.Context, opts runtime.Options) (runti
 	if opts.ModelPath == "" {
 		return nil, fmt.Errorf("llama: model path is required")
 	}
-	eng := New(opts.LlamaBin)
+	eng := New(opts.BinaryPath)
 	if err := eng.Initialize(ctx, opts); err != nil {
 		return nil, fmt.Errorf("llama: initialize: %w", err)
 	}
 	return eng, nil
+}
+
+func init() {
+	runtime.RegisterProvider(&llamaProvider{})
 }
 
 func Register() {

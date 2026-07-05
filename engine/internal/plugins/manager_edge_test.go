@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"context"
 	"errors"
 	"testing"
 )
@@ -11,7 +12,7 @@ type failingPlugin struct {
 
 func (p *failingPlugin) Name() string          { return p.name }
 func (p *failingPlugin) Version() string        { return "1.0" }
-func (p *failingPlugin) Init(ctx interface{}) error { return errors.New("init failed") }
+func (p *failingPlugin) Init(ctx context.Context) error { return errors.New("init failed") }
 
 func TestLoadInitFailure(t *testing.T) {
 	m := NewManager()

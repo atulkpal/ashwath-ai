@@ -51,16 +51,16 @@ The engine exposes a gRPC API on localhost (127.0.0.1) using a dynamically assig
 | `internal/downloads` | Model download manager | ✅ |
 | `internal/logging` | Structured slog-based logger | ✅ |
 | `internal/models` | Model registry (installed + available) | ✅ |
-| `internal/runtime` | Engine abstraction (mock, future: llama.cpp) | ✅ |
+| `internal/runtime` | Engine abstraction + Provider registry (mock, llama.cpp) | ✅ |
 | `internal/runtime/llama` | llama.cpp adapter (binary process wrapper) | ✅ |
 | `internal/server` | gRPC server wiring | ✅ |
 | `internal/rag` | Retrieval-augmented generation | 🗂️ Planned |
 | `internal/voice` | STT/TTS | 🗂️ Planned |
 | `internal/vision` | Image understanding | 🗂️ Planned |
 | `internal/knowledge` | Knowledge base management | 🗂️ Planned |
-| `internal/plugins` | Plugin system | 🗂️ Planned |
+| `internal/plugins` | Plugin system (Manager, ToolPlugin) | ✅ |
 | `mobile` | Mobile-specific Go package (backend selection) | ✅ |
-| `pkg/api` | Public API types for external consumers | 🗂️ Scaffold |
+| ~~`pkg/api`~~ | Removed — protobuf (`api/proto/service.proto`) is the API contract | ❌ |
 
 ### Testing
 - Unit tests: 42+ tests across 8 packages.

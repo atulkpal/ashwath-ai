@@ -14,7 +14,6 @@ import (
 	"github.com/ashwathai/ashwath-engine/internal/logging"
 	"github.com/ashwathai/ashwath-engine/internal/models"
 	"github.com/ashwathai/ashwath-engine/internal/runtime"
-	"github.com/ashwathai/ashwath-engine/internal/runtime/llama"
 	"google.golang.org/grpc"
 )
 
@@ -45,16 +44,14 @@ func Run(ctx context.Context, cfg *config.Config, opts Options) error {
 		)
 	}
 
-	llama.Register()
-
 	engType := opts.EngineType
 	if engType == "" {
 		engType = "mock"
 	}
 
 	initOpts := runtime.Options{
-		ModelPath: opts.ModelPath,
-		LlamaBin:  opts.LlamaBin,
+		ModelPath:  opts.ModelPath,
+		BinaryPath: opts.LlamaBin,
 	}
 
 	eng, err := runtime.CreateEngine(ctx, engType, initOpts)

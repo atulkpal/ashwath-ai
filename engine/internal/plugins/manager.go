@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"context"
 	"fmt"
 	"sync"
 )
@@ -38,7 +39,7 @@ func (m *manager) Load(path string) (Plugin, error) {
 	}
 
 	p := factory()
-	if err := p.Init(nil); err != nil {
+	if err := p.Init(context.Background()); err != nil {
 		return nil, fmt.Errorf("init plugin %q: %w", path, err)
 	}
 	m.plugins[p.Name()] = p

@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"github.com/ashwathai/ashwath-engine/internal/runtime"
-	"github.com/ashwathai/ashwath-engine/internal/runtime/llama"
+	_ "github.com/ashwathai/ashwath-engine/internal/runtime/llama"
 )
 
 // EngineConfig is passed to NewEngine. All fields are optional; zero values use defaults.
@@ -17,7 +17,7 @@ type EngineConfig struct {
 	EngineType string // "mock" (default) or "llama"
 	ModelPath  string
 	DataDir    string
-	LlamaBin   string // path to llama-server binary (empty = search PATH)
+	LlamaBin   string // path to provider binary (empty = search PATH)
 }
 
 // TokenCallback is implemented by the platform (Android/iOS) to receive tokens.
@@ -64,21 +64,13 @@ func (e *AshwathEngine) Initialize(config *EngineConfig) error {
 		llamaBin = config.LlamaBin
 	}
 
-	opts := runtime.Options{ModelPath: modelPath}
-
-	var eng runtime.Engine
-	switch engineType {
-	case "llama":
-		if modelPath == "" {
-			return errors.New("ModelPath required when EngineType is llama")
-		}
-		eng = llama.New(llamaBin)
-		opts.ModelPath = modelPath
-	default:
-		eng = runtime.NewMock()
+	opts := runtime.Options{
+		ModelPath:  modelPath,
+		BinaryPath: llamaBin,
 	}
 
-	if err := eng.Initialize(context.Background(), opts); err != nil {
+	eng, err := runtime.CreateEngine(context.Background(), engineType, opts)
+	if err != nil {
 		return err
 	}
 	e.engine = eng

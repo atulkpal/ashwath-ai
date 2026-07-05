@@ -13,7 +13,6 @@ type Handler func(Event)
 
 type Bus interface {
 	Publish(topic string, payload any)
-	PublishSync(topic string, payload any)
 	Subscribe(topic string, handler Handler) func()
 }
 
@@ -41,10 +40,6 @@ func (b *inmemBus) Publish(topic string, payload any) {
 	for _, sub := range subs {
 		sub.handler(Event{Topic: topic, Payload: payload})
 	}
-}
-
-func (b *inmemBus) PublishSync(topic string, payload any) {
-	b.Publish(topic, payload)
 }
 
 func (b *inmemBus) Subscribe(topic string, handler Handler) func() {

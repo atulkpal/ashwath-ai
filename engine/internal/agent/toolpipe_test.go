@@ -17,7 +17,7 @@ type mockToolPlugin struct {
 
 func (m *mockToolPlugin) Name() string          { return m.name }
 func (m *mockToolPlugin) Version() string        { return m.version }
-func (m *mockToolPlugin) Init(ctx interface{}) error { return nil }
+func (m *mockToolPlugin) Init(ctx context.Context) error { return nil }
 func (m *mockToolPlugin) Execute(ctx context.Context, args map[string]any) (any, error) {
 	if m.execute != nil {
 		return m.execute(ctx, args)

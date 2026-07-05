@@ -5,7 +5,7 @@ import "context"
 type Plugin interface {
 	Name() string
 	Version() string
-	Init(ctx interface{}) error
+	Init(ctx context.Context) error
 }
 
 type ToolPlugin interface {

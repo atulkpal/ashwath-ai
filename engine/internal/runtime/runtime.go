@@ -12,9 +12,9 @@ type Engine interface {
 }
 
 type Options struct {
-	ModelPath string
-	Device    string
-	LlamaBin  string
+	ModelPath  string
+	Device     string
+	BinaryPath string
 }
 
 type Request struct {
