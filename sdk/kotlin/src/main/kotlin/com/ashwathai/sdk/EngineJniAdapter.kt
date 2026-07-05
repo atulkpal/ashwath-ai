@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.callbackFlow
 
 class EngineJniAdapter(
     private val bridge: AshwathBridge = AshwathBridge(),
-    private val engineType: String = "mock",
+    private val engineType: String = "llama",
     private val modelPath: String? = null,
     private val llamaBin: String? = null,
 ) : InferenceEngine {

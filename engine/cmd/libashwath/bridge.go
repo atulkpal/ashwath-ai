@@ -1,15 +1,5 @@
 //go:build !android
 
-// Command libashwath produces libashwath_engine.so (or .dylib/.dll) for
-// platforms that embed the engine via C ABI (desktop, iOS).
-//
-// Build for Android:
-//
-//	CGO_ENABLED=1 GOOS=android GOARCH=arm64 CC=<NDK clang> \
-//	  go build -buildmode=c-shared -o libashwath_engine.so ./cmd/libashwath/
-//
-// On Android the JNI entry points in bridge_jni.go (+android build tag)
-// are compiled alongside these plain C exports.
 package main
 
 /*
@@ -21,19 +11,10 @@ static void call_token_callback(TokenCallbackFn cb, const char* text, int done, 
     cb(text, done, userdata);
 }
 
-// ── Lifecycle ──────────────────────────────────────────────────────────
-//
-// engine_type: "mock" (default) or "llama".
-// model_path : path to GGUF model (required for "llama").
-// llama_bin  : path to llama-server binary (empty = search PATH).
 int  engine_init      (const char* engine_type, const char* model_path, const char* llama_bin);
 void engine_shutdown  (void);
 int  engine_is_running(void);
 
-// ── Generation ─────────────────────────────────────────────────────────
-//
-// Tokens are delivered to the callback from a goroutine.
-// The last invocation has done == 1.
 int engine_generate(
     const char*      prompt,
     int              max_tokens,
@@ -65,14 +46,16 @@ func engineInit(cEngineType, cModelPath, cLlamaBin *C.char) C.int {
 	opts := runtime.Options{}
 
 	switch engineType {
+	case "mock":
+		eng = runtime.NewMock()
 	case "llama":
+		fallthrough
+	default:
 		if modelPath == "" {
 			return 0
 		}
 		eng = llama.New(llamaBin)
 		opts.ModelPath = modelPath
-	default:
-		eng = runtime.NewMock()
 	}
 
 	if err := eng.Initialize(context.Background(), opts); err != nil {

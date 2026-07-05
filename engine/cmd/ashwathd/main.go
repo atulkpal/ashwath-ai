@@ -9,7 +9,6 @@ import (
 	"syscall"
 
 	"github.com/ashwathai/ashwath-engine/internal/config"
-	"github.com/ashwathai/ashwath-engine/internal/runtime/llama"
 	"github.com/ashwathai/ashwath-engine/internal/server"
 )
 
@@ -17,9 +16,9 @@ func main() {
 	port := flag.Int("port", 0, "gRPC server port (overrides ASHWATH_PORT)")
 	dataDir := flag.String("data-dir", "", "data directory (overrides ASHWATH_DATA_DIR)")
 	logLevel := flag.String("log-level", "", "log level: debug, info, warn, error (overrides ASHWATH_LOG_LEVEL)")
-	engineType := flag.String("engine", "mock", "inference engine: mock|llama")
+	engineType := flag.String("engine", "llama", "inference engine: mock|llama")
 	llamaBin := flag.String("llama-bin", "", "path to llama-server binary (default: search PATH)")
-	modelPath := flag.String("model", "", "path to GGUF model file (required for --engine=llama)")
+	modelPath := flag.String("model", "", "path to GGUF model file (default: use first installed model)")
 	flag.Parse()
 
 	cfg, err := config.Load()
@@ -37,8 +36,6 @@ func main() {
 	if *logLevel != "" {
 		cfg.LogLevel = *logLevel
 	}
-
-	llama.Register()
 
 	opts := server.Options{
 		EngineType: *engineType,

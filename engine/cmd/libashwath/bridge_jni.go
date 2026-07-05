@@ -11,16 +11,17 @@ import "C"
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"sync"
 	"unsafe"
 
 	"github.com/ashwathai/ashwath-engine/internal/config"
+	"github.com/ashwathai/ashwath-engine/internal/downloads"
+	"github.com/ashwathai/ashwath-engine/internal/models"
 	"github.com/ashwathai/ashwath-engine/internal/runtime"
 	"github.com/ashwathai/ashwath-engine/internal/runtime/llama"
 	"github.com/ashwathai/ashwath-engine/internal/server"
 )
-
-// Go-exported functions called from C.
 
 var (
 	eng          runtime.Engine
@@ -37,14 +38,16 @@ func goInit(cEngineType, cModelPath, cLlamaBin *C.char) C.int {
 	opts := runtime.Options{}
 
 	switch engineType {
+	case "mock":
+		eng = runtime.NewMock()
 	case "llama":
+		fallthrough
+	default:
 		if modelPath == "" {
 			return 0
 		}
 		eng = llama.New(llamaBin)
 		opts.ModelPath = modelPath
-	default:
-		eng = runtime.NewMock()
 	}
 
 	if err := eng.Initialize(context.Background(), opts); err != nil {
@@ -125,11 +128,42 @@ func goStartServer(port C.int, cDataDir *C.char, cEngineType *C.char) C.int {
 	defer serverMu.Unlock()
 
 	if serverCancel != nil {
-		return 1 // Already running
+		return 1
 	}
 
 	dataDir := C.GoString(cDataDir)
 	engineType := C.GoString(cEngineType)
+	modelPath := ""
+
+	if engineType == "" {
+		engineType = "llama"
+	}
+
+	llama.Register()
+
+	if engineType == "llama" {
+		downloader := downloads.NewManager()
+		modelsDir := filepath.Join(dataDir, "models")
+		reg := models.NewRegistry(modelsDir, downloader)
+
+		mdls, _ := reg.List()
+		for _, m := range mdls {
+			if m.Installed {
+				modelPath = filepath.Join(modelsDir, m.ID, m.Filename)
+				break
+			}
+		}
+
+		if modelPath == "" && len(mdls) > 0 {
+			m := mdls[0]
+			if err := reg.Install(m.ID); err == nil {
+				installed, err := reg.Get(m.ID)
+				if err == nil && installed != nil {
+					modelPath = filepath.Join(modelsDir, installed.ID, installed.Filename)
+				}
+			}
+		}
+	}
 
 	cfg := &config.Config{
 		Port:     int(port),
@@ -139,6 +173,8 @@ func goStartServer(port C.int, cDataDir *C.char, cEngineType *C.char) C.int {
 
 	opts := server.Options{
 		EngineType: engineType,
+		LlamaBin:   "",
+		ModelPath:  modelPath,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -146,7 +182,7 @@ func goStartServer(port C.int, cDataDir *C.char, cEngineType *C.char) C.int {
 
 	go func() {
 		if err := server.Run(ctx, cfg, opts); err != nil {
-			fmt.Printf("Embedded server error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Embedded server error: %v\n", err)
 		}
 		serverMu.Lock()
 		serverCancel = nil
