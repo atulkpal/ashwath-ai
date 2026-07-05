@@ -89,7 +89,10 @@ func main() {
 	}
 	log.Info("Engine initialized", "name", eng.Name())
 
-	reg := models.NewRegistry(cfg.ModelsDir, downloads.NewManager(), models.WithOllamaSource())
+	reg := models.NewRegistry(cfg.ModelsDir, downloads.NewManager(),
+		models.WithOllamaSource(),
+		models.WithUpstreamIndex("", cfg.DataDir),
+	)
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
