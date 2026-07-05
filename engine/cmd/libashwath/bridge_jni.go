@@ -11,16 +11,17 @@ import "C"
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"sync"
 	"unsafe"
 
 	"github.com/ashwathai/ashwath-engine/internal/config"
+	"github.com/ashwathai/ashwath-engine/internal/downloads"
+	"github.com/ashwathai/ashwath-engine/internal/models"
 	"github.com/ashwathai/ashwath-engine/internal/runtime"
 	"github.com/ashwathai/ashwath-engine/internal/runtime/llama"
 	"github.com/ashwathai/ashwath-engine/internal/server"
 )
-
-// Go-exported functions called from C.
 
 var (
 	eng          runtime.Engine
@@ -39,7 +40,7 @@ func goInit(cEngineType, cModelPath, cLlamaBin *C.char) C.int {
 	switch engineType {
 	case "llama":
 		if modelPath == "" {
-			return 0
+			return ErrInitFailed
 		}
 		eng = llama.New(llamaBin)
 		opts.ModelPath = modelPath
@@ -49,9 +50,9 @@ func goInit(cEngineType, cModelPath, cLlamaBin *C.char) C.int {
 
 	if err := eng.Initialize(context.Background(), opts); err != nil {
 		eng = nil
-		return 0
+		return ErrInitFailed
 	}
-	return 1
+	return ErrOK
 }
 
 //export goShutdown
@@ -72,9 +73,9 @@ func goShutdown() {
 //export goRunning
 func goRunning() C.int {
 	if eng != nil {
-		return 1
+		return ErrOK
 	}
-	return 0
+	return ErrEngineNil
 }
 
 //export goGenerate
@@ -86,7 +87,10 @@ func goGenerate(
 	cTopP C.float,
 ) C.int {
 	if eng == nil {
-		return 0
+		return ErrEngineNil
+	}
+	if cPrompt == nil || C.GoString(cPrompt) == "" {
+		return ErrInvalidArgs
 	}
 	prompt := C.GoString(cPrompt)
 	req := runtime.Request{
@@ -98,7 +102,7 @@ func goGenerate(
 	}
 	ch, err := eng.Generate(context.Background(), req)
 	if err != nil {
-		return 0
+		return ErrGenerateFailed
 	}
 	go func() {
 		for r := range ch {
@@ -111,12 +115,15 @@ func goGenerate(
 			C.free(unsafe.Pointer(text))
 		}
 	}()
-	return 1
+	return ErrOK
 }
 
 //export goCancel
 func goCancel() C.int {
-	return 1
+	if eng == nil {
+		return ErrEngineNil
+	}
+	return ErrOK
 }
 
 //export goStartServer
@@ -125,11 +132,43 @@ func goStartServer(port C.int, cDataDir *C.char, cEngineType *C.char) C.int {
 	defer serverMu.Unlock()
 
 	if serverCancel != nil {
-		return 1 // Already running
+		return ErrOK // Already running
 	}
 
 	dataDir := C.GoString(cDataDir)
 	engineType := C.GoString(cEngineType)
+
+	if engineType == "" {
+		engineType = "llama"
+	}
+
+	llama.Register()
+
+	var modelPath string
+
+	if engineType == "llama" {
+		downloader := downloads.NewManager()
+		modelsDir := filepath.Join(dataDir, "models")
+		reg := models.NewRegistry(modelsDir, downloader, models.WithOllamaSource(), models.WithUpstreamIndex("", dataDir))
+
+		mdls, _ := reg.List()
+		for _, m := range mdls {
+			if m.Installed {
+				modelPath = filepath.Join(modelsDir, m.ID, m.Filename)
+				break
+			}
+		}
+
+		if modelPath == "" && len(mdls) > 0 {
+			m := mdls[0]
+			if err := reg.Install(m.ID); err == nil {
+				installed, err := reg.Get(m.ID)
+				if err == nil && installed != nil {
+					modelPath = filepath.Join(modelsDir, installed.ID, installed.Filename)
+				}
+			}
+		}
+	}
 
 	cfg := &config.Config{
 		Port:     int(port),
@@ -139,6 +178,8 @@ func goStartServer(port C.int, cDataDir *C.char, cEngineType *C.char) C.int {
 
 	opts := server.Options{
 		EngineType: engineType,
+		LlamaBin:   "",
+		ModelPath:  modelPath,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -153,7 +194,7 @@ func goStartServer(port C.int, cDataDir *C.char, cEngineType *C.char) C.int {
 		serverMu.Unlock()
 	}()
 
-	return 1
+	return ErrOK
 }
 
 func main() {}

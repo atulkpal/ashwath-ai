@@ -27,9 +27,9 @@ class EmbeddedInferenceEngine(
         // 1. Start in-process gRPC server
         println("EmbeddedInferenceEngine: Starting native server on port $port...")
         val result = bridge.nativeStartServer(port, dataDir.absolutePath, engineType)
-        if (result != 1) {
+        if (result != AshwathBridge.ERR_OK) {
             println("EmbeddedInferenceEngine: Native server failed to start (code=$result)")
-            return Result.failure(Exception("Failed to start embedded engine (code=$result)"))
+            return Result.failure(Exception("Failed to start embedded engine (${AshwathBridge.errorMessage(result)})"))
         }
 
         // 2. Connect via gRPC (localhost)
