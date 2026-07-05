@@ -47,6 +47,7 @@ open class LibraryViewModel(
                 }
             }
             is LibraryEvent.DeleteModel -> deleteModel(event.modelId)
+            is LibraryEvent.DownloadModel -> startDownload(event.modelId)
             is LibraryEvent.Refresh -> loadInstalledModels()
         }
     }
@@ -61,6 +62,26 @@ open class LibraryViewModel(
                 loadInstalledModels()
             } catch (e: Exception) {
                 _state.update { it.copy(error = "Delete failed: ${e.message}") }
+            }
+        }
+    }
+
+    fun startDownload(modelId: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(downloadingModelId = modelId, downloadProgress = 0f) }
+            try {
+                withContext(ioDispatcher) {
+                    modelRepository.downloadModel(modelId)
+                }
+                modelRepository.downloadProgress(modelId).collect { progress ->
+                    _state.update { it.copy(downloadProgress = progress) }
+                    if (progress >= 1f) {
+                        _state.update { it.copy(downloadingModelId = null, downloadProgress = 0f) }
+                        loadInstalledModels()
+                    }
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(downloadingModelId = null, downloadProgress = 0f, error = "Download failed: ${e.message}") }
             }
         }
     }
