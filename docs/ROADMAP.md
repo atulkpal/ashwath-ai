@@ -1,6 +1,7 @@
 # Ashwath AI Roadmap
 
-> **Model:** Five parallel tracks, coordinated at epoch boundaries (every 3 weeks).
+> **Model:** Five parallel tracks, coordinated at epoch boundaries (every 2-3 weeks).
+> Epochs are **planning windows**, not fixed deadlines. Stories that miss one epoch roll to the next.
 > See `docs/analysis/PROJECT_PLANNING_SPRINT_1.md` for full context.
 
 ---

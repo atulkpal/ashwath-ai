@@ -15,10 +15,11 @@
 
 | Subsystem | Status | Primary Maintainer |
 | :--- | :--- | :--- |
-| **Engine** | v1 Certified, Stable | Platform Agent |
+| **Engine** | v1 Certified, Stable | Engine Agent |
 | **Android Client** | Stable (needs polish) | Android Agent |
 | **Web Client** | Active Development | Web Agent |
 | **Research Lab** | Experimental | Research Agent |
+| **Marketing** | Future | Marketing Agent |
 | **Documentation** | Governed | Chief Architect |
 
 ---
@@ -45,7 +46,7 @@
 
 | Track | EPIC | Owner | Status |
 |---|---|---|---|
-| Engine | E4: Engine Stability | Platform Agent | Not started |
+| Engine | E4: Engine Stability | Engine Agent | Not started |
 | Android | E5: Android App v1 | Android Agent | Not started |
 | Web | E6: Web Frontend v1 | Web Agent | Not started |
 | Platform | E12: Release Engineering | Chief Architect | Not started |
@@ -88,8 +89,8 @@
 | Directory | Purpose | Owner |
 |---|---|---|
 | `/android` | Android application (Compose + MVVM) | Android Agent |
-| `/engine` | Go engine (gRPC server, agent, providers) | Platform Agent |
-| `/sdk` | Cross-platform SDKs (Kotlin, Go, TS, Swift) | Platform Agent / Android Agent |
+| `/engine` | Go engine (gRPC server, agent, providers) | Engine Agent |
+| `/sdk` | Cross-platform SDKs (Kotlin, Go, TS, Swift) | Engine Agent / Android Agent |
 | `/web` | Web frontend (React + Vite + TypeScript) | Web Agent |
 | `/research` | Model research, benchmark data | Research Agent |
 | `/docs` | Platform documentation | Chief Architect |

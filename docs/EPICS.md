@@ -11,7 +11,7 @@
 
 **Goal**: Go engine compiles, starts, and serves a gRPC API with mock responses.
 
-**Owner:** Platform Team
+**Owner:** Engine Team
 
 - [x] E1.1: Implement gRPC server with service stubs (JSON codec, all 5 RPCs)
 - [x] E1.2: Implement config loading from file/env
@@ -34,7 +34,7 @@
 
 **Goal**: Event bus, plugin system, agent runtime, provider decoupling, stabilization.
 
-**Owner:** Platform Team
+**Owner:** Engine Team
 
 - [x] E3.A: Engine Foundation + Android Integration (15 stories)
 - [x] E3.B: Architecture Foundation — bus, plugins, source abstraction, module boundaries
@@ -65,7 +65,7 @@ Three parallel tracks. No track blocks another.
 
 ### EPIC-4: Engine Stability (E4-ENG)
 
-**Owner:** Platform Agent
+**Owner:** Engine Agent
 **Dependencies:** None (Engine v1 certified)
 
 - [ ] E4.1: Downloads package test coverage (156 lines, 0 tests)
@@ -107,7 +107,7 @@ Three parallel tracks. No track blocks another.
 
 ### EPIC-7: Knowledge & RAG (E7-KNOW)
 
-**Backend Owner:** Platform Agent
+**Backend Owner:** Engine Agent
 **Android UI Owner:** Android Agent
 **Web UI Owner:** Web Agent
 **Dependencies:** EPIC 4 (tested downloads)
@@ -135,7 +135,7 @@ Three parallel tracks. No track blocks another.
 
 ### EPIC-8: Voice & Vision (E8-MODAL)
 
-**Backend Owner:** Platform Agent
+**Backend Owner:** Engine Agent
 **Android UI Owner:** Android Agent
 **Dependencies:** EPIC 7 (optional parallel)
 
@@ -156,7 +156,7 @@ Three parallel tracks. No track blocks another.
 
 ### EPIC-10: Desktop App (E10-DESKTOP)
 
-**Owner:** Platform Agent
+**Owner:** Engine Agent
 **Dependencies:** EPIC 4 (binary bundling)
 
 - [ ] E10.1: Tauri app scaffold
@@ -166,7 +166,7 @@ Three parallel tracks. No track blocks another.
 
 ### EPIC-11: iOS App (E11-IOS)
 
-**Owner:** Platform Agent (future: iOS Agent)
+**Owner:** Engine Agent (future: iOS Agent)
 **Dependencies:** EPIC 3 (stable API), EPIC 2 patterns
 
 - [ ] E11.1: Swift SDK with gRPC client

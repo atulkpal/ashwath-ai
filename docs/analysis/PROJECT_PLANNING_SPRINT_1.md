@@ -37,8 +37,9 @@ Epoch 4 (Oct)    —                           —             E11-iOS       —
 **Why Epochs?**
 - Parallel across tracks, sequential within tracks
 - Integration points at epoch boundaries
-- Each epoch is 2-3 weeks
+- Each epoch is a planning window (2-3 weeks), not a fixed deadline
 - Clear go/no-go at each epoch review
+- **Epoch end dates are targets, not commitments.** If a story misses its epoch, it rolls to the next. No deadline pressure on quality.
 
 ### 2. Workspace Restructure
 
@@ -46,25 +47,27 @@ Standardize worktrees to match the new track structure:
 
 | Worktree | Branch | Owner | Tracks |
 |---|---|---|---|
-| `worktrees/platform` | `feature/platform` | Platform Agent | Engine, SDK, backend |
+| `worktrees/platform` | `feature/platform` | Engine Agent | Engine, SDK, backend |
 | `worktrees/android` | `feature/android-client` | Android Agent | Android app |
 | `worktrees/web` | `feature/web-client` | Web Agent | Web frontend |
 | `worktrees/research` | `feature/research` | Research Agent | Model research |
 | `worktrees/release` | `feature/release` | Chief Architect | CI/CD, release engineering |
+| `worktrees/marketing` | `feature/marketing` | Marketing Agent (future) | Website, community, marketing |
 
 ### 3. Ownership Matrix
 
 | Subsystem | Owner | Documents Owned |
 |---|---|---|
-| **Engine** | Platform Agent | ENGINE_API.md, ENGINE_CLIENT_CONTRACT.md, JNI_ARCHITECTURE.md, docs/engine/*, MODULE_BOUNDARIES.md |
+| **Engine** | Engine Agent | ENGINE_API.md, ENGINE_CLIENT_CONTRACT.md, JNI_ARCHITECTURE.md, docs/engine/*, MODULE_BOUNDARIES.md |
 | **Android** | Android Agent | ANDROID_ARCHITECTURE.md, docs/engineering/gradle-go-integration.md |
 | **Web** | Web Agent | WEB_ARCHITECTURE.md |
 | **Design** | Design Team | DESIGN_SYSTEM.md, design/* |
 | **SDK (Kotlin)** | Android Agent | sdk/kotlin/* |
-| **SDK (Go/TS/Swift)** | Platform Agent | sdk/go/*, sdk/typescript/*, sdk/swift/* |
+| **SDK (Go/TS/Swift)** | Engine Agent | sdk/go/*, sdk/typescript/*, sdk/swift/* |
 | **Release Eng.** | Chief Architect | CHANGELOG.md, .github/workflows/* |
 | **Documentation** | Chief Architect | AGENT.md, DOCUMENTATION_GOVERNANCE.md, REPOSITORY_MANIFEST.md, ROADMAP.md, EPICS.md, PROJECT_STATE.md, GUILD.md, DECISIONS.md, VISION.md, ARCHITECTURE.md, PLATFORM_GUIDE.md, PLATFORM_RULES.md, docs/analysis/* |
 | **Research** | Research Agent | research/* |
+| **Marketing** (Future) | Marketing Agent | marketing/*, website, community |
 
 ---
 
@@ -85,7 +88,7 @@ These three tracks run in parallel. No track blocks another.
 
 #### EPIC 4: Engine Stability (E4-ENG)
 
-**Owner:** Platform Agent
+**Owner:** Engine Agent
 **Dependencies:** None (Engine v1 certified)
 **Risk:** Low — maintenance work on stable codebase
 
@@ -139,7 +142,7 @@ These three tracks run in parallel. No track blocks another.
 
 #### EPIC 7: Knowledge & RAG (E7-KNOW)
 
-**Backend Owner:** Platform Agent
+**Backend Owner:** Engine Agent
 **Android UI Owner:** Android Agent
 **Web UI Owner:** Web Agent
 **Dependencies:** EPIC 4 (Engine Stability — downloads need to be tested)
@@ -175,7 +178,7 @@ These three tracks run in parallel. No track blocks another.
 
 #### EPIC 8: Voice & Vision (E8-MODAL)
 
-**Backend Owner:** Platform Agent
+**Backend Owner:** Engine Agent
 **Android UI Owner:** Android Agent
 **Dependencies:** EPIC 7 (optional — can be developed in parallel with different models)
 
@@ -198,7 +201,7 @@ These three tracks run in parallel. No track blocks another.
 
 #### EPIC 10: Desktop App (E10-DESKTOP)
 
-**Owner:** Platform Agent
+**Owner:** Engine Agent
 **Dependencies:** EPIC 4 (Engine Stability — binary bundling)
 
 **Stories:**
@@ -209,7 +212,7 @@ These three tracks run in parallel. No track blocks another.
 
 #### EPIC 11: iOS App (E11-IOS)
 
-**Owner:** Platform Agent (future: iOS Agent)
+**Owner:** Engine Agent (future: iOS Agent)
 **Dependencies:** EPIC 3 (stable gRPC API), EPIC 2 patterns (JNI → Swift equivalent)
 
 **Stories:**
@@ -329,7 +332,7 @@ EPIC 13 (Research)
 | Blocker | Track | Severity | Resolution |
 |---|---|---|---|
 | Stitch/Google Fonts theme conflict | E5-AND | HIGH | E5.1 — first priority for Android Agent |
-| Downloads package has 0 tests | E4-ENG | MEDIUM | E4.1 — first priority for Platform Agent |
+| Downloads package has 0 tests | E4-ENG | MEDIUM | E4.1 — first priority for Engine Agent |
 | llama.cpp binary not in CI artifacts | E4-ENG, E10-DESKTOP | MEDIUM | E4.3 — bundle in release pipeline |
 | JNI error codes are not granular | E5-AND | LOW | E4.4 — nice to have |
 | Download progress not streamed | E5-AND, E6-WEB | MEDIUM | E4.2 — needed for UI progress bars |
@@ -342,7 +345,7 @@ EPIC 13 (Research)
 ### Week 1 (immediate)
 | Agent | Task |
 |---|---|
-| **Platform Agent** | E4.1 (Downloads tests), E4.3 (llama binary bundling) |
+| **Engine Agent** | E4.1 (Downloads tests), E4.3 (llama binary bundling) |
 | **Android Agent** | E5.1 (Stitch fix — unlock `assembleDebug`) |
 | **Web Agent** | E6.1 (gRPC-Web TS SDK), E6.2 (connection management) |
 | **Chief Architect** | E12.1 (semver policy), update setup-worktrees.ps1 |
@@ -350,14 +353,14 @@ EPIC 13 (Research)
 ### Week 2
 | Agent | Task |
 |---|---|
-| **Platform Agent** | E4.2 (download progress via bus), E4.4 (JNI error codes) |
+| **Engine Agent** | E4.2 (download progress via bus), E4.4 (JNI error codes) |
 | **Android Agent** | E5.2 (Explore/Library screens), E5.3 (download progress UI) |
 | **Web Agent** | E6.3 (model browser), E6.4 (chat end-to-end) |
 
 ### Week 3
 | Agent | Task |
 |---|---|
-| **Platform Agent** | E4.5 (benchmark CI), E4.6 (provider docs) |
+| **Engine Agent** | E4.5 (benchmark CI), E4.6 (provider docs) |
 | **Android Agent** | E5.4 (offline state), E5.5 (lifecycle), E5.6 (instrumented tests) |
 | **Web Agent** | E6.5 (PWA), E6.6 (responsive layout) |
 | **Chief Architect** | E12.2-E12.5 (release pipeline improvements) |
@@ -375,7 +378,7 @@ EPIC 13 (Research)
 | Stitch fix takes >1 week | Medium | High — blocks all Android UI | Escalate to Chief Architect; consider workaround |
 | Downloads tests reveal bugs | Medium | Medium — could delay E4 | Fix immediately; E4.1 is first priority |
 | gRPC-Web has compatibility issues | Low | Medium — blocks Web E2E | Use Runtime as fallback; document constraints |
-| Multiple agents modify engine simultaneously | Low | High — merge conflicts | Single Writer Principle; only Platform Agent modifies `engine/internal/` |
+| Multiple agents modify engine simultaneously | Low | High — merge conflicts | Single Writer Principle; only Engine Agent modifies `engine/internal/` |
 | Epoch scope creep | Medium | Medium — missed deadlines | Strict Definition of Done; unpushed stories deferred to next epoch |
 
 ---

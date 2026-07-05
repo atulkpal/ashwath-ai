@@ -22,10 +22,10 @@
 | `.editorconfig` | cfg | Chief Architect | Active | Editor settings across all languages |
 | `.gitignore` | cfg | Chief Architect | Active | Git exclusion rules |
 | `AGENT.md` | gov | Chief Architect | Active | Repository constitution — mission, principles, governance, workflow |
-| `CHANGELOG.md` | doc | Platform Team | Active | Release changelog |
+| `CHANGELOG.md` | doc | Engine Team | Active | Release changelog |
 | `CONTRIBUTING.md` | doc | Chief Architect | Active | Contribution guidelines |
 | `LICENSE` | cfg | Chief Architect | Active | Apache 2.0 license |
-| `Makefile` | cfg | Platform Team | Active | Engine build targets |
+| `Makefile` | cfg | Engine Team | Active | Engine build targets |
 | `README.md` | doc | Chief Architect | Active | Project overview and quickstart |
 
 ---
@@ -35,8 +35,8 @@
 | Path | Type | Owner | Lifecycle | Purpose |
 |---|---|---|---|---|
 | `workflows/android-ci.yml` | cfg | Android Team | Active | Android CI pipeline |
-| `workflows/engine-ci.yml` | cfg | Platform Team | Active | Go engine CI (lint, test, build) |
-| `workflows/release-engine.yml` | cfg | Platform Team | Active | Engine binary release pipeline |
+| `workflows/engine-ci.yml` | cfg | Engine Team | Active | Go engine CI (lint, test, build) |
+| `workflows/release-engine.yml` | cfg | Engine Team | Active | Engine binary release pipeline |
 
 ---
 
@@ -71,7 +71,7 @@
 
 | Path | Type | Owner | Lifecycle | Purpose |
 |---|---|---|---|---|
-| `README.md` | doc | Platform Team | Active | Desktop platform stub — future work |
+| `README.md` | doc | Engine Team | Active | Desktop platform stub — future work |
 
 ---
 
@@ -80,17 +80,17 @@
 | Path | Type | Owner | Lifecycle | Purpose |
 |---|---|---|---|---|
 | `ANDROID_ARCHITECTURE.md` | doc | Android Team | Active | Android app architecture |
-| `ARCHITECTURE.md` | doc | Platform Team | Active | Overall system architecture |
+| `ARCHITECTURE.md` | doc | Engine Team | Active | Overall system architecture |
 | `DECISIONS.md` | doc | Chief Architect | Active | Architectural decision records |
 | `DESIGN_SYSTEM.md` | doc | Design Team | Active | Synthetic Noir design system reference |
 | `DOCUMENTATION_GOVERNANCE.md` | gov | Chief Architect | Active | Documentation ownership, types, lifecycle policies |
-| `ENGINE_API.md` | doc | Platform Team | Active | Go engine gRPC API reference |
-| `ENGINE_CLIENT_CONTRACT.md` | doc | Platform Team | Active | Engine-sdk client contract |
+| `ENGINE_API.md` | doc | Engine Team | Active | Go engine gRPC API reference |
+| `ENGINE_CLIENT_CONTRACT.md` | doc | Engine Team | Active | Engine-sdk client contract |
 | `EPICS.md` | doc | Chief Architect | Active | Epic tracking and story status |
 | `GUILD.md` | doc | Chief Architect | Active | Engineering charter — team structure, culture, principles |
 | `JNI_ARCHITECTURE.md` | doc | Android Team | Active | JNI bridge architecture |
-| `PLATFORM_GUIDE.md` | doc | Platform Team | Active | Platform team development guide |
-| `PLATFORM_RULES.md` | doc | Platform Team | Active | Platform engineering rules |
+| `PLATFORM_GUIDE.md` | doc | Engine Team | Active | Platform team development guide |
+| `PLATFORM_RULES.md` | doc | Engine Team | Active | Platform engineering rules |
 | `PROJECT_STATE.md` | doc | Chief Architect | Active | Operational dashboard — milestones, health, current work |
 | `ROADMAP.md` | doc | Chief Architect | Active | Product roadmap |
 | `VISION.md` | doc | Chief Architect | Active | Project vision statement |
@@ -108,8 +108,8 @@
 
 | Path | Type | Owner | Lifecycle | Purpose |
 |---|---|---|---|---|
-| `MODULE_BOUNDARIES.md` | doc | Platform Team | Active | Go engine module dependency diagram and invariants |
-| `PROGRESS.md` | doc | Platform Team | Active | Engine development progress tracking |
+| `MODULE_BOUNDARIES.md` | doc | Engine Team | Active | Go engine module dependency diagram and invariants |
+| `PROGRESS.md` | doc | Engine Team | Active | Engine development progress tracking |
 
 ### `docs/engineering/`
 
@@ -123,7 +123,7 @@
 
 | Path | Type | Owner | Lifecycle | Purpose |
 |---|---|---|---|---|
-| (tree) | src | Platform Team | Active | Go engine — gRPC server, agent runtime, provider registry |
+| (tree) | src | Engine Team | Active | Go engine — gRPC server, agent runtime, provider registry |
 
 ---
 
@@ -131,7 +131,7 @@
 
 | Path | Type | Owner | Lifecycle | Purpose |
 |---|---|---|---|---|
-| `README.md` | doc | Platform Team | Stale | Example code stub — not yet populated |
+| `README.md` | doc | Engine Team | Stale | Example code stub — not yet populated |
 
 ---
 
@@ -139,7 +139,7 @@
 
 | Path | Type | Owner | Lifecycle | Purpose |
 |---|---|---|---|---|
-| `README.md` | doc | Platform Team | Active | iOS platform stub — future work |
+| `README.md` | doc | Engine Team | Active | iOS platform stub — future work |
 
 ---
 
@@ -156,9 +156,9 @@
 
 | Path | Type | Owner | Lifecycle | Purpose |
 |---|---|---|---|---|
-| `go/` | src | Platform Team | Active | Go SDK — gRPC client library |
+| `go/` | src | Engine Team | Active | Go SDK — gRPC client library |
 | `kotlin/` | src | Android Team | Active | Kotlin SDK — gRPC client, JNI bridge, engine integration |
-| `swift/` | doc | Platform Team | Stale | Swift SDK stub — not yet implemented |
+| `swift/` | doc | Engine Team | Stale | Swift SDK stub — not yet implemented |
 | `typescript/` | doc | Web Team | Stale | TypeScript SDK stub — not yet implemented |
 
 ---
@@ -167,7 +167,7 @@
 
 | Path | Type | Owner | Lifecycle | Purpose |
 |---|---|---|---|---|
-| `README.md` | doc | Platform Team | Stale | Tools stub — not yet populated |
+| `README.md` | doc | Engine Team | Stale | Tools stub — not yet populated |
 
 ---
 
