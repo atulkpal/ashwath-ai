@@ -1,16 +1,23 @@
 package com.ashwathai.ashwathai.features.download.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -25,9 +33,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ashwathai.ashwathai.app.theme.CyanPrimary
 import com.ashwathai.ashwathai.app.theme.JetBrainsMonoFontFamily
+import com.ashwathai.ashwathai.app.theme.OnSurfaceVariant
 import com.ashwathai.ashwathai.app.theme.SurfaceTier1
 import com.ashwathai.ashwathai.app.theme.SurfaceTier2
 import com.ashwathai.ashwathai.domain.models.ModelInfo
+import com.ashwathai.ashwathai.features.download.LocalFileImporter
 import com.ashwathai.ashwathai.features.download.viewmodel.DownloadViewModel
 import kotlinx.coroutines.launch
 
@@ -40,6 +50,24 @@ fun DownloadScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val modelsDir = remember { java.io.File(context.filesDir, "models") }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+    ) { uri: Uri? ->
+        if (uri != null) {
+            scope.launch {
+                val file = LocalFileImporter.importModel(context, uri, modelsDir)
+                if (file != null) {
+                    snackbarHostState.showSnackbar("Imported: ${file.name}")
+                    viewModel.loadModels()
+                } else {
+                    snackbarHostState.showSnackbar("Failed to import model")
+                }
+            }
+        }
+    }
 
     LaunchedEffect(state.isComplete) {
         if (state.isComplete) {
@@ -137,6 +165,58 @@ fun DownloadScreen(
                         )
                     }
 
+                    item {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 16.dp),
+                            color = SurfaceTier2,
+                        )
+                    }
+                    item {
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { filePickerLauncher.launch(arrayOf("application/octet-stream", "*/*")) },
+                            color = SurfaceTier1,
+                            shape = RoundedCornerShape(8.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(CyanPrimary.copy(alpha = 0.1f), CircleShape),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Icon(
+                                        Icons.Default.FolderOpen,
+                                        contentDescription = null,
+                                        tint = CyanPrimary,
+                                        modifier = Modifier.size(20.dp),
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        "Import from device",
+                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                                        color = Color.White,
+                                    )
+                                    Text(
+                                        "Select a .gguf file from storage",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = OnSurfaceVariant,
+                                    )
+                                }
+                                Icon(
+                                    Icons.Default.Add,
+                                    contentDescription = "Import",
+                                    tint = CyanPrimary,
+                                )
+                            }
+                        }
+                    }
                     item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
             }

@@ -27,17 +27,17 @@ class GrpcModelRepository(
     private data class ModelSource(val id: String, val name: String, val sources: List<String>, val filename: String, val sizeBytes: Long)
 
     private val hardcodedSources = listOf(
-        ModelSource("gemma-3-4b", "Gemma 3 4B", listOf(
-            "https://huggingface.co/google/gemma-3-4b-it-gguf/resolve/main/gemma-3-4b-it-Q4_K_M.gguf",
-        ), "gemma-3-4b-it-Q4_K_M.gguf", 2_800_000_000L),
         ModelSource("phi-4-mini", "Phi-4 Mini", listOf(
-            "https://huggingface.co/microsoft/Phi-4-mini-instruct-gguf/resolve/main/Phi-4-mini-instruct-Q4_K_M.gguf",
-        ), "Phi-4-mini-instruct-Q4_K_M.gguf", 2_100_000_000L),
+            "https://huggingface.co/bartowski/microsoft_Phi-4-mini-instruct-GGUF/resolve/main/microsoft_Phi-4-mini-instruct-Q4_K_M.gguf",
+        ), "microsoft_Phi-4-mini-instruct-Q4_K_M.gguf", 2_100_000_000L),
+        ModelSource("phi-3.1-mini", "Phi-3.1 Mini", listOf(
+            "https://huggingface.co/bartowski/Phi-3.1-mini-4k-instruct-GGUF/resolve/main/Phi-3.1-mini-4k-instruct-Q4_K_M.gguf",
+        ), "Phi-3.1-mini-4k-instruct-Q4_K_M.gguf", 2_500_000_000L),
         ModelSource("llama-3.2-3b", "Llama 3.2 3B", listOf(
-            "https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct-gguf/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+            "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
         ), "Llama-3.2-3B-Instruct-Q4_K_M.gguf", 2_500_000_000L),
         ModelSource("qwen-2.5-3b", "Qwen 2.5 3B", listOf(
-            "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-gguf/resolve/main/Qwen2.5-3B-Instruct-Q4_K_M.gguf",
+            "https://huggingface.co/bartowski/Qwen2.5-3B-Instruct-GGUF/resolve/main/Qwen2.5-3B-Instruct-Q4_K_M.gguf",
         ), "Qwen2.5-3B-Instruct-Q4_K_M.gguf", 3_100_000_000L),
     )
 
