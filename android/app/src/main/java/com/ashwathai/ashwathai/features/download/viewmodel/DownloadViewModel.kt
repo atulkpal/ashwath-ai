@@ -5,12 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.ashwathai.ashwathai.di.ServiceLocator
 import com.ashwathai.ashwathai.domain.repository.ModelRepository
 import com.ashwathai.ashwathai.features.download.state.DownloadState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class DownloadViewModel(
     private val modelRepository: ModelRepository = ServiceLocator.provideModelRepository(),
@@ -42,9 +40,6 @@ class DownloadViewModel(
         viewModelScope.launch {
             _state.update { it.copy(downloadingModelId = modelId, downloadProgress = 0f, error = null) }
             try {
-                withContext(Dispatchers.IO) {
-                    modelRepository.downloadModel(modelId)
-                }
                 modelRepository.downloadProgress(modelId).collect { progress ->
                     _state.update { it.copy(downloadProgress = progress) }
                     if (progress >= 1f) {

@@ -29,6 +29,7 @@ import com.ashwathai.ashwathai.app.theme.SurfaceTier1
 import com.ashwathai.ashwathai.app.theme.SurfaceTier2
 import com.ashwathai.ashwathai.domain.models.ModelInfo
 import com.ashwathai.ashwathai.features.download.viewmodel.DownloadViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +38,8 @@ fun DownloadScreen(
     onNavigateToChat: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(state.isComplete) {
         if (state.isComplete) {
@@ -44,7 +47,16 @@ fun DownloadScreen(
         }
     }
 
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            scope.launch {
+                snackbarHostState.showSnackbar(it)
+            }
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {

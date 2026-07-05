@@ -39,8 +39,13 @@ class GrpcModelRepository(
 
     override fun getRecommendedModels(): Flow<List<ModelInfo>> = flow {
         val result = grpcClient.listModels()
-        emit(result.map { list -> list.modelsList.map { it.toDomain() } }
-            .getOrDefault(emptyList()))
+        val gRpcModels = result.map { list -> list.modelsList.map { it.toDomain() } }
+            .getOrDefault(emptyList())
+        if (gRpcModels.isNotEmpty()) {
+            emit(gRpcModels)
+        } else {
+            emit(catalogModels())
+        }
     }
 
     override fun getInstalledModels(): Flow<List<ModelInfo>> = flow {
@@ -116,6 +121,11 @@ class GrpcModelRepository(
         val filename = modelFilenames[modelId] ?: return@flow
         val dest = File(modelsDir, filename)
 
+        if (dest.exists()) {
+            emit(1f)
+            return@flow
+        }
+
         modelsDir.mkdirs()
 
         var done = false
@@ -126,7 +136,7 @@ class GrpcModelRepository(
                 return@collect
             }
         }
-        if (!done) emit(1f)
+        if (!done && dest.exists()) emit(1f)
     }.flowOn(kotlinx.coroutines.Dispatchers.IO)
 
     private fun com.ashwathai.sdk.generated.ModelInfo.toDomain(): ModelInfo = ModelInfo(
@@ -138,6 +148,13 @@ class GrpcModelRepository(
         parameters = parameters,
         tags = tagsList,
         isInstalled = installed,
+    )
+
+    private fun catalogModels(): List<ModelInfo> = listOf(
+        ModelInfo("gemma-3-4b", "Gemma 3 4B", "Google", "Lightweight, state-of-the-art open model. Excels at reasoning and chat.", "2.8 GB", "4B", listOf("General", "Efficient", "Chat")),
+        ModelInfo("phi-4-mini", "Phi-4 Mini", "Microsoft", "Extremely capable small model. Strong at reasoning, coding, and math.", "2.1 GB", "3.8B", listOf("Reasoning", "Coding", "Math")),
+        ModelInfo("llama-3.2-3b", "Llama 3.2 3B", "Meta", "Optimized for mobile and edge devices. Well-balanced chat and general tasks.", "2.5 GB", "3B", listOf("Balanced", "Chat", "General")),
+        ModelInfo("qwen-2.5-3b", "Qwen 2.5 3B", "Alibaba", "High performance multilingual model with strong coding abilities.", "3.1 GB", "3B", listOf("Multilingual", "Coding")),
     )
 
     private fun formatSize(bytes: Long): String = when {
