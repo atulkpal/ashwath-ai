@@ -39,12 +39,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,woff2}"],
-        runtimeCaching: [
-          {
-            urlPattern: /^https?:\/\/.*\/ashwath\.AshwathEngine\//,
-            handler: "NetworkOnly",
-          },
-        ],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/\/ashwath\.AshwathEngine\//],
       },
     }),
   ],
