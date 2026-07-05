@@ -36,6 +36,19 @@ class GrpcModelRepository(private val grpcClient: EngineGrpcClient) : ModelRepos
         grpcClient.removeModel(id)
     }
 
+    override fun downloadProgress(modelId: String): Flow<Float> = flow {
+        while (true) {
+            val result = grpcClient.listModels()
+            val model = result.getOrNull()?.modelsList?.firstOrNull { it.id == modelId }
+            if (model?.installed == true) {
+                emit(1f)
+                break
+            }
+            emit(0.5f)
+            kotlinx.coroutines.delay(1000)
+        }
+    }
+
     private fun com.ashwathai.sdk.generated.ModelInfo.toDomain(): ModelInfo = ModelInfo(
         id = id,
         name = name,
