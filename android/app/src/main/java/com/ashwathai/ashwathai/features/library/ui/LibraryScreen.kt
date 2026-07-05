@@ -38,7 +38,7 @@ import com.ashwathai.ashwathai.features.library.viewmodel.LibraryViewModel
 @Composable
 fun LibraryScreen(
     viewModel: LibraryViewModel = viewModel(),
-    onNavigateToExplore: () -> Unit = {}
+    onNavigateToDownload: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -66,7 +66,7 @@ fun LibraryScreen(
                     CircularProgressIndicator(color = CyanPrimary)
                 }
             } else if (state.installedModels.isEmpty()) {
-                EmptyLibraryContent(onExploreClick = onNavigateToExplore)
+                EmptyLibraryContent(onExploreClick = onNavigateToDownload)
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -97,6 +97,23 @@ fun LibraryScreen(
                         )
                     }
 
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                    item {
+                        Button(
+                            onClick = onNavigateToDownload,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = CyanPrimary,
+                                contentColor = Color.Black,
+                            ),
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Download More Models", fontWeight = FontWeight.SemiBold)
+                        }
+                    }
                     item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
             }

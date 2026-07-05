@@ -78,7 +78,7 @@ fun AshwathNavHost(
         }
         composable(Screen.Library.route) {
             LibraryScreen(
-                onNavigateToExplore = { navController.navigate(Screen.Explore.route) },
+                onNavigateToDownload = { navController.navigate(Screen.Download.route) },
             )
         }
         composable(Screen.Knowledge.route) { KnowledgeScreen() }

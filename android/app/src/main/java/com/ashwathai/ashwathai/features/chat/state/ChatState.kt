@@ -13,6 +13,6 @@ data class ChatState(
     val messages: List<ChatMessage> = emptyList(),
     val inputText: String = "",
     val isTyping: Boolean = false,
-    val activeModelName: String = "Ashwath AI Engine",
+    val activeModelName: String = "",
     val engineStatus: EngineStatus = EngineStatus.Initializing
 )

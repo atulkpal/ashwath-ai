@@ -106,10 +106,32 @@ class GrpcModelRepository(
 
     private fun sourceFor(id: String): ModelSource? = sources.find { it.id == id }
 
+    private fun modelDir(id: String): File? {
+        val src = sourceFor(id) ?: return null
+        return File(modelsDir, id).also { it.mkdirs() }
+    }
+
     private fun downloadedFile(id: String): File? {
         val src = sourceFor(id) ?: return null
-        val file = File(modelsDir, src.filename)
+        val dir = modelDir(id) ?: return null
+        val file = File(dir, src.filename)
         return if (file.exists()) file else null
+    }
+
+    private fun installedStateFile(): File = File(modelsDir, ".installed.json")
+
+    private fun markInstalled(id: String, installed: Boolean) {
+        try {
+            modelsDir.mkdirs()
+            val state = mutableMapOf<String, Boolean>()
+            if (installedStateFile().exists()) {
+                val text = installedStateFile().readText()
+                val json = org.json.JSONObject(text)
+                for (key in json.keys()) state[key] = json.getBoolean(key)
+            }
+            state[id] = installed
+            installedStateFile().writeText(org.json.JSONObject(state.toMap()).toString(2))
+        } catch (_: Exception) {}
     }
 
     override fun getRecommendedModels(): Flow<List<ModelInfo>> = flow {
@@ -125,19 +147,21 @@ class GrpcModelRepository(
 
     override fun getInstalledModels(): Flow<List<ModelInfo>> = flow {
         val scanned = modelsDir.listFiles()
-            ?.filter { it.name.endsWith(".gguf") }
-            ?.map { file ->
-                val matched = sources.firstOrNull { it.filename == file.name }
-                ModelInfo(
-                    id = matched?.id ?: "local:${file.nameWithoutExtension}",
-                    name = matched?.name ?: file.nameWithoutExtension,
-                    provider = "Local",
-                    description = "Downloaded model",
-                    size = formatSize(file.length()),
-                    parameters = "",
-                    tags = emptyList(),
-                    isInstalled = true,
-                )
+            ?.filter { it.isDirectory }
+            ?.flatMap { dir ->
+                dir.listFiles()?.filter { it.name.endsWith(".gguf") }?.map { file ->
+                    val matched = sources.firstOrNull { it.filename == file.name }
+                    ModelInfo(
+                        id = matched?.id ?: "local:${dir.name}",
+                        name = matched?.name ?: dir.name,
+                        provider = "Local",
+                        description = "Downloaded model",
+                        size = formatSize(file.length()),
+                        parameters = "",
+                        tags = emptyList(),
+                        isInstalled = true,
+                    )
+                } ?: emptyList()
             } ?: emptyList()
 
         val result = grpcClient.listModels()
@@ -159,12 +183,14 @@ class GrpcModelRepository(
 
     override suspend fun downloadModel(id: String) {
         val src = sourceFor(id) ?: throw IllegalArgumentException("Unknown model: $id")
-        val dest = File(modelsDir, src.filename)
-        modelsDir.mkdirs()
+        val dir = modelDir(id) ?: throw Exception("Cannot create model directory")
+        val dest = File(dir, src.filename)
+        dir.mkdirs()
 
         for (url in src.sources) {
             try {
                 downloader.download(url, dest).collect { }
+                markInstalled(id, true)
                 return
             } catch (_: Exception) { continue }
         }
@@ -172,18 +198,23 @@ class GrpcModelRepository(
     }
 
     override suspend fun deleteModel(id: String) {
-        downloadedFile(id)?.delete()
+        downloadedFile(id)?.let { file ->
+            file.delete()
+            file.parentFile?.delete()
+            markInstalled(id, false)
+        }
     }
 
     override fun downloadProgress(modelId: String): Flow<Float> = flow {
         val src = sourceFor(modelId) ?: return@flow
-        val dest = File(modelsDir, src.filename)
+        val dir = modelDir(modelId) ?: return@flow
+        val dest = File(dir, src.filename)
 
         if (dest.exists()) { emit(1f); return@flow }
-        modelsDir.mkdirs()
+        dir.mkdirs()
 
         for (url in src.sources) {
-            val tempFile = File(modelsDir, dest.name + ".tmp")
+            val tempFile = File(dir, dest.name + ".tmp")
             if (tempFile.exists()) tempFile.delete()
 
             try {
@@ -223,6 +254,7 @@ class GrpcModelRepository(
 
                 if (tempFile.exists() && tempFile.length() > 0) {
                     tempFile.renameTo(dest)
+                    markInstalled(modelId, true)
                     emit(1f)
                     return@flow
                 }
