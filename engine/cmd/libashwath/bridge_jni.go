@@ -102,11 +102,12 @@ extern int  go_generate(const char* prompt, int max_tokens,
 extern int  go_cancel(void);
 
 static jint jni_init(JNIEnv* env, jstring modelPath, jstring dataDir) {
-    const char* mp = modelPath ? (*env)->GetStringUTFChars(env, modelPath, NULL) : "";
-    const char* dd = dataDir   ? (*env)->GetStringUTFChars(env, dataDir,   NULL) : "";
+    if (modelPath == NULL || dataDir == NULL) return ErrInvalidArgs;
+    const char* mp = (*env)->GetStringUTFChars(env, modelPath, NULL);
+    const char* dd = (*env)->GetStringUTFChars(env, dataDir,   NULL);
     jint result = go_init(mp, dd);
-    if (modelPath) (*env)->ReleaseStringUTFChars(env, modelPath, mp);
-    if (dataDir)   (*env)->ReleaseStringUTFChars(env, dataDir,   dd);
+    (*env)->ReleaseStringUTFChars(env, modelPath, mp);
+    (*env)->ReleaseStringUTFChars(env, dataDir,   dd);
     return result;
 }
 
@@ -118,12 +119,13 @@ static jint jni_generate(JNIEnv* env, jstring prompt,
                          jint maxTokens, jfloat temperature,
                          jint topK, jfloat topP,
                          jobject callback) {
+    if (prompt == NULL) return ErrInvalidArgs;
     jni_setup(env, callback);
 
-    const char* pStr = prompt ? (*env)->GetStringUTFChars(env, prompt, NULL) : "";
+    const char* pStr = (*env)->GetStringUTFChars(env, prompt, NULL);
     jint result = go_generate(pStr, (int)maxTokens, (float)temperature,
                               (int)topK, (float)topP);
-    if (prompt) (*env)->ReleaseStringUTFChars(env, prompt, pStr);
+    (*env)->ReleaseStringUTFChars(env, prompt, pStr);
     return result;
 }
 
@@ -148,9 +150,9 @@ func goInit(cModelPath, cDataDir *C.char) C.int {
 	eng = runtime.NewMock()
 	opts := runtime.Options{ModelPath: modelPath}
 	if err := eng.Initialize(context.Background(), opts); err != nil {
-		return 0
+		return ErrInitFailed
 	}
-	return 1
+	return ErrOK
 }
 
 //export go_shutdown
@@ -164,9 +166,9 @@ func goShutdown() {
 //export go_running
 func goRunning() C.int {
 	if eng != nil {
-		return 1
+		return ErrOK
 	}
-	return 0
+	return ErrEngineNil
 }
 
 //export go_generate
@@ -178,7 +180,10 @@ func goGenerate(
 	cTopP C.float,
 ) C.int {
 	if eng == nil {
-		return 0
+		return ErrEngineNil
+	}
+	if cPrompt == nil || C.GoString(cPrompt) == "" {
+		return ErrInvalidArgs
 	}
 	prompt := C.GoString(cPrompt)
 	req := runtime.Request{
@@ -190,7 +195,7 @@ func goGenerate(
 	}
 	ch, err := eng.Generate(context.Background(), req)
 	if err != nil {
-		return 0
+		return ErrGenerateFailed
 	}
 	go func() {
 		for r := range ch {
@@ -203,10 +208,13 @@ func goGenerate(
 			C.free(unsafe.Pointer(text))
 		}
 	}()
-	return 1
+	return ErrOK
 }
 
 //export go_cancel
 func goCancel() C.int {
-	return 1
+	if eng == nil {
+		return ErrEngineNil
+	}
+	return ErrOK
 }
