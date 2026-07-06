@@ -12,3 +12,6 @@
 /captures
 .externalNativeBuild
 .cxx
+
+# Build outputs (compiled engine .so)
+jniLibs/

@@ -4,12 +4,14 @@ import (
 	"context"
 	"io"
 	"net"
+	"os"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/ashwathai/ashwath-engine/internal/api/pb"
 	"github.com/ashwathai/ashwath-engine/internal/device"
+	"github.com/ashwathai/ashwath-engine/internal/downloads"
 	"github.com/ashwathai/ashwath-engine/internal/logging"
 	"github.com/ashwathai/ashwath-engine/internal/models"
 	"github.com/ashwathai/ashwath-engine/internal/runtime"
@@ -61,7 +63,7 @@ func TestServiceGetDeviceInfo(t *testing.T) {
 	}
 }
 
-func TestServiceInstallModel(t *testing.T) {
+func TestServiceRemoveModel(t *testing.T) {
 	srv, lis := newTestServer(t)
 	defer srv.GracefulStop()
 	go srv.Serve(lis)
@@ -71,12 +73,28 @@ func TestServiceInstallModel(t *testing.T) {
 	defer conn.Close()
 
 	client := pb.NewAshwathEngineClient(conn)
-	resp, err := client.InstallModel(context.Background(), &pb.InstallRequest{ModelId: "llama-3.2-3b"})
+	resp, err := client.RemoveModel(context.Background(), &pb.RemoveRequest{ModelId: "nonexistent"})
 	if err != nil {
-		t.Fatalf("InstallModel failed: %v", err)
+		t.Fatalf("RemoveModel failed: %v", err)
 	}
-	if !resp.Started {
-		t.Error("InstallModel should return started=true")
+	if resp.Success {
+		t.Error("RemoveModel should return success=false for nonexistent model")
+	}
+}
+
+func TestServiceInstallModelMissing(t *testing.T) {
+	srv, lis := newTestServer(t)
+	defer srv.GracefulStop()
+	go srv.Serve(lis)
+	defer srv.Stop()
+
+	conn := dialTest(t, lis)
+	defer conn.Close()
+
+	client := pb.NewAshwathEngineClient(conn)
+	_, err := client.InstallModel(context.Background(), &pb.InstallRequest{ModelId: "nonexistent"})
+	if err == nil {
+		t.Fatal("InstallModel should fail for unknown model")
 	}
 }
 
@@ -152,7 +170,12 @@ func newTestServer(t *testing.T) (*grpc.Server, *bufconn.Listener) {
 	t.Helper()
 	eng := runtime.NewMock()
 	det := device.New()
-	reg := models.NewRegistry("", nil)
+	dir, err := os.MkdirTemp("", "ashwath-models-*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { os.RemoveAll(dir) })
+	reg := models.NewRegistry(dir, downloads.NewManager())
 	log := logging.NewDefault()
 
 	svc := NewEngineService(eng, det, reg, log)

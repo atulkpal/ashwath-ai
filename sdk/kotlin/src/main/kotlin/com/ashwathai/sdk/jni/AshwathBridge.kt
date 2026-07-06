@@ -2,6 +2,9 @@ package com.ashwathai.sdk.jni
 
 class AshwathBridge {
     companion object {
+        var isLoaded = false
+            private set
+
         const val ERR_OK = 0
         const val ERR_ENGINE_NIL = 1
         const val ERR_INIT_FAILED = 2
@@ -25,11 +28,21 @@ class AshwathBridge {
         }
 
         init {
-            System.loadLibrary("ashwath_engine")
+            try {
+                System.loadLibrary("ashwath_engine")
+                isLoaded = true
+                println("AshwathBridge: Successfully loaded native library")
+            } catch (e: UnsatisfiedLinkError) {
+                println("AshwathBridge: Failed to load native library: ${e.message}")
+            }
         }
     }
 
-    external fun nativeInit(modelPath: String?, dataDir: String?): Int
+    external fun nativeInit(
+        engineType: String?,
+        modelPath: String?,
+        llamaBin: String?,
+    ): Int
 
     external fun nativeShutdown()
 
@@ -43,4 +56,10 @@ class AshwathBridge {
     ): Int
 
     external fun nativeCancel(): Int
+
+    external fun nativeStartServer(
+        port: Int,
+        dataDir: String?,
+        engineType: String?,
+    ): Int
 }

@@ -1,4 +1,4 @@
-# Ashwath.AI Kotlin SDK
+# Ashwath AI Kotlin SDK
 
 Kotlin client library for communicating with the Go Engine via gRPC.
 

@@ -9,12 +9,15 @@ import (
 	"sync"
 
 	"github.com/ashwathai/ashwath-engine/internal/runtime"
+	_ "github.com/ashwathai/ashwath-engine/internal/runtime/llama"
 )
 
 // EngineConfig is passed to NewEngine. All fields are optional; zero values use defaults.
 type EngineConfig struct {
-	ModelPath string
-	DataDir   string
+	EngineType string // "mock" (default) or "llama"
+	ModelPath  string
+	DataDir    string
+	LlamaBin   string // path to provider binary (empty = search PATH)
 }
 
 // TokenCallback is implemented by the platform (Android/iOS) to receive tokens.
@@ -41,6 +44,10 @@ func NewEngine() *AshwathEngine {
 
 // Initialize starts the engine with the given config.
 // Returns an error if already initialized or if the backend fails to start.
+//
+// EngineType selects the backend: "mock" (default) or "llama".
+// For "llama", ModelPath must point to a GGUF file and LlamaBin may optionally
+// specify the llama-server binary (empty = search PATH).
 func (e *AshwathEngine) Initialize(config *EngineConfig) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -49,13 +56,21 @@ func (e *AshwathEngine) Initialize(config *EngineConfig) error {
 		return errors.New("engine already initialized")
 	}
 
-	eng := runtime.NewMock()
-	modelPath := ""
+	engineType := "mock"
+	var modelPath, llamaBin string
 	if config != nil {
+		engineType = config.EngineType
 		modelPath = config.ModelPath
+		llamaBin = config.LlamaBin
 	}
-	opts := runtime.Options{ModelPath: modelPath}
-	if err := eng.Initialize(context.Background(), opts); err != nil {
+
+	opts := runtime.Options{
+		ModelPath:  modelPath,
+		BinaryPath: llamaBin,
+	}
+
+	eng, err := runtime.CreateEngine(context.Background(), engineType, opts)
+	if err != nil {
 		return err
 	}
 	e.engine = eng

@@ -1,4 +1,4 @@
-# Ashwath.AI Desktop
+# Ashwath AI Desktop
 
 Future desktop frontend. Not yet implemented.
 

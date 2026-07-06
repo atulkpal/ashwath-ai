@@ -1,13 +1,5 @@
-// Command libashwath produces libashwath_engine.so (or .dylib/.dll) for
-// platforms that embed the engine via C ABI (desktop, iOS).
-//
-// Build for Android:
-//
-//	CGO_ENABLED=1 GOOS=android GOARCH=arm64 CC=<NDK clang> \
-//	  go build -buildmode=c-shared -o libashwath_engine.so ./cmd/libashwath/
-//
-// On Android the JNI entry points in bridge_jni.go (+android build tag)
-// are compiled alongside these plain C exports.
+//go:build !android
+
 package main
 
 /*
@@ -15,15 +7,14 @@ package main
 
 typedef void (*TokenCallbackFn)(const char* text, int done, void* userdata);
 
-// ── Lifecycle ──────────────────────────────────────────────────────────
-int  engine_init      (const char* model_path, const char* data_dir);
+static void call_token_callback(TokenCallbackFn cb, const char* text, int done, void* userdata) {
+    cb(text, done, userdata);
+}
+
+int  engine_init      (const char* engine_type, const char* model_path, const char* llama_bin);
 void engine_shutdown  (void);
 int  engine_is_running(void);
 
-// ── Generation ─────────────────────────────────────────────────────────
-//
-// Tokens are delivered to the callback from a goroutine.
-// The last invocation has done == 1.
 int engine_generate(
     const char*      prompt,
     int              max_tokens,
@@ -41,22 +32,39 @@ import (
 	"unsafe"
 
 	"github.com/ashwathai/ashwath-engine/internal/runtime"
+	"github.com/ashwathai/ashwath-engine/internal/runtime/llama"
 )
 
 var eng runtime.Engine
 
-//export engine_init
-func engineInit(cModelPath, cDataDir *C.char) C.int {
+//export engineInit
+func engineInit(cEngineType, cModelPath, cLlamaBin *C.char) C.int {
+	engineType := C.GoString(cEngineType)
 	modelPath := C.GoString(cModelPath)
-	eng = runtime.NewMock()
-	opts := runtime.Options{ModelPath: modelPath}
+	llamaBin := C.GoString(cLlamaBin)
+
+	opts := runtime.Options{}
+
+	switch engineType {
+	case "mock":
+		eng = runtime.NewMock()
+	case "llama":
+		fallthrough
+	default:
+		if modelPath == "" {
+			return 0
+		}
+		eng = llama.New(llamaBin)
+		opts.ModelPath = modelPath
+	}
+
 	if err := eng.Initialize(context.Background(), opts); err != nil {
 		return ErrInitFailed
 	}
 	return ErrOK
 }
 
-//export engine_shutdown
+//export engineShutdown
 func engineShutdown() {
 	if eng != nil {
 		_ = eng.Stop(context.Background())
@@ -64,7 +72,7 @@ func engineShutdown() {
 	}
 }
 
-//export engine_is_running
+//export engineIsRunning
 func engineIsRunning() C.int {
 	if eng != nil {
 		return ErrOK
@@ -72,7 +80,7 @@ func engineIsRunning() C.int {
 	return ErrEngineNil
 }
 
-//export engine_generate
+//export engineGenerate
 func engineGenerate(
 	cPrompt *C.char,
 	cMaxTokens C.int,
@@ -107,14 +115,14 @@ func engineGenerate(
 			if r.Done || r.Error != nil {
 				done = 1
 			}
-			cb(text, C.int(done), userdata)
+			C.call_token_callback(cb, text, C.int(done), userdata)
 			C.free(unsafe.Pointer(text))
 		}
 	}()
 	return ErrOK
 }
 
-//export engine_cancel
+//export engineCancel
 func engineCancel() C.int {
 	if eng == nil {
 		return ErrEngineNil

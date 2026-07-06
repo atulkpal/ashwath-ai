@@ -100,9 +100,28 @@ func ftoa(f float64) string {
 
 func (s *EngineService) InstallModel(ctx context.Context, req *pb.InstallRequest) (*pb.InstallResponse, error) {
 	s.log.Info("InstallModel", "model_id", req.ModelId)
+	if err := s.registry.Install(req.ModelId); err != nil {
+		s.log.Error("InstallModel failed", "model_id", req.ModelId, "error", err)
+		return nil, status.Errorf(codes.Internal, "install failed: %v", err)
+	}
 	return &pb.InstallResponse{
 		Started: true,
-		Message: fmt.Sprintf("Installation started for %s", req.ModelId),
+		Message: fmt.Sprintf("Model %s installed successfully", req.ModelId),
+	}, nil
+}
+
+func (s *EngineService) RemoveModel(ctx context.Context, req *pb.RemoveRequest) (*pb.RemoveResponse, error) {
+	s.log.Info("RemoveModel", "model_id", req.ModelId)
+	if err := s.registry.Remove(req.ModelId); err != nil {
+		s.log.Error("RemoveModel failed", "model_id", req.ModelId, "error", err)
+		return &pb.RemoveResponse{
+			Success: false,
+			Message: fmt.Sprintf("Remove failed: %v", err),
+		}, nil
+	}
+	return &pb.RemoveResponse{
+		Success: true,
+		Message: fmt.Sprintf("Model %s removed", req.ModelId),
 	}, nil
 }
 

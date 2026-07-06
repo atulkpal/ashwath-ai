@@ -1,7 +1,7 @@
-# Ashwath.AI Vision
+# Ashwath AI Vision
 
 ## Overview
-Ashwath.AI is an open-source, offline-first AI platform. One shared Go engine powers multiple native frontends — Android, iOS, Desktop, and Web. All inference, storage, and processing happen locally. Zero data leaves the device.
+Ashwath AI is an open-source, offline-first AI platform. One shared Go engine powers multiple native frontends — Android, iOS, Desktop, and Web. All inference, storage, and processing happen locally. Zero data leaves the device.
 
 ## Core Pillars
 1. **Privacy by Default**: All inference, storage, and processing happen locally. No cloud dependency.

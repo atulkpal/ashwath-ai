@@ -1,4 +1,4 @@
-# Ashwath.AI Go SDK
+# Ashwath AI Go SDK
 
 Go client library for communicating with the Go Engine.
 
