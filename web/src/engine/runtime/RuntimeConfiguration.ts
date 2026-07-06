@@ -8,7 +8,7 @@ export interface RuntimeConfiguration {
 
 export function createRuntimeConfiguration(overrides: Partial<RuntimeConfiguration> = {}): RuntimeConfiguration {
   return {
-    endpoint: "http://127.0.0.1:8080",
+    endpoint: "http://127.0.0.1:50052",
     timeoutMs: 10000,
     retryCount: 0,
     healthCheckIntervalMs: 5000,

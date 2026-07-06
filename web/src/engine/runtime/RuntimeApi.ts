@@ -59,7 +59,10 @@ export interface RuntimeGenerateRequest extends GenerateRequest {
   stream?: boolean;
 }
 
-export interface RuntimeGenerateResponse extends GenerateResponse {}
+export interface RuntimeGenerateResponse extends GenerateResponse {
+  done?: boolean;
+  tokensUsed?: number;
+}
 
 export interface RuntimeCancelRequest {
   requestId: string;
@@ -164,6 +167,9 @@ export interface RuntimeApi {
 
   /** Generate a response using the runtime. */
   generate(request: RuntimeGenerateRequest): Promise<RuntimeGenerateResponse>;
+
+  /** Stream a generation response from the runtime token by token. */
+  streamGenerate(request: RuntimeGenerateRequest): AsyncIterable<RuntimeGenerateResponse>;
 
   /** Cancel an in-flight runtime generation request. */
   cancel(request: RuntimeCancelRequest): Promise<RuntimeCancelResponse>;

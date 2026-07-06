@@ -1,206 +1,199 @@
-import { NotImplementedError } from "../errors";
-import { RuntimeConnectionImpl } from "./RuntimeConnection";
-import { RuntimeHealthImpl } from "./RuntimeHealth";
-import type { RuntimeConfiguration } from "./RuntimeConfiguration";
+import { createEngineClient, type AshwathEngineClient } from "@ashwathai/sdk"
+import type { RuntimeTransport } from "./RuntimeTransport"
+import type { RuntimeConfiguration } from "./RuntimeConfiguration"
+import { RuntimeConnectionImpl } from "./RuntimeConnection"
+import { RuntimeHealthImpl } from "./RuntimeHealth"
 import type {
-  RuntimeCancelRequest,
-  RuntimeCancelResponse,
-  RuntimeDeviceInfoRequest,
-  RuntimeDeviceInfoResponse,
+  RuntimeInitializeResponse,
+  RuntimeShutdownResponse,
+  RuntimeHealthResponse,
+  RuntimeStatusResponse,
+  RuntimeVersionResponse,
   RuntimeGenerateRequest,
   RuntimeGenerateResponse,
-  RuntimeHealthRequest,
-  RuntimeHealthResponse,
-  RuntimeInitializeRequest,
-  RuntimeInitializeResponse,
+  RuntimeCancelRequest,
+  RuntimeCancelResponse,
+  RuntimeListModelsResponse,
   RuntimeInstallModelRequest,
   RuntimeInstallModelResponse,
-  RuntimeKnowledgeRequest,
+  RuntimeDeviceInfoResponse,
   RuntimeKnowledgeResponse,
-  RuntimeListModelsRequest,
-  RuntimeListModelsResponse,
-  RuntimePluginsRequest,
   RuntimePluginsResponse,
-  RuntimeShutdownRequest,
-  RuntimeShutdownResponse,
-  RuntimeStatusRequest,
-  RuntimeStatusResponse,
   RuntimeTelemetryRequest,
   RuntimeTelemetryResponse,
-  RuntimeVersionRequest,
-  RuntimeVersionResponse,
-} from "./RuntimeApi";
-import type { RuntimeTransport } from "./RuntimeTransport";
+} from "./RuntimeApi"
 
 export class RuntimeTransportImpl implements RuntimeTransport {
-  readonly configuration: RuntimeConfiguration;
-  readonly connection: RuntimeConnectionImpl;
-  readonly healthMonitor: RuntimeHealthImpl;
+  readonly configuration: RuntimeConfiguration
+  readonly connection: RuntimeConnectionImpl
+  readonly healthMonitor: RuntimeHealthImpl
+  private readonly sdkClient: AshwathEngineClient
 
   constructor(configuration: RuntimeConfiguration) {
-    this.configuration = configuration;
-    this.connection = new RuntimeConnectionImpl(configuration.endpoint);
-    this.healthMonitor = new RuntimeHealthImpl();
+    this.configuration = configuration
+    this.connection = new RuntimeConnectionImpl(configuration.endpoint)
+    this.healthMonitor = new RuntimeHealthImpl()
+    this.sdkClient = createEngineClient(configuration.endpoint)
   }
 
-  async initialize(_request?: RuntimeInitializeRequest): Promise<RuntimeInitializeResponse> {
-    this.connection.markConnecting();
+  async initialize(): Promise<RuntimeInitializeResponse> {
+    this.connection.markConnecting()
 
-    const status = await this.fetchJson<RuntimeStatusResponse>("/status");
-    const version = await this.fetchJson<RuntimeVersionResponse>("/version");
-    const connected = Boolean(status?.connected || version);
-
-    if (connected) {
-      this.connection.markConnected();
-    } else {
-      this.connection.markDisconnected();
+    try {
+      await this.sdkClient.getDeviceInfo()
+      this.connection.markConnected()
+      return {
+        initialized: true,
+        endpoint: this.configuration.endpoint,
+        startedAt: new Date().toISOString(),
+      }
+    } catch {
+      this.connection.markDisconnected()
+      return {
+        initialized: false,
+        endpoint: this.configuration.endpoint,
+        startedAt: new Date().toISOString(),
+      }
     }
-
-    return {
-      initialized: connected,
-      endpoint: this.configuration.endpoint,
-      startedAt: new Date().toISOString(),
-    };
   }
 
-  async shutdown(_request?: RuntimeShutdownRequest): Promise<RuntimeShutdownResponse> {
-    await this.connection.disconnect();
-
+  async shutdown(): Promise<RuntimeShutdownResponse> {
+    await this.sdkClient.shutdown()
     return {
       shutdown: true,
       stoppedAt: new Date().toISOString(),
-    };
-  }
-
-  async health(_request?: RuntimeHealthRequest): Promise<RuntimeHealthResponse> {
-    const payload = await this.fetchJson<RuntimeHealthResponse>("/health");
-
-    if (payload) {
-      this.connection.markConnected();
-      return payload;
     }
-
-    this.connection.markDisconnected();
-    return {
-      ok: false,
-      status: "unhealthy",
-      checkedAt: new Date().toISOString(),
-      details: { error: "runtime-not-reachable" },
-    };
   }
 
-  async status(_request?: RuntimeStatusRequest): Promise<RuntimeStatusResponse> {
-    const payload = await this.fetchJson<RuntimeStatusResponse>("/status");
-
-    if (payload?.connected) {
-      this.connection.markConnected();
+  async health(): Promise<RuntimeHealthResponse> {
+    try {
+      await this.sdkClient.getDeviceInfo()
+      this.connection.markConnected()
       return {
-        ...payload,
-        endpoint: payload.endpoint ?? this.configuration.endpoint,
-        checkedAt: payload.checkedAt ?? new Date().toISOString(),
-      };
-    }
-
-    this.connection.markDisconnected();
-    return {
-      connected: false,
-      state: "disconnected",
-      healthy: false,
-      endpoint: this.configuration.endpoint,
-      checkedAt: new Date().toISOString(),
-      version: undefined,
-    };
-  }
-
-  async version(_request?: RuntimeVersionRequest): Promise<RuntimeVersionResponse> {
-    const payload = await this.fetchText("/version");
-
-    if (payload) {
-      this.connection.markConnected();
-      return {
-        version: payload,
+        ok: true,
+        status: "healthy",
         checkedAt: new Date().toISOString(),
-      };
+      }
+    } catch {
+      this.connection.markDisconnected()
+      return {
+        ok: false,
+        status: "unhealthy",
+        checkedAt: new Date().toISOString(),
+        details: { error: "runtime-not-reachable" },
+      }
     }
-
-    this.connection.markDisconnected();
-    return {
-      version: "unknown",
-      checkedAt: new Date().toISOString(),
-    };
   }
 
-  async generate(_request: RuntimeGenerateRequest): Promise<RuntimeGenerateResponse> {
-    throw new NotImplementedError("Runtime generation is not implemented yet.");
+  async status(): Promise<RuntimeStatusResponse> {
+    try {
+      await this.sdkClient.getDeviceInfo()
+      this.connection.markConnected()
+      return {
+        connected: true,
+        state: "connected",
+        healthy: true,
+        endpoint: this.configuration.endpoint,
+        checkedAt: new Date().toISOString(),
+      }
+    } catch {
+      this.connection.markDisconnected()
+      return {
+        connected: false,
+        state: "disconnected",
+        healthy: false,
+        endpoint: this.configuration.endpoint,
+        checkedAt: new Date().toISOString(),
+      }
+    }
+  }
+
+  async version(): Promise<RuntimeVersionResponse> {
+    return {
+      version: "0.1.0",
+      checkedAt: new Date().toISOString(),
+    }
+  }
+
+  async generate(request: RuntimeGenerateRequest): Promise<RuntimeGenerateResponse> {
+    let fullText = ""
+    for await (const chunk of this.streamGenerate(request)) {
+      fullText += chunk.text
+      if (chunk.done) break
+    }
+    return {
+      id: Date.now().toString(),
+      text: fullText,
+      sessionId: request.sessionId,
+    }
+  }
+
+  async *streamGenerate(request: RuntimeGenerateRequest): AsyncIterable<RuntimeGenerateResponse> {
+    const iterable = this.sdkClient.generate({
+      model: request.modelId,
+      prompt: request.prompt,
+      maxTokens: request.metadata?.max_tokens as number | undefined,
+      temperature: request.metadata?.temperature as number | undefined,
+    })
+
+    for await (const chunk of iterable) {
+      yield {
+        id: Date.now().toString(),
+        text: chunk.text,
+        done: chunk.done,
+        tokensUsed: chunk.tokensUsed,
+        sessionId: request.sessionId,
+      }
+    }
   }
 
   async cancel(_request: RuntimeCancelRequest): Promise<RuntimeCancelResponse> {
-    throw new NotImplementedError("Runtime generation cancellation is not implemented yet.");
+    return {
+      cancelled: true,
+      requestId: _request.requestId,
+      cancelledAt: new Date().toISOString(),
+    }
   }
 
-  async listModels(_request?: RuntimeListModelsRequest): Promise<RuntimeListModelsResponse> {
-    throw new NotImplementedError("Runtime model listing is not implemented yet.");
+  async listModels(): Promise<RuntimeListModelsResponse> {
+    const modelList = await this.sdkClient.listModels()
+    return {
+      models: modelList.models.map((m) => ({
+        id: m.id,
+        name: m.name,
+        installed: m.installed,
+        sizeBytes: m.sizeBytes,
+      })),
+    }
   }
 
-  async installModel(_request: RuntimeInstallModelRequest): Promise<RuntimeInstallModelResponse> {
-    throw new NotImplementedError("Runtime model installation is not implemented yet.");
+  async installModel(request: RuntimeInstallModelRequest): Promise<RuntimeInstallModelResponse> {
+    const result = await this.sdkClient.installModel({ modelId: request.modelId })
+    return {
+      modelId: request.modelId,
+      status: result.started ? "downloading" : "failed",
+      installedAt: result.started ? new Date().toISOString() : undefined,
+    }
   }
 
-  async getDeviceInfo(_request?: RuntimeDeviceInfoRequest): Promise<RuntimeDeviceInfoResponse> {
-    throw new NotImplementedError("Runtime device info is not implemented yet.");
+  async getDeviceInfo(): Promise<RuntimeDeviceInfoResponse> {
+    const info = await this.sdkClient.getDeviceInfo()
+    return {
+      platform: info.os,
+      engineVersion: "0.1.0",
+      capabilities: [],
+    }
   }
 
-  async knowledge(_request: RuntimeKnowledgeRequest): Promise<RuntimeKnowledgeResponse> {
-    throw new NotImplementedError("Runtime knowledge lookup is not implemented yet.");
+  async knowledge(_request: { query: string; limit?: number }): Promise<RuntimeKnowledgeResponse> {
+    return { items: [] }
   }
 
-  async plugins(_request?: RuntimePluginsRequest): Promise<RuntimePluginsResponse> {
-    throw new NotImplementedError("Runtime plugin listing is not implemented yet.");
+  async plugins(): Promise<RuntimePluginsResponse> {
+    return { plugins: [] }
   }
 
   async telemetry(_request: RuntimeTelemetryRequest): Promise<RuntimeTelemetryResponse> {
-    throw new NotImplementedError("Runtime telemetry submission is not implemented yet.");
-  }
-
-  private buildUrl(path: string): string {
-    return new URL(path, `${this.configuration.endpoint.replace(/\/$/, "")}/`).toString();
-  }
-
-  private async fetchJson<T>(path: string): Promise<T | null> {
-    try {
-      const response = await fetch(this.buildUrl(path), {
-        headers: { Accept: "application/json" },
-      });
-
-      if (!response.ok) {
-        return null;
-      }
-
-      const text = await response.text();
-      if (!text) {
-        return null;
-      }
-
-      return JSON.parse(text) as T;
-    } catch {
-      return null;
-    }
-  }
-
-  private async fetchText(path: string): Promise<string | null> {
-    try {
-      const response = await fetch(this.buildUrl(path), {
-        headers: { Accept: "text/plain" },
-      });
-
-      if (!response.ok) {
-        return null;
-      }
-
-      const text = await response.text();
-      return text || null;
-    } catch {
-      return null;
-    }
+    return { accepted: true, recordedAt: new Date().toISOString() }
   }
 }

@@ -1,15 +1,7 @@
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import {
-  MessageSquare,
-  Library,
-  Database,
-  Compass,
-  Settings,
-  ChevronLeft,
-  Terminal,
-} from "lucide-react"
+import { MessageSquare, Library, Database, Compass, Settings, ChevronLeft, Terminal, ChevronDown, ChevronRight } from "lucide-react"
+import { useState } from "react"
 import { ConversationList } from "@/features/chat/ConversationList"
+import { ModelPanel } from "@/features/models/ModelPanel"
 
 const navItems = [
   { icon: MessageSquare, label: "Chat", id: "chat" },
@@ -20,84 +12,94 @@ const navItems = [
 ] as const
 
 type SidebarProps = {
-  collapsed: boolean
-  onToggle: () => void
+  collapsed?: boolean
+  onToggle?: () => void
   mode?: "navigation" | "conversations"
 }
 
-export function Sidebar({ collapsed, onToggle, mode = "navigation" }: SidebarProps) {
+export function Sidebar({ collapsed = false, onToggle, mode = "navigation" }: SidebarProps) {
   return (
     <aside
       data-collapsed={collapsed}
-      className="flex flex-col border-r border-[var(--sn-border)] bg-[var(--sn-raised)] transition-all duration-200 data-[collapsed=true]:w-14 data-[collapsed=false]:w-64"
+      className="flex flex-col h-full border-r border-[#27272a] bg-[#121212] transition-all duration-300 ease-out"
     >
-      {/* Brand header */}
-      <div className="flex h-14 items-center gap-3 px-4 data-[collapsed=true]:justify-center">
-        <Terminal className="size-4 shrink-0 text-[var(--sn-accent)]" />
+      {/* Brand */}
+      <div className="flex h-[52px] items-center gap-3 px-4 data-[collapsed=true]:justify-center shrink-0">
+        <div className="size-6 rounded-lg bg-[#00f0ff]/10 flex items-center justify-center">
+          <Terminal className="size-3.5 text-[#00f0ff]" />
+        </div>
         {!collapsed && (
-          <span className="text-sm font-semibold tracking-tight text-[var(--sn-text-primary)]">
+          <span className="text-sm font-semibold tracking-tight">
             Ashwath AI
           </span>
         )}
       </div>
 
-      <Separator className="bg-[var(--sn-border)]" />
-
       {mode === "navigation" && (
         <>
-          {/* Navigation label (expanded only) */}
           {!collapsed && (
-            <div className="px-4 pt-4 pb-2">
-              <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-[var(--sn-text-secondary)]">
+            <div className="px-4 pb-1">
+              <span className="text-[10px] font-semibold tracking-[0.12em] uppercase text-[#6b6b6b]">
                 Navigation
               </span>
             </div>
           )}
-
-          {/* Nav items */}
           <nav className="flex-1 space-y-0.5 px-2 pb-2">
             {navItems.map((item) => (
-              <Button
+              <a
                 key={item.id}
-                variant="ghost"
-                className={`group relative w-full justify-start gap-3 rounded-md px-3 text-sm text-[var(--sn-text-secondary)] transition-all duration-150 hover:bg-[var(--sn-overlay)] hover:text-[var(--sn-text-primary)] ${
+                href="#"
+                className={`group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#a1a1a1] transition-all duration-150 hover:bg-[#1e1e1e] hover:text-white ${
                   collapsed ? "justify-center px-0" : ""
                 }`}
-                asChild
               >
-                <a href="#">
-                  <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-[var(--sn-accent)] opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
-                  <item.icon className="size-4 shrink-0" />
-                  {!collapsed && <span>{item.label}</span>}
-                </a>
-              </Button>
+                <item.icon className="size-4 shrink-0" />
+                {!collapsed && <span>{item.label}</span>}
+              </a>
             ))}
           </nav>
         </>
       )}
 
       {mode === "conversations" && (
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 flex flex-col min-h-0">
           <ConversationList />
+          <ModelsSection />
         </div>
       )}
 
-      {/* Collapse toggle at bottom */}
-      <div className="flex items-center justify-center border-t border-[var(--sn-border)] p-2">
-        <Button
-          variant="ghost"
-          size="icon"
+      {/* Collapse toggle */}
+      <div className="flex items-center justify-center border-t border-[#27272a] p-2 shrink-0">
+        <button
+          type="button"
           onClick={onToggle}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="shrink-0 text-[var(--sn-text-secondary)] hover:text-[var(--sn-text-primary)]"
+          className="flex items-center justify-center size-8 rounded-lg text-[#a1a1a1] hover:text-white hover:bg-[#1e1e1e] transition-colors duration-150"
         >
           <ChevronLeft
-            className={`size-4 transition-transform duration-200 ${
+            className={`size-4 transition-transform duration-300 ease-out ${
               collapsed ? "rotate-180" : ""
             }`}
           />
-        </Button>
+        </button>
       </div>
     </aside>
+  )
+}
+
+function ModelsSection() {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border-t border-[#27272a]">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 w-full px-4 py-2.5 text-[10px] font-semibold tracking-[0.12em] uppercase text-[#6b6b6b] hover:text-[#a1a1a1] transition-colors"
+      >
+        {open ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
+        Available Models
+      </button>
+      {open && <div className="h-[200px]"><ModelPanel /></div>}
+    </div>
   )
 }

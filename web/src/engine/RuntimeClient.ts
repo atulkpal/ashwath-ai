@@ -47,7 +47,7 @@ export class RuntimeClient extends EngineClient {
 
   constructor(options: RuntimeClientOptions = {}) {
     super();
-    this.endpoint = options.endpoint ?? options.configuration?.endpoint ?? "http://127.0.0.1:8080";
+    this.endpoint = options.endpoint ?? options.configuration?.endpoint ?? "http://127.0.0.1:50052";
     const configuration = options.configuration ?? createRuntimeConfiguration({ endpoint: this.endpoint });
     this.runtimeApi = options.transport ?? new RuntimeTransportImpl(configuration);
   }
@@ -77,11 +77,34 @@ export class RuntimeClient extends EngineClient {
   }
 
   override async streamGenerate(
-    _request: GenerateRequest,
-    _onEvent: (event: EngineStreamEvent) => void,
+    request: GenerateRequest,
+    onEvent: (event: EngineStreamEvent) => void,
     _options?: EngineRequestOptions,
   ): Promise<GenerateResponse> {
-    throw new NotImplementedError("Runtime streaming is not implemented yet.");
+    let fullText = "";
+    let lastId = "";
+
+    for await (const chunk of this.runtimeApi.streamGenerate({
+      prompt: request.prompt,
+      sessionId: request.sessionId,
+      modelId: request.modelId,
+      metadata: request.metadata,
+    })) {
+      fullText += chunk.text;
+      lastId = chunk.id;
+
+      onEvent({
+        type: chunk.done ? "done" : "token",
+        text: chunk.text,
+        metadata: { id: chunk.id, sessionId: chunk.sessionId },
+      });
+    }
+
+    return {
+      id: lastId,
+      text: fullText,
+      sessionId: request.sessionId,
+    };
   }
 
   override async createSession(): Promise<{ sessionId: string }> {

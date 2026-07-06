@@ -19,5 +19,9 @@ export abstract class EngineClient implements EngineClientLike {
 
   abstract getRuntimeVersion(): Promise<RuntimeVersionResponse>;
 
+  abstract listRuntimeModels(request?: { includeInstalled?: boolean }): Promise<import("./runtime/RuntimeApi").RuntimeListModelsResponse>;
+
+  abstract installRuntimeModel(request: { modelId: string }): Promise<import("./runtime/RuntimeApi").RuntimeInstallModelResponse>;
+
   abstract shutdown(): Promise<void>;
 }
