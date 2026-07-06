@@ -10,23 +10,23 @@
 AshwathAI/
 ├── engine/            Go AI Engine (ashwathd binary, libashwath .so)
 ├── android/           Android frontend (Jetpack Compose, standalone Gradle project)
-├── ios/               iOS frontend (future)
-├── desktop/           Desktop frontend (future)
 ├── web/               Web frontend (React + Vite + TypeScript, active)
 ├── sdk/               Client SDKs for engine API
 │   ├── kotlin/        Kotlin SDK (active MVP, Gradle subproject for Android)
-│   ├── swift/         Swift SDK (scaffold)
+│   ├── typescript/    TypeScript SDK (active, gRPC-Web for web frontend)
 │   ├── go/            Go SDK (scaffold)
-│   └── typescript/    TypeScript SDK (scaffold, for web)
+│   └── swift/         Swift SDK (scaffold)
 ├── docs/              Platform documentation
 ├── design/            Shared design assets (Synthetic Noir)
 ├── scripts/           Build & CI scripts
-├── tools/             Development tools
-├── examples/          Usage examples
 ├── .github/           GitHub Actions workflows
 │   └── workflows/
-│       ├── engine-ci.yml       Engine lint + test + build
-│       └── release-engine.yml  Cross-compile + publish to GitHub Releases
+│       ├── engine-ci.yml              Engine lint + test + build
+│       ├── android-ci.yml             Android CI pipeline
+│       ├── web-ci.yml                 Web CI (pnpm install + lint + build)
+│       ├── integration-gate.yml       Proto change gate
+│       ├── engine-consistency.yml     Cross-branch engine/sdk drift check
+│       └── release-engine.yml         Cross-compile + publish to GitHub Releases
 ```
 
 ## Development Workflow
@@ -47,14 +47,23 @@ Open `android/` in Android Studio for UI development.
 ```bash
 cd engine
 go build ./cmd/ashwathd          # Build binary
-go test -count=1 ./...            # Run all tests (42+ tests)
+go test -count=1 ./...            # Run all tests (100+ tests)
 go vet ./...                      # Static analysis
 go run tests/smoke.go             # Manual smoke test (requires running server)
 ```
 
 Run the server:
 ```bash
-ashwathd --port 9750 --log-level debug
+ashwathd --port 9750 --log-level debug --engine mock
+```
+
+### Web
+```bash
+cd web
+pnpm install                      # Install dependencies
+pnpm lint                         # ESLint check
+pnpm build                        # Production build
+pnpm dev                          # Dev server with HMR
 ```
 
 ### SDK (standalone)
@@ -76,9 +85,12 @@ make test-all         # Run all tests
 
 | Workflow | Trigger | Actions |
 |----------|---------|---------|
-| Engine CI | Changes to `engine/` | `go vet`, `go test`, `go build` |
+| Engine CI | `engine/` changes | `go vet`, `go test`, `go build` |
+| Android CI | `android/` + `sdk/kotlin/` changes | APK build, lint checks |
+| Web CI | `web/` + `sdk/typescript/` changes | `pnpm install`, `pnpm lint`, `pnpm build` |
+| Integration Gate | `engine/api/proto/` changes | Build engine, run tests, build Android SDK |
+| Engine Consistency | Post-push to `main` | Warn if feature branches have diverged engine/sdk code |
 | Engine Release | `engine/v*` tags | Cross-compile for 7 targets, publish to GitHub Releases |
-| Android CI | TBD | APK build, lint checks |
 
 ### Engine Release Targets
 - `linux/amd64` — Linux x86_64
@@ -104,7 +116,7 @@ make test-all         # Run all tests
 
 ## Testing Philosophy
 
-- **Engine**: Unit tests for all `internal/` packages. In-memory gRPC integration tests (`bufconn`). Manual smoke test for end-to-end. 42+ tests across 8 packages.
+- **Engine**: Unit tests for all `internal/` packages. In-memory gRPC integration tests (`bufconn`). Manual smoke test for end-to-end. 100+ tests across 10+ packages.
 - **Android**: Unit tests for ViewModels, SDK client (10+ tests). Instrumented tests for download/install flow (planned).
 - **Web**: Unit tests with Vitest. Component tests with Testing Library. E2E with Playwright (future).
 
