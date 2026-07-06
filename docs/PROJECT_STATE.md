@@ -26,13 +26,11 @@
 ### Repository Health
 
 - **Build Status**: ✅ Passing (Engine `go build`, Engine `go vet`, Android `buildGoEngine` both ABIs)
-- **Test Status**: ✅ Passing (Engine: 97+ tests, Android/SDK: 10+ tests)
+- **Test Status**: ✅ Passing (Engine: 100+ tests, Android/SDK: 10+ tests)
 - **Known Issues**:
   - Stitch/Google Fonts theme conflict blocks Android `assembleDebug`.
-  - `internal/downloads` has 0 tests (156 untested lines).
-  - TypeScript SDK was regenerated but needs feature parity with Kotlin SDK.
+  - TypeScript SDK needs feature parity with Kotlin SDK.
 - **Technical Debt**:
-  - `internal/downloads` — no test coverage.
   - llama.cpp binary not bundled in CI artifacts.
   - Go SDK (`sdk/go/`) is scaffold only.
 
@@ -46,16 +44,16 @@
 - [x] **EPIC-M2: Branch Reconciliation** — `feature/platform`, `feature/android-client`, `feature/web-client` reconciled into `main`. `research/lab` archived.
 - [x] **EPIC-M3: Governance Enablement** — PR template, Web CI, Integration Gate, Engine Consistency Check, `release/v0.2.x` branch, tag standardization.
 - [x] **EPIC-M4: Documentation Cleanup** — Obsolete docs archived, AGENT.md updated, lockfile regenerated.
+- [x] **EPIC-4: Engine Stability** — Downloads tests (83.8%), event bus, llama bundling, JNI codes, benchmark CI, provider docs.
 
 ---
 
 ### Next Priorities (Epoch 1)
 
-1. **E4 (Engine)**: Downloads tests, progress streaming, llama bundling, benchmark CI.
-2. **E5 (Android)**: Stitch fix, screen wiring, progress UI, offline state, lifecycle, tests.
-3. **E6 (Web)**: gRPC-Web SDK polish, connection management, model browser, chat E2E, PWA, responsive.
-4. **E12 (Release)**: Semver policy, pipeline audit, Android/web deploy, changelog gen.
-5. **E13 (Research)**: Quant benchmarks, NPU study, eval harness.
+1. **E5 (Android)**: Stitch fix, screen wiring, progress UI, offline state, lifecycle, tests.
+2. **E6 (Web)**: gRPC-Web SDK polish, connection management, model browser, chat E2E, PWA, responsive.
+3. **E12 (Release)**: Semver policy, pipeline audit, Android/web deploy, changelog gen.
+4. **E13 (Research)**: Quant benchmarks, NPU study, eval harness.
 
 ---
 
