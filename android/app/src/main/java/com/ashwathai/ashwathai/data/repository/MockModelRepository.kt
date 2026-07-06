@@ -62,4 +62,6 @@ class MockModelRepository : ModelRepository {
     override suspend fun deleteModel(id: String) {
         // Mock delete
     }
+
+    override fun downloadProgress(modelId: String): Flow<Float> = flowOf(1f)
 }

@@ -12,6 +12,7 @@ interface InferenceEngine {
 }
 
 data class GenerationOptions(
+    val modelId: String = "",
     val temperature: Float = 0.7f,
     val topK: Int = 40,
     val topP: Float = 0.9f,

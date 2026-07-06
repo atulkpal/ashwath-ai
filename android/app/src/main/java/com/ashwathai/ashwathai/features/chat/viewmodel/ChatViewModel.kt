@@ -2,8 +2,10 @@ package com.ashwathai.ashwathai.features.chat.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ashwathai.ashwathai.di.ServiceLocator
 import com.ashwathai.ashwathai.domain.models.ChatMessage
 import com.ashwathai.ashwathai.domain.models.Sender
+import com.ashwathai.ashwathai.domain.repository.ModelRepository
 import com.ashwathai.ashwathai.features.chat.events.ChatEvent
 import com.ashwathai.ashwathai.features.chat.state.ChatState
 import com.ashwathai.ashwathai.features.chat.state.EngineStatus
@@ -13,12 +15,14 @@ import com.ashwathai.ashwathai.runtime.api.InferenceResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ChatViewModel(
     private val engine: InferenceEngine,
+    private val modelRepository: ModelRepository = ServiceLocator.provideModelRepository(),
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatState())
     val state = _state.asStateFlow()
@@ -34,7 +38,17 @@ class ChatViewModel(
                 engine.initialize()
             }
             result.onSuccess {
-                _state.update { it.copy(engineStatus = EngineStatus.Connected) }
+                val models = withContext(Dispatchers.IO) {
+                    modelRepository.getInstalledModels().firstOrNull()
+                }
+                if (models.isNullOrEmpty()) {
+                    _state.update { it.copy(engineStatus = EngineStatus.NoModelInstalled) }
+                } else {
+                    _state.update { it.copy(
+                        engineStatus = EngineStatus.Connected,
+                        activeModelName = models.first().name,
+                    ) }
+                }
             }.onFailure { e ->
                 _state.update {
                     it.copy(engineStatus = EngineStatus.Error(
@@ -78,7 +92,9 @@ class ChatViewModel(
 
         try {
             var fullText = ""
-            engine.generate(prompt, GenerationOptions()).collect { result ->
+            val modelId = _state.value.activeModelName
+            val options = GenerationOptions(modelId = modelId)
+            engine.generate(prompt, options).collect { result ->
                 when (result) {
                     is InferenceResult.Partial -> {
                         _state.update { it.copy(isTyping = false) }

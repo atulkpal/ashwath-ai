@@ -6,5 +6,7 @@ data class LibraryState(
     val isLoading: Boolean = false,
     val installedModels: List<ModelInfo> = emptyList(),
     val activeModelId: String? = "gemma-3-4b",
+    val downloadingModelId: String? = null,
+    val downloadProgress: Float = 0f,
     val error: String? = null
 )
