@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 
-### Migration (Repository Architecture)
+### Migration (Repository Architecture) — Complete
+- Full migration from prototype workflow to Trunk-Based Development + Release Branches.
 - Archival of 6 stale branches (tagged `archive/*`), branch reconciliation completed.
 - EPIC-4 engine features merged: model catalog, upstream index, Ollama detection, JNI error codes, benchmarking, CI workflows.
 - Android client v1 merged: real gRPC model repository, engine model management, download flow, design polish.
@@ -11,6 +12,10 @@
 - CI added: Web CI, Integration Gate (proto changes), Engine Consistency Check.
 - PR template added, `release/v0.2.x` branch created, tag convention standardized.
 - Worktree policy updated: merge-based sync (no cherry-pick), 2-week lifetime limit.
+- AGENT.md §§7-9 updated for new branching, worktree, and merge policies.
+- Obsolete docs archived: SYNC.md, GUILD.md, PLATFORM_RULES.md, ENGINE_CLIENT_CONTRACT.md, sprint reports.
+- Android Go engine cross-compile build fixed (bridge_jni.go C preamble conflict resolved).
+- Required: GitHub branch protection on `main` (PR required, status checks, linear history) — enable via GitHub UI.
 
 ### Added
 - EPIC 3 (Engine Foundation): Architecture Foundation, Runtime, Provider Abstraction, Stabilization.
