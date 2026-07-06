@@ -94,12 +94,13 @@ Three parallel tracks. No track blocks another. EPIC-4 (Engine Stability) comple
 **Owner:** Web Agent
 **Dependencies:** EPIC 3, Engine v1 (stable API via Runtime)
 
-- [ ] E6.1: gRPC-Web client in TypeScript SDK
-- [ ] E6.2: Engine connection management (connected/disconnected/reconnecting)
-- [ ] E6.3: Model browser UI (list, install, remove models)
-- [ ] E6.4: Chat UI end-to-end (prompt → stream → display)
-- [ ] E6.5: Progressive Web App support (service worker, offline fallback)
-- [ ] E6.6: Responsive layout (mobile + desktop breakpoints)
+- [ ] E6.1: gRPC-Web client in TypeScript SDK (REST/SSE transport works, proto-generated client pending)
+- [ ] E6.2: Engine connection management (EngineContext + status polling built, wiring to UI pending)
+- [x] E6.3: Model browser UI (ModelPanel with list/install in sidebar)
+- [x] E6.4: Chat UI end-to-end (messages, streaming input, parameter panel, conversation list)
+- [x] E6.5: Progressive Web App support (service worker, manifest, icons, Workbox caching)
+- [x] E6.6: Responsive layout (mobile sidebar overlay, responsive right panel)
+- [x] **E6.7: Client-side routing** — react-router-dom with 5 routes (Chat, Library, Knowledge, Explore, Settings) + persistent conversations via localStorage
 
 ---
 
