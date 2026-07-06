@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Migration (Repository Architecture)
+- Archival of 6 stale branches (tagged `archive/*`), branch reconciliation completed.
+- EPIC-4 engine features merged: model catalog, upstream index, Ollama detection, JNI error codes, benchmarking, CI workflows.
+- Android client v1 merged: real gRPC model repository, engine model management, download flow, design polish.
+- Web frontend v1 merged: chat E2E with engine streaming, gRPC-Web SDK, PWA support, model browser.
+- Branching model established: Trunk-Based Development + Release Branches.
+- CI added: Web CI, Integration Gate (proto changes), Engine Consistency Check.
+- PR template added, `release/v0.2.x` branch created, tag convention standardized.
+- Worktree policy updated: merge-based sync (no cherry-pick), 2-week lifetime limit.
+
 ### Added
 - EPIC 3 (Engine Foundation): Architecture Foundation, Runtime, Provider Abstraction, Stabilization.
   - Event System (`internal/bus`): in-memory pub/sub event bus with 6 predefined topics.
