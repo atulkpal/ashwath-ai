@@ -3,16 +3,46 @@ import type { Message, Conversation } from "./chat-data"
 import { conversations as initialConversations, messages as initialMessages } from "./chat-data"
 import { useEngine } from "@/engine"
 
+const STORAGE_KEY = "ashwath-conversations"
+const MESSAGES_KEY = "ashwath-messages"
+const ACTIVE_KEY = "ashwath-active-conv"
+
+function loadJSON<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? (JSON.parse(raw) as T) : fallback
+  } catch {
+    return fallback
+  }
+}
+
 export function useChatState() {
   const { client } = useEngine()
-  const [conversations, setConversations] = useState<Conversation[]>(initialConversations)
-  const [messages, setMessages] = useState<Message[]>(initialMessages)
-
+  const [conversations, setConversations] = useState<Conversation[]>(() =>
+    loadJSON(STORAGE_KEY, initialConversations)
+  )
+  const [messages, setMessages] = useState<Message[]>(() =>
+    loadJSON(MESSAGES_KEY, initialMessages)
+  )
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [activeConversationId, setActiveConversationId] = useState("1")
+  const [activeConversationId, setActiveConversationId] = useState(() =>
+    loadJSON(ACTIVE_KEY, "1")
+  )
   const [searchQuery, setSearchQuery] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations))
+  }, [conversations])
+
+  useEffect(() => {
+    localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages))
+  }, [messages])
+
+  useEffect(() => {
+    localStorage.setItem(ACTIVE_KEY, JSON.stringify(activeConversationId))
+  }, [activeConversationId])
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -59,13 +89,11 @@ export function useChatState() {
       )
     } catch (e) {
       const msg = e instanceof TypeError
-        ? "⚡ Engine not running. Start it with:  cd engine && go run ./cmd/ashwathd/"
+        ? "Engine not running. Start it with: cd engine && go run ./cmd/ashwathd/"
         : `Error: ${e instanceof Error ? e.message : "Unknown error"}`
       setMessages((prev) =>
         prev.map((m) =>
-          m.id === assistantId
-            ? { ...m, content: msg }
-            : m
+          m.id === assistantId ? { ...m, content: msg } : m
         )
       )
     } finally {
