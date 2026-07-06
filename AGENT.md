@@ -128,6 +128,7 @@ Prefer evolving existing code over starting from scratch. The repository should 
 | `DECISIONS.md` | Chief Architect | Append-only |
 | `DESIGN_SYSTEM.md` | Design Team | Living |
 | `docs/analysis/*.md` | Chief Architect | Historical — Never edited |
+| `docs/AGENT_ONBOARDING.md` | Chief Architect | Living — Onboarding guide |
 | `docs/engine/*.md` | Engine Agent | Workspace progress |
 | `docs/decisions/*.md` | Chief Architect | ADR — Append-only |
 | `docs/proposals/*.md` | Any Agent | Proposal — Read-only after review |
@@ -371,17 +372,14 @@ Before every commit, verify:
 
 ---
 
-## 14. Session Startup Checklist
+## 14. Agent Onboarding
 
-When an AI agent begins a work session:
-- [ ] Read this document (AGENT.md)
-- [ ] Read DOCUMENTATION_GOVERNANCE.md
-- [ ] Read PROJECT_STATE.md
-- [ ] Read the relevant EPIC document
-- [ ] Read the current progress log for the workspace
-- [ ] Read the architecture document for the affected subsystem
-- [ ] Check git log for recent changes (`git log --oneline -10`)
-- [ ] Check current state of the worktree
+When spawned with an instruction like *"read AGENT.md and continue with EPIC-<N>"*:
+
+1. **Read `docs/AGENT_ONBOARDING.md`** — this is your self-onboarding guide.
+2. Follow the 7-step process: read core docs → understand EPIC → create worktree/branch → implement → test → report → PR.
+
+All agents must complete the [Required Reading](#16-required-reading) before starting work.
 
 ---
 
@@ -400,14 +398,16 @@ When an AI agent ends a work session:
 
 ## 16. Required Reading
 
-Before performing any work, agents must read:
-1. `AGENT.md` — This document
-2. `docs/DOCUMENTATION_GOVERNANCE.md` — Documentation ownership rules
-3. `docs/PROJECT_STATE.md` — Current status
-4. `docs/ARCHITECTURE.md` — Platform architecture
-5. `docs/EPICS.md` — Current EPIC and phase
-6. The architecture document for the affected subsystem
-7. The workspace progress log for the affected workspace
+Before performing any work, agents must read (in order):
+1. `AGENT.md` — This document (constitution and governance)
+2. `docs/AGENT_ONBOARDING.md` — Self-onboarding guide for spawned agents
+3. `docs/DOCUMENTATION_GOVERNANCE.md` — Documentation ownership rules
+4. `docs/PROJECT_STATE.md` — Current status and known issues
+5. `docs/EPICS.md` — Current EPIC and story breakdown
+6. `docs/PLATFORM_GUIDE.md` — Build commands, CI/CD, coding standards
+7. `docs/ARCHITECTURE.md` — Platform architecture
+8. The architecture document for the affected subsystem
+9. The workspace progress log for the affected workspace
 
 ---
 
