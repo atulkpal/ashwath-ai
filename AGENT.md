@@ -92,19 +92,19 @@ Prefer evolving existing code over starting from scratch. The repository should 
 
 ### 5.1 Directory Ownership
 
-| Directory | Owner | Purpose |
-|-----------|-------|---------|
-| `engine/` | Engine Agent | Go AI Engine |
-| `android/` | Android Agent | Android frontend (Kotlin) |
-| `web/` | Web Agent | Web frontend (React/TypeScript) |
-| `sdk/` | Engine Agent | Client SDKs |
-| `docs/` | Chief Architect | Repository documentation |
-| `design/` | Design Team | Shared design assets |
-| `ios/` | (future) | iOS frontend placeholder |
-| `desktop/` | (future) | Desktop frontend placeholder |
-| `scripts/` | Project Integrator | Build and CI scripts |
-| `tools/` | Owner TBD | Development tools |
-| `examples/` | Engine Agent | Usage examples |
+| Directory | Owner | Branch Prefix | Purpose |
+|-----------|-------|---------------|---------|
+| `engine/` | Engine Agent | `feature/engine/` | Go AI Engine |
+| `android/` | Android Agent | `feature/android/` | Android frontend (Kotlin) |
+| `web/` | Web Agent | `feature/web/` | Web frontend (React/TypeScript) |
+| `sdk/` | Engine Agent | `feature/engine/` | Client SDKs |
+| `docs/` | Chief Architect | `feature/arch/` | Repository documentation |
+| `design/` | Design Team | — | Shared design assets |
+| `ios/` | (future) | `feature/ios/` | iOS frontend placeholder |
+| `desktop/` | (future) | `feature/desktop/` | Desktop frontend placeholder |
+| `scripts/` | Project Integrator | `feature/arch/` | Build and CI scripts |
+| `tools/` | Owner TBD | — | Development tools |
+| `examples/` | Engine Agent | `feature/engine/` | Usage examples |
 
 ### 5.2 File Ownership (Documentation)
 
@@ -202,21 +202,50 @@ No new documents may be created at `docs/` root level without Chief Architect ap
 
 ## 7. Branch Policy
 
-### 7.1 Branch Naming
+### 7.1 Model: Trunk-Based Development + Release Branches
 
-| Branch | Purpose | Base |
-|--------|---------|------|
-| `main` | Integration branch. Always stable, building, passing all tests. | — |
-| `feature/*` | Feature development | main |
-| `fix/*` | Bug fixes | main |
-| `docs/*` | Documentation changes | main |
-| `research/*` | Experimental work | main |
+```
+main  ──●────●────●────●────●────●────●────●────●────●────●──
+          \        /   \        /        \        /
+feature/  ●────●──     ●──────  ●────●    ●──────
+           (short-lived, squash-merge to main)
 
-### 7.2 Branch Rules
-- Never commit directly to `main`.
+release/v0.3.x ──●────●────● (bug fixes only, tagged)
+                    \
+hotfix/             ●────● (emergency, merge back to main + release)
+```
+
+### 7.2 Branch Naming
+
+| Branch | Purpose | Base | Lifetime |
+|--------|---------|------|----------|
+| `main` | Trunk — always green, always deployable | — | Permanent |
+| `feature/<agent>/<description>` | Feature development | main | Days, not weeks |
+| `fix/<agent>/<description>` | Bug fixes | main | Days |
+| `docs/<agent>/<description>` | Documentation changes | main | Days |
+| `research/<topic>` | Experimental work | main | Max 1 week |
+| `release/v<major>.<minor>.x` | Release stabilization | main | Until release + patches done |
+| `hotfix/<description>` | Emergency fixes from release branches | release/* | Days |
+
+### 7.3 Agent Branch Prefixes
+
+| Agent | Prefix |
+|-------|--------|
+| Engine | `feature/engine/` |
+| Android | `feature/android/` |
+| Web | `feature/web/` |
+| Chief Architect | `feature/arch/` or `docs/` |
+| Project Integrator | `release/v*`, `hotfix/` |
+
+### 7.4 Branch Rules
+- Never commit directly to `main`. All changes via PR with CI passing.
 - Feature branches must be short-lived (days, not weeks).
 - Large features must be broken into multiple small PRs.
 - One branch = one concern.
+- Feature branches must `git merge main` regularly (not cherry-pick) to stay current.
+- CI enforces `git diff <branch>..main -- engine/ sdk/` is empty before merge.
+- Release branches are cut from `main` at a stable commit. Only bug fixes are cherry-picked to them.
+- Hotfix branches are cut from `release/*`, merged back to both `release/*` and `main`.
 
 ---
 
@@ -225,22 +254,41 @@ No new documents may be created at `docs/` root level without Chief Architect ap
 ### 8.1 Parallel Development
 This repository supports multiple AI agents working in parallel. Each agent workspace is a separate Git worktree.
 
-### 8.2 Worktree Rules
+### 8.2 Worktree Purpose
+Worktrees are for active development only, not for permanent branching.
+
+| Scenario | Worktree? | Strategy |
+|----------|-----------|----------|
+| Active feature development (e.g., new Android screen) | Yes | Feature branch in worktree, merge to main weekly via squash |
+| Engine SDK improvements | No (use main worktree) | Direct to main via PR |
+| Cross-platform refactoring | Yes | Create temporary worktree, merge within days |
+| Research/experimentation | Yes | `research/*` branch, merge or archive within 1 week |
+| Release stabilization | No (use main worktree) | `release/v*` branch, cherry-pick-only bug fixes |
+
+### 8.3 Worktree Rules
 - Each worktree is a complete working copy of the repository.
 - Worktrees may diverge temporarily but must be reconciled via PR to `main`.
 - Shared files (engine API, proto definitions, documentation) must be coordinated.
 - No two agents may modify the same file simultaneously.
+- A worktree must not exist for more than 2 weeks without merging changes to `main` or a `release/` branch.
+- Run `git worktree prune` after deleting a worktree.
+- Sync mechanism (replaces old cherry-pick model):
+  1. Engine changes → commit on `main` (via PR).
+  2. Feature branches → `git merge main` (not cherry-pick) to stay current.
+  3. CI enforces `git diff <branch>..main -- engine/ sdk/` is empty before merge.
 
 ---
 
 ## 9. Merge Policy
 
 ### 9.1 Pull Request Requirements
-- All tests must pass.
+- All CI status checks must pass (engine, android, web as applicable).
 - `go vet` must be clean (for Go changes).
 - Lint must pass (for TypeScript/Kotlin changes).
 - Documentation must be updated if architecture or API changes.
 - No merge conflicts.
+- PR template must be filled out (platforms affected, testing, docs, breaking changes).
+- Every merged PR must include a CHANGELOG entry or explain why not needed.
 
 ### 9.2 Review Requirements
 - Cross-boundary changes require the owning agent's review.
@@ -251,6 +299,13 @@ This repository supports multiple AI agents working in parallel. Each agent work
 - Squash merge for feature branches.
 - Rebase merge for documentation branches.
 - No merge commits on `main`.
+
+### 9.4 Before Merge Verification
+- `git diff <branch>..main -- engine/ sdk/` is empty (no engine/sdk drift).
+- Engine builds and all tests pass.
+- Android builds (if android/ changed).
+- Web builds and lints (if web/ changed).
+- Integration gate passes if `engine/api/proto/` changed.
 
 ---
 
