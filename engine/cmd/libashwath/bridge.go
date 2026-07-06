@@ -59,10 +59,9 @@ func engineInit(cEngineType, cModelPath, cLlamaBin *C.char) C.int {
 	}
 
 	if err := eng.Initialize(context.Background(), opts); err != nil {
-		eng = nil
-		return 0
+		return ErrInitFailed
 	}
-	return 1
+	return ErrOK
 }
 
 //export engineShutdown
@@ -76,9 +75,9 @@ func engineShutdown() {
 //export engineIsRunning
 func engineIsRunning() C.int {
 	if eng != nil {
-		return 1
+		return ErrOK
 	}
-	return 0
+	return ErrEngineNil
 }
 
 //export engineGenerate
@@ -92,7 +91,10 @@ func engineGenerate(
 	userdata unsafe.Pointer,
 ) C.int {
 	if eng == nil {
-		return 0
+		return ErrEngineNil
+	}
+	if cPrompt == nil || C.GoString(cPrompt) == "" {
+		return ErrInvalidArgs
 	}
 	prompt := C.GoString(cPrompt)
 	req := runtime.Request{
@@ -104,7 +106,7 @@ func engineGenerate(
 	}
 	ch, err := eng.Generate(context.Background(), req)
 	if err != nil {
-		return 0
+		return ErrGenerateFailed
 	}
 	go func() {
 		for r := range ch {
@@ -117,12 +119,15 @@ func engineGenerate(
 			C.free(unsafe.Pointer(text))
 		}
 	}()
-	return 1
+	return ErrOK
 }
 
 //export engineCancel
 func engineCancel() C.int {
-	return 1
+	if eng == nil {
+		return ErrEngineNil
+	}
+	return ErrOK
 }
 
 func main() {}

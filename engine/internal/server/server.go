@@ -53,7 +53,10 @@ func Run(ctx context.Context, cfg *config.Config, opts Options) error {
 	log.Info("Engine type selected", "type", engType)
 
 	downloader := downloads.NewManager()
-	reg := models.NewRegistry(cfg.ModelsDir, downloader)
+	reg := models.NewRegistry(cfg.ModelsDir, downloader,
+		models.WithOllamaSource(),
+		models.WithUpstreamIndex("", cfg.DataDir),
+	)
 
 	resolvedModelPath := opts.ModelPath
 	if engType == "llama" && resolvedModelPath == "" {

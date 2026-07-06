@@ -71,7 +71,16 @@ func (r *registry) Install(id string) error {
 
 	dest := filepath.Join(modelDir, m.Filename)
 
-	if err := r.downloader.Download(context.Background(), m.DownloadURL, dest, nil); err != nil {
+	progressCb := func(p downloads.Progress) {
+		r.emitEvent(bus.TopicDownloadProgress, map[string]interface{}{
+			"model_id":          id,
+			"bytes_downloaded":  p.BytesDownloaded,
+			"total_bytes":       p.TotalBytes,
+			"status":            p.Status,
+		})
+	}
+
+	if err := r.downloader.Download(context.Background(), m.DownloadURL, dest, progressCb); err != nil {
 		os.RemoveAll(modelDir)
 		return fmt.Errorf("download %s: %w", m.ID, err)
 	}
