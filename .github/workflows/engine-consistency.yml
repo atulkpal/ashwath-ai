@@ -1,0 +1,26 @@
+name: Engine Consistency Check
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check engine code consistency across active branches
+        run: |
+          ACTIVE_BRANCHES=$(git branch -r | grep -v origin/main | grep -v origin/HEAD | grep -v archive/ || true)
+          for branch in $ACTIVE_BRANCHES; do
+            LOCAL_NAME=$(echo $branch | sed 's|origin/||')
+            if git show-ref --verify refs/heads/$LOCAL_NAME 2>/dev/null; then
+              DIFF=$(git diff main..$LOCAL_NAME -- engine/ sdk/ 2>/dev/null)
+              if [ -n "$DIFF" ]; then
+                echo "WARNING: Branch $LOCAL_NAME has diverged engine/sdk code:"
+                echo "$DIFF" | head -20
+              fi
+            fi
+          done

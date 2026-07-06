@@ -4,6 +4,7 @@ import com.ashwathai.ashwathai.runtime.api.GenerationOptions
 import com.ashwathai.ashwathai.runtime.api.InferenceEngine
 import com.ashwathai.ashwathai.runtime.api.InferenceResult
 import com.ashwathai.sdk.jni.AshwathBridge
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
@@ -24,16 +25,18 @@ class EmbeddedInferenceEngine(
             return Result.failure(Exception("Native engine library not loaded"))
         }
 
-        // 1. Start in-process gRPC server
+        // 1. Start in-process gRPC server (model loads in background)
         println("EmbeddedInferenceEngine: Starting native server on port $port...")
         val result = bridge.nativeStartServer(port, dataDir.absolutePath, engineType)
-        if (result != 1) {
+        if (result != AshwathBridge.ERR_OK) {
             println("EmbeddedInferenceEngine: Native server failed to start (code=$result)")
-            return Result.failure(Exception("Failed to start embedded engine (code=$result)"))
+            return Result.failure(Exception("Failed to start embedded engine (${AshwathBridge.errorMessage(result)})"))
         }
 
-        // 2. Connect via gRPC (localhost)
-        println("EmbeddedInferenceEngine: Connecting to local gRPC server...")
+        // 2. Wait for server goroutine to start, then connect via gRPC (localhost)
+        //    Model loading can take 10-30s for 2-3GB GGUF files, so retry generously
+        println("EmbeddedInferenceEngine: Waiting for gRPC server to start...")
+        delay(500)
         val clientResult = clientEngine.initialize()
         println("EmbeddedInferenceEngine: Client initialization result: $clientResult")
         return clientResult

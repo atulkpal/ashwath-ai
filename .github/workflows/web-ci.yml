@@ -1,0 +1,27 @@
+name: Web CI
+
+on:
+  push:
+    paths: ['web/**', 'sdk/typescript/**']
+  pull_request:
+    paths: ['web/**', 'sdk/typescript/**']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install
+      - run: pnpm lint
+      - run: pnpm build

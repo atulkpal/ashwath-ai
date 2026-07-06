@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Migration (Repository Architecture)
+- Archival of 6 stale branches (tagged `archive/*`), branch reconciliation completed.
+- EPIC-4 engine features merged: model catalog, upstream index, Ollama detection, JNI error codes, benchmarking, CI workflows.
+- Android client v1 merged: real gRPC model repository, engine model management, download flow, design polish.
+- Web frontend v1 merged: chat E2E with engine streaming, gRPC-Web SDK, PWA support, model browser.
+- Branching model established: Trunk-Based Development + Release Branches.
+- CI added: Web CI, Integration Gate (proto changes), Engine Consistency Check.
+- PR template added, `release/v0.2.x` branch created, tag convention standardized.
+- Worktree policy updated: merge-based sync (no cherry-pick), 2-week lifetime limit.
+
 ### Added
 - EPIC 3 (Engine Foundation): Architecture Foundation, Runtime, Provider Abstraction, Stabilization.
   - Event System (`internal/bus`): in-memory pub/sub event bus with 6 predefined topics.
@@ -72,6 +82,17 @@
 - ViewModels: `ChatViewModel` (connected to engine), `LibraryViewModel`.
 - Version catalog (`libs.versions.toml`) with gRPC, Ktor, protobuf, Compose dependencies.
 - Full app build succeeds (`./gradlew assembleDebug`).
+
+### Engine (EPIC-3, Phase A: Foundation Stabilization)
+- Real model installation pipeline with background download worker.
+- Persistent model registry (`registry.json`) with install/remove lifecycle management.
+- Integration of `llama.cpp` backend wiring with initial `llama-server` process management.
+- Download manager with multi-threaded chunked downloads and SHA-256 verification.
+- Benchmark implementation for on-device performance evaluation (tokens/sec, memory).
+- Refined engine configuration with data directory isolation.
+- Verified end-to-end integration between engine and SDK for real model metadata.
+- Unit test coverage expanded to 45 tests; `go test` and `go vet` clean.
+- Fixed various race conditions in streaming response cancellation.
 
 ### Fixed
 - gRPC `HandlerType` nil-pointer crash in service descriptor registration.

@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            artifact: ashwathd-linux-amd64
+          - os: ubuntu-latest
+            goos: linux
+            goarch: arm64
+            artifact: ashwathd-linux-arm64
+          - os: macos-latest
+            goos: darwin
+            goarch: arm64
+            artifact: ashwathd-darwin-arm64
+          - os: windows-latest
+            goos: windows
+            goarch: amd64
+            artifact: ashwathd-windows-amd64.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Build engine
+        run: go build -o ${{ matrix.artifact }} ./cmd/ashwathd/
+        working-directory: engine
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+
+      - name: Download llama.cpp bundle
+        run: bash scripts/bundle-llama.sh
+        working-directory: engine
+
+      - name: Package release
+        run: |
+          tar czf ${{ matrix.artifact }}.tar.gz ${{ matrix.artifact }} dist/llama/
+        working-directory: engine
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: engine/${{ matrix.artifact }}.tar.gz

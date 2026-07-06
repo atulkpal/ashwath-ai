@@ -1,25 +1,29 @@
-# AshwathAI Worktree Setup
-# Run from repo root to create isolated checkouts for each frontend.
-# Each worktree is a separate directory with its own branch,
-# so teams can work independently without touching engine code.
+# Ashwath AI Worktree Setup
+# Run from repo root to create isolated checkouts for each workspace.
+# Each worktree has its own feature branch — commit independently, merge to main.
+# See AGENT.md for branch and merge policy.
 
 $ROOT = Resolve-Path (Split-Path $MyInvocation.MyCommand.Path -Parent)/..
 $WORKTREES = "$ROOT/worktrees"
 
-$frontends = @(
-    @{ Name = "android-installer"; Branch = "feature/android-installer" }
-    @{ Name = "web-frontend";      Branch = "feature/web-frontend" }
-    @{ Name = "ios-frontend";      Branch = "feature/ios-frontend" }
-    @{ Name = "desktop-frontend";  Branch = "feature/desktop-frontend" }
+$workspaces = @(
+    @{ Name = "platform";   Branch = "feature/platform" }
+    @{ Name = "android";    Branch = "feature/android-client" }
+    @{ Name = "web";        Branch = "feature/web-client" }
+    @{ Name = "research";   Branch = "feature/research" }
+    @{ Name = "release";    Branch = "feature/release" }
+    # Uncomment when work begins:
+    # @{ Name = "ios";      Branch = "feature/ios" }
+    # @{ Name = "desktop";  Branch = "feature/desktop" }
 )
 
-foreach ($f in $frontends) {
-    $path = "$WORKTREES/$($f.Name)"
+foreach ($w in $workspaces) {
+    $path = "$WORKTREES/$($w.Name)"
     if (Test-Path $path) {
-        Write-Host "Worktree $($f.Name) already exists at $path" -ForegroundColor Yellow
+        Write-Host "Worktree $($w.Name) already exists at $path" -ForegroundColor Yellow
     } else {
-        git worktree add $path $f.Branch
-        Write-Host "Created worktree $($f.Name) at $path" -ForegroundColor Green
+        git worktree add $path $w.Branch
+        Write-Host "Created worktree $($w.Name) at $path" -ForegroundColor Green
     }
 }
 

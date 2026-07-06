@@ -52,7 +52,7 @@ Prefer evolving existing code over starting from scratch. The repository should 
 - Architecture reviews and ADR approval
 - Final authority on all cross-cutting decisions
 
-### 4.2 Platform Agent
+### 4.2 Engine Agent
 - Primary maintainer of `engine/`, `sdk/`, gRPC API, platform documentation
 - May modify engine, SDK, platform docs under docs/
 - Must consult Chief Architect for architecture changes
@@ -71,7 +71,12 @@ Prefer evolving existing code over starting from scratch. The repository should 
 - Works in `research/` (when created) or experimental branches
 - May propose but never merge architecture changes without review
 
-### 4.6 Project Integrator
+### 4.6 Marketing Agent (Future)
+- Responsible for website, community, release announcements, marketing materials
+- Works primarily in documentation and outward-facing content
+- Does not modify engine, SDK, or client code
+
+### 4.7 Project Integrator
 - Manages CI/CD, release pipeline, version tags
 - Coordinates merge windows and release cycles
 
@@ -89,17 +94,17 @@ Prefer evolving existing code over starting from scratch. The repository should 
 
 | Directory | Owner | Purpose |
 |-----------|-------|---------|
-| `engine/` | Platform Agent | Go AI Engine |
+| `engine/` | Engine Agent | Go AI Engine |
 | `android/` | Android Agent | Android frontend (Kotlin) |
 | `web/` | Web Agent | Web frontend (React/TypeScript) |
-| `sdk/` | Platform Agent | Client SDKs |
+| `sdk/` | Engine Agent | Client SDKs |
 | `docs/` | Chief Architect | Repository documentation |
 | `design/` | Design Team | Shared design assets |
 | `ios/` | (future) | iOS frontend placeholder |
 | `desktop/` | (future) | Desktop frontend placeholder |
 | `scripts/` | Project Integrator | Build and CI scripts |
 | `tools/` | Owner TBD | Development tools |
-| `examples/` | Platform Agent | Usage examples |
+| `examples/` | Engine Agent | Usage examples |
 
 ### 5.2 File Ownership (Documentation)
 
@@ -123,7 +128,7 @@ Prefer evolving existing code over starting from scratch. The repository should 
 | `DECISIONS.md` | Chief Architect | Append-only |
 | `DESIGN_SYSTEM.md` | Design Team | Living |
 | `docs/analysis/*.md` | Chief Architect | Historical — Never edited |
-| `docs/engine/*.md` | Platform Agent | Workspace progress |
+| `docs/engine/*.md` | Engine Agent | Workspace progress |
 | `docs/decisions/*.md` | Chief Architect | ADR — Append-only |
 | `docs/proposals/*.md` | Any Agent | Proposal — Read-only after review |
 | `design/shared/*.md` | Design Team | Draft → Living |
@@ -178,7 +183,7 @@ New documents may only be created in these locations:
 - `docs/analysis/` — Historical reports (owner: Chief Architect)
 - `docs/decisions/` — ADRs (owner: Chief Architect)
 - `docs/proposals/` — Proposals (any agent, for review)
-- `docs/engine/` — Engine workspace progress (owner: Platform Agent)
+- `docs/engine/` — Engine workspace progress (owner: Engine Agent)
 - `docs/android/` — Android workspace docs (owner: Android Agent)
 - `docs/web/` — Web workspace docs (owner: Web Agent)
 - `docs/architecture/` — Architecture docs (owner: Chief Architect)
@@ -240,7 +245,7 @@ This repository supports multiple AI agents working in parallel. Each agent work
 ### 9.2 Review Requirements
 - Cross-boundary changes require the owning agent's review.
 - Architecture changes require Chief Architect review.
-- Engine API changes require Platform Agent + Chief Architect review.
+- Engine API changes require Engine Agent + Chief Architect review.
 
 ### 9.3 Merge Strategy
 - Squash merge for feature branches.

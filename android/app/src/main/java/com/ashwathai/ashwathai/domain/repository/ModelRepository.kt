@@ -9,4 +9,5 @@ interface ModelRepository {
     fun getModel(id: String): Flow<ModelInfo?>
     suspend fun downloadModel(id: String)
     suspend fun deleteModel(id: String)
+    fun downloadProgress(modelId: String): Flow<Float>
 }

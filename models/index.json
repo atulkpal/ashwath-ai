@@ -1,0 +1,74 @@
+{
+  "version": 2,
+  "updated": "2026-07-05",
+  "models": [
+    {
+      "id": "phi-4-mini",
+      "name": "Phi-4 Mini",
+      "provider": "Microsoft",
+      "description": "Extremely capable small language model. Strong at reasoning, coding, and math.",
+      "sizeBytes": 2100000000,
+      "parameters": "3.8B",
+      "tags": ["Reasoning", "Coding", "Math"],
+      "minRamGB": 3.0,
+      "recommendedRamGB": 5.0,
+      "capabilities": ["reasoning", "coding", "math", "logic"],
+      "speedClass": "fast",
+      "sources": [
+        "https://huggingface.co/bartowski/microsoft_Phi-4-mini-instruct-GGUF/resolve/main/microsoft_Phi-4-mini-instruct-Q4_K_M.gguf"
+      ],
+      "filename": "microsoft_Phi-4-mini-instruct-Q4_K_M.gguf"
+    },
+    {
+      "id": "phi-3.1-mini",
+      "name": "Phi-3.1 Mini",
+      "provider": "Microsoft",
+      "description": "Excellent small model for chat and general tasks. Optimized for mobile.",
+      "sizeBytes": 2500000000,
+      "parameters": "3.8B",
+      "tags": ["Chat", "General", "Mobile"],
+      "minRamGB": 3.0,
+      "recommendedRamGB": 5.0,
+      "capabilities": ["chat", "general", "reasoning"],
+      "speedClass": "fast",
+      "sources": [
+        "https://huggingface.co/bartowski/Phi-3.1-mini-4k-instruct-GGUF/resolve/main/Phi-3.1-mini-4k-instruct-Q4_K_M.gguf"
+      ],
+      "filename": "Phi-3.1-mini-4k-instruct-Q4_K_M.gguf"
+    },
+    {
+      "id": "llama-3.2-3b",
+      "name": "Llama 3.2 3B",
+      "provider": "Meta",
+      "description": "Optimized for mobile and edge devices. Well-balanced chat and general tasks.",
+      "sizeBytes": 2500000000,
+      "parameters": "3B",
+      "tags": ["Balanced", "Chat", "General"],
+      "minRamGB": 4.0,
+      "recommendedRamGB": 6.0,
+      "capabilities": ["chat", "general", "creative"],
+      "speedClass": "medium",
+      "sources": [
+        "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+      ],
+      "filename": "Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+    },
+    {
+      "id": "qwen-2.5-3b",
+      "name": "Qwen 2.5 3B",
+      "provider": "Alibaba",
+      "description": "High performance multilingual model with strong coding abilities.",
+      "sizeBytes": 3100000000,
+      "parameters": "3B",
+      "tags": ["Multilingual", "Coding"],
+      "minRamGB": 4.0,
+      "recommendedRamGB": 6.0,
+      "capabilities": ["multilingual", "coding", "translation"],
+      "speedClass": "medium",
+      "sources": [
+        "https://huggingface.co/bartowski/Qwen2.5-3B-Instruct-GGUF/resolve/main/Qwen2.5-3B-Instruct-Q4_K_M.gguf"
+      ],
+      "filename": "Qwen2.5-3B-Instruct-Q4_K_M.gguf"
+    }
+  ]
+}

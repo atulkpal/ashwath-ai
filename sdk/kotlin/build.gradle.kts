@@ -8,8 +8,8 @@ dependencies {
     implementation("io.grpc:grpc-stub:1.68.0")
     implementation("io.grpc:grpc-protobuf-lite:1.68.0")
     implementation("io.grpc:grpc-kotlin-stub:1.4.1")
-    implementation("com.google.protobuf:protobuf-kotlin-lite:3.25.3")
-    implementation("com.google.protobuf:protobuf-javalite:3.25.3")
+    api("com.google.protobuf:protobuf-kotlin-lite:3.25.3")
+    api("com.google.protobuf:protobuf-javalite:3.25.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
 

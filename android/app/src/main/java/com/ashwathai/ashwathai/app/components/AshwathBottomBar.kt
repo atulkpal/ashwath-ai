@@ -1,13 +1,15 @@
 package com.ashwathai.ashwathai.app.components
 
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -23,7 +25,9 @@ fun AshwathBottomBar(navController: NavController) {
 
     NavigationBar(
         containerColor = SurfaceTier1,
-        contentColor = Color.White
+        contentColor = Color.White,
+        tonalElevation = 0.dp,
+        windowInsets = WindowInsets.navigationBars
     ) {
         Screen.bottomNavItems.forEach { screen ->
             val selected = currentRoute == screen.route
@@ -42,21 +46,27 @@ fun AshwathBottomBar(navController: NavController) {
                     screen.icon?.let {
                         Icon(
                             imageVector = it,
-                            contentDescription = screen.label
+                            contentDescription = screen.label,
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                 },
                 label = {
                     screen.label?.let {
-                        Text(text = it)
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.labelSmall,
+                            letterSpacing = 0.5.sp,
+                            fontSize = 9.sp
+                        )
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = PureBlack,
                     selectedTextColor = CyanPrimary,
                     indicatorColor = CyanPrimary,
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray
+                    unselectedIconColor = Color.Gray.copy(alpha = 0.6f),
+                    unselectedTextColor = Color.Gray.copy(alpha = 0.6f)
                 )
             )
         }
