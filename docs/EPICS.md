@@ -61,19 +61,19 @@
 
 ## Epoch 1 — Client Polish (July 2026)
 
-Three parallel tracks. No track blocks another.
+Three parallel tracks. No track blocks another. EPIC-4 (Engine Stability) complete.
 
-### EPIC-4: Engine Stability (E4-ENG)
+### EPIC-4: Engine Stability (E4-ENG) ✅
 
 **Owner:** Engine Agent
 **Dependencies:** None (Engine v1 certified)
 
-- [ ] E4.1: Downloads package test coverage (156 lines, 0 tests)
-- [ ] E4.2: Download progress streaming via event bus
-- [ ] E4.3: llama.cpp binary bundling in release pipeline
-- [ ] E4.4: JNI error code granularity (numeric error codes from Go)
-- [ ] E4.5: Engine benchmark CI (nightly benchmark runs)
-- [ ] E4.6: Provider documentation (how to write a new runtime provider)
+- [x] E4.1: Downloads package test coverage (83.8%, 156 lines)
+- [x] E4.2: Download progress streaming via event bus
+- [x] E4.3: llama.cpp binary bundling in release pipeline (`scripts/bundle-llama.sh`)
+- [x] E4.4: JNI error code granularity (8 numeric error codes in `bridge_errors.go`)
+- [x] E4.5: Engine benchmark CI (nightly benchmark runs)
+- [x] E4.6: Provider documentation (`docs/engine/PROVIDER_DOCUMENTATION.md`)
 
 ### EPIC-5: Android App v1 (E5-AND)
 
