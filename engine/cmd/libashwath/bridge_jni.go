@@ -4,6 +4,8 @@ package main
 
 /*
 #include <stdlib.h>
+
+void jni_on_token(const char* text, int done);
 */
 import "C"
 import (
