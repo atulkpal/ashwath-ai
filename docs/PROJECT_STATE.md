@@ -45,13 +45,14 @@
 - [x] **EPIC-M3: Governance Enablement** — PR template, Web CI, Integration Gate, Engine Consistency Check, `release/v0.2.x` branch, tag standardization.
 - [x] **EPIC-M4: Documentation Cleanup** — Obsolete docs archived, AGENT.md updated, lockfile regenerated.
 - [x] **EPIC-4: Engine Stability** — Downloads tests (83.8%), event bus, llama bundling, JNI codes, benchmark CI, provider docs.
+- [x] **EPIC-6: Web v1 (in progress)** — Client-side routing, 5 pages, sidebar navigation, conversation persistence, PWA, responsive layout.
 
 ---
 
 ### Next Priorities (Epoch 1)
 
 1. **E5 (Android)**: Stitch fix, screen wiring, progress UI, offline state, lifecycle, tests.
-2. **E6 (Web)**: gRPC-Web SDK polish, connection management, model browser, chat E2E, PWA, responsive.
+2. **E6 (Web)**: gRPC-Web SDK polish, wire real engine status to UI, model browser page.
 3. **E12 (Release)**: Semver policy, pipeline audit, Android/web deploy, changelog gen.
 4. **E13 (Research)**: Quant benchmarks, NPU study, eval harness.
 
